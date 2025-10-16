@@ -1,9 +1,13 @@
-import { memo } from 'react';
+import { memo } from "react";
+import AppProvider from "./provider";
+import AppRouter from "./routes";
 
 const App = () => {
   return (
     <div>
-      <h2>App</h2>
+      <AppProvider>
+        <AppRouter />
+      </AppProvider>
     </div>
   );
 };
