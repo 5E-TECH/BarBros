@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const Rating = () => {
+const Booking = () => {
   const [currentMonth] = useState("August 2022");
   const [activeTab, setActiveTab] = useState("Oy");
   const [filters, setFilters] = useState({
@@ -56,7 +56,7 @@ const Rating = () => {
 
   return (
     <div className="flex bg-[#14151F] rounded-[8px] text-white">
-      <div className="w-72 p-6">
+      <div className="w-72 p-2">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">August 2022</h3>
@@ -293,4 +293,4 @@ const Rating = () => {
   );
 };
 
-export default Rating;
+export default Booking;

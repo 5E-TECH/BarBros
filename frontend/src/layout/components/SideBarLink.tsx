@@ -17,8 +17,8 @@ const SidebarLink: React.FC<SideBarLink> = ({ to, icon, label, end }) => {
         className={({ isActive }) =>
           `flex items-center gap-2 text-sm transition-colors duration-200 ${
             isActive
-              ? "text-[#FA8B00]"
-              : "text-[#fff] hover:text-[#FA8B00] cursor-pointer"
+              ? "bg-[#FA8B00] px-[16px] py-[12px]"
+              : "text-[#fff] hover:text-[#FA8B00] cursor-pointer px-[16px] py-[12px]"
           }`
         }
       >

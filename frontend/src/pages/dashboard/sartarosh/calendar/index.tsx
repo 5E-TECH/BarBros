@@ -1,12 +1,11 @@
 import { memo } from 'react';
-import Profile from '../../../profile';
 
-const Department = () => {
+const Calendar = () => {
   return (
     <div className='bg-[#14151F] p-[24px] rounded-[8px]'>
-      <Profile/>
+      <h2>Calendar</h2>
     </div>
   );
 };
 
-export default memo(Department);
+export default memo(Calendar);
