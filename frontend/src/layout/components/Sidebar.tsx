@@ -13,7 +13,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="bg-[#14151F] w-[289px] p-[32px] rounded-[8px]">
+    <div className="w-[289px] p-[32px] rounded-[8px]">
       <ul className="flex flex-col">
         <div className="flex gap-[13px] text-white mb-[32px]">
           <div>
