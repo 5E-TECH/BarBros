@@ -2,6 +2,7 @@ import { memo, useEffect, useState } from "react";
 import { Upload } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import ImgCrop from "antd-img-crop";
+import { Eye, EyeOff } from 'lucide-react';
 
 type ProfileData = {
   firstName: string;
@@ -19,6 +20,7 @@ interface ProfileProps {
 
 const Profile = ({ data }: ProfileProps) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
     if (data?.image) {
@@ -121,6 +123,10 @@ const Profile = ({ data }: ProfileProps) => {
               type="password"
               className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
             />
+            <div onClick={() => setShow(!show)}>
+
+            {show ? <Eye/> : <EyeOff/>}
+            </div>
           </div>
 
           <div>

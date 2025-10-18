@@ -2,16 +2,21 @@ import { lazy, memo } from 'react';
 import { useRoutes } from 'react-router-dom';
 
 const DashboardLayout = lazy(() => import('../layout/DashboardLayout'))
-const Department = lazy(() => import('../pages/dashboard/sartarosh/department'))
-const Rating = lazy(() => import('../pages/dashboard/sartarosh/rating'))
-const WorkHours = lazy(() => import('../pages/dashboard/sartarosh/work-hours'))
+const Calendar = lazy(() => import('../pages/dashboard/sartarosh/calendar'))
+const Booking = lazy(() => import('../pages/dashboard/sartarosh/booking'))
+const Service = lazy(() => import('../pages/dashboard/sartarosh/service'))
+const Setting = lazy(() => import('../pages/dashboard/sartarosh/setting'))
+
+const Profile = lazy(() => import('../pages/profile'))
 
 const AppRouter = () => {
   return useRoutes([
     {path: '/', element: <DashboardLayout/>, children: [
-      {index: true, element: <Department/>},
-      {path: "rating", element: <Rating/>},
-      {path: "clock", element: <WorkHours/>}
+      {index: true, element: <Calendar/>},
+      {path: "booking", element: <Booking/>},
+      {path: "service", element: <Service/>},
+      {path: "setting", element: <Setting/>},
+      {path: "profile", element: <Profile/>}
     ]}
   ])
 };
