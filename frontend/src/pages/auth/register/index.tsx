@@ -1,6 +1,6 @@
 import "./style.css"
 import RegisterImg from "../../../shared/assets/register.png"
-import { useState, FormEvent, ChangeEvent } from "react"
+import { useState, type FormEvent, type ChangeEvent } from "react"
 import { useNavigate } from "react-router-dom"
 
 const Register: React.FC = () => {
