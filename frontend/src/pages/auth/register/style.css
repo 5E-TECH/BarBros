@@ -1,0 +1,115 @@
+.register {
+    padding: 90px 0px;
+}
+
+.register__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.register__img {
+    width: 560px;
+    height: 811.3756103515625px;
+    top: 129px;
+    left: 113.5px;
+    opacity: 1;
+    border-width: 1px;
+}
+
+.register__title {
+    font-family: Public Sans;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 36px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.register__input {
+    margin-bottom: 15px;
+}
+
+.register__sub-title {
+    font-family: Public Sans;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: #FFFFFF;
+    margin-bottom: 5px;
+}
+
+.register__input-btn {
+    width: 372px;
+    height: 34px;
+    opacity: 1;
+    font-family: Public Sans;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 24px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    background: linear-gradient(0deg, #FFFFFF, #FFFFFF),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6));
+    outline: none;
+    border: none;
+    border-radius: 5px;
+}
+
+.register__row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.register__sub2-title {
+    font-family: Public Sans;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: #FFFFFF;
+}
+
+.register__span {
+    font-family: Public Sans;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    color: #FA8B00;
+}
+
+.register__btn {
+    width: 372px;
+    height: 38px;
+    opacity: 1;
+    border-radius: 6px;
+    background: var(--FA8B00, #FA8B00);
+    font-family: Public Sans;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 100%;
+    letter-spacing: 0.43px;
+    vertical-align: middle;
+    color: #FFFFFF;
+    margin-bottom: 15px;
+}
+
+.register__sub3-title {
+    font-family: Public Sans;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+    letter-spacing: 0px;
+    text-align: center;
+    vertical-align: middle;
+    color: #FFFFFF;
+}
