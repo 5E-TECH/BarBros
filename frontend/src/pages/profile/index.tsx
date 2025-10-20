@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from "react";
 import { Upload } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import ImgCrop from "antd-img-crop";
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Edit } from "lucide-react";
 
 type ProfileData = {
   firstName: string;
@@ -20,7 +20,8 @@ interface ProfileProps {
 
 const Profile = ({ data }: ProfileProps) => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     if (data?.image) {
@@ -74,79 +75,61 @@ const Profile = ({ data }: ProfileProps) => {
         </div>
 
         <div className="grid grid-cols-2 gap-6 mb-6">
-          <div>
-            <label className="block mb-2 text-sm">Ism</label>
-            <input
-              name="firstName"
-              value={data?.firstName}
-              placeholder="Ism"
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-          </div>
+          {[
+            { label: "Ism", value: data?.firstName },
+            { label: "Familiya", value: data?.lastName },
+            { label: "Telefon raqam", value: data?.phone },
+            { label: "Username", value: data?.username },
+            { label: "Parol", value: show ? data?.password : "********" },
+            { label: "Manzil", value: data?.address },
+          ].map((field, i) => (
+            <div key={i}>
+              <label className="block mb-2 text-sm">{field.label}</label>
 
-          <div>
-            <label className="block mb-2 text-sm">Familiya</label>
-            <input
-              name="lastName"
-              value={data?.lastName}
-              placeholder="Familiya"
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-          </div>
+              {editMode ? (
+                <input
+                  defaultValue={field.value}
+                  className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
+                />
+              ) : (
+                <div className="w-full border border-[#DBDADE] bg-[#1f2027] text-gray-200 pl-[14px] py-[7px] rounded-[6px]">
+                  {field.value || "-"}
+                </div>
+              )}
 
-          <div>
-            <label className="block mb-2 text-sm">Telefon raqam</label>
-            <input
-              name="phone"
-              value={data?.phone}
-              placeholder="+998..."
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Username</label>
-            <input
-              name="username"
-              value={data?.username}
-              placeholder="username"
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Parol</label>
-            <input
-              name="password"
-              value={data?.password}
-              placeholder="Parol"
-              type="password"
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-            <div onClick={() => setShow(!show)}>
-
-            {show ? <Eye/> : <EyeOff/>}
+              {field.label === "Parol" && (
+                <div
+                  onClick={() => setShow(!show)}
+                  className="absolute ml-[90%] -mt-7 cursor-pointer"
+                >
+                  {show ? <Eye size={16} /> : <EyeOff size={16} />}
+                </div>
+              )}
             </div>
-          </div>
-
-          <div>
-            <label className="block mb-2 text-sm">Manzilni kiriting</label>
-            <input
-              name="address"
-              value={data?.address}
-              placeholder="Manzil"
-              className="w-full border border-[#DBDADE] bg-transparent pl-[14px] py-[7px] rounded-[6px] outline-none"
-            />
-          </div>
+          ))}
         </div>
 
         <div className="flex gap-[16px]">
-          <button className="bg-[#FA8B00] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer">
-            O'zgarishlarni saqlash
-          </button>
-          <button className="bg-[#2d2e36] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer">
-            Bekor qilish
-          </button>
+          {!editMode ? (
+            <button
+              onClick={() => setEditMode(true)}
+              className="bg-[#7B3FE4] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer flex items-center gap-2"
+            >
+              <Edit size={16} /> Edit
+            </button>
+          ) : (
+            <>
+              <button className="bg-[#FA8B00] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer">
+                O'zgarishlarni saqlash
+              </button>
+              <button
+                onClick={() => setEditMode(false)}
+                className="bg-[#2d2e36] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer"
+              >
+                Bekor qilish
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
