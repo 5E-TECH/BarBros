@@ -1,8 +1,7 @@
 import "./style.css"
 import LoginImg from "../../../shared/assets/login.png"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
-import type { FormEvent, ChangeEvent } from "react"
+import { useState, type FormEvent, type ChangeEvent } from "react"
 
 const Login: React.FC = () => {
     const navigate = useNavigate()
@@ -32,7 +31,7 @@ const Login: React.FC = () => {
             <div className="container login__container">
                 <img className="login__img" src={LoginImg} alt="Login" />
                 <div className="login__content">
-                    <h1 className="login__title">BarBrosga Xush Kelibsiz! 👋</h1>
+                    <h1 className="login__title">BarBrosga Xush Kelibsiz ! 👋</h1>
                     <p className="login__text">Iltimos, hisobingizga kiring</p>
 
                     <form className="login__form" onSubmit={handleLogin}>
@@ -54,7 +53,7 @@ const Login: React.FC = () => {
                                     onClick={handleForgotPassword}
                                     style={{ cursor: "pointer" }}
                                 >
-                                    Parolni unutdingizmi?
+                                    Parolni unutdingizmi ?
                                 </h3>
                             </div>
                             <input
