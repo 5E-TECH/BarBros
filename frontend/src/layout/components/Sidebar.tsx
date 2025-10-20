@@ -7,7 +7,7 @@ const Sidebar = () => {
     { to: `/`, icon: <Home />, label: "Kalendar", end: true },
     { to: `booking`, icon: <CalendarCheck />, label: "Bron qilingan" },
     { to: `service`, icon: <Clock />, label: "Xizmatlar" },
-    { to: `setting`, icon: <Settings />, label: "Kamentariyalar" },
+    { to: `comment`, icon: <Settings />, label: "Kamentariyalar" },
   ];
 
   return (
