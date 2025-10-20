@@ -13,7 +13,7 @@ const Register = lazy(() => import("../pages/auth/register"));
 const AppRouter = () => {
   return useRoutes([
     {
-      path: "/",
+      path: "login",
       element: <Login />, 
     },
     {
