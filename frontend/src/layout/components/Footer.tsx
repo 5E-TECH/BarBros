@@ -2,10 +2,9 @@ import { memo } from "react";
 import logoo from "../../shared/assets/logoo.svg";
 import { Instagram, Linkedin, Mail, Phone } from "lucide-react";
 import { FaTelegramPlane } from "react-icons/fa";
-import { Trans, useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 
 const Footer = () => {
-  useTranslation();
 
   return (
     <div className="flex flex-col items-center bg-[#14151F] py-2">
