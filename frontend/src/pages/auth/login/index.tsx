@@ -26,29 +26,27 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="py-[90px] bg-[#0a0a0a] min-h-screen">
-      <div className="container mx-auto flex items-center justify-between px-6">
+    <div className="py-[60px] sm:py-[90px] bg-[#0a0a0a] min-h-screen flex items-center">
+      <div className="container mx-auto flex flex-col-reverse md:flex-row items-center justify-between px-6 gap-10">
         <img
-          className="w-[593px] h-[711px] object-contain"
+          className="w-[300px] sm:w-[400px] md:w-[550px] lg:w-[593px] h-auto object-contain"
           src={LoginImg}
           alt="Login"
         />
 
-        <div className="flex flex-col text-white">
-          <h1 className="font-[600] text-[26px] leading-[36px] mb-1">
+        <div className="flex flex-col text-white max-w-[400px] w-full">
+          <h1 className="font-[600] text-[22px] sm:text-[26px] leading-[32px] mb-1 text-center md:text-left">
             BarBrosga Xush Kelibsiz ! 👋
           </h1>
-          <p className="font-normal text-[15px] leading-[22px] mb-[30px]">
+          <p className="font-normal text-[14px] sm:text-[15px] mb-[30px] text-center md:text-left">
             Iltimos, hisobingizga kiring
           </p>
 
           <form className="flex flex-col" onSubmit={handleLogin}>
             <div className="mb-[15px]">
-              <h2 className="font-normal text-[13px] mb-[5px]">
-                Foydalanuvchi nom
-              </h2>
+              <h2 className="font-normal text-[13px] mb-[5px]">Foydalanuvchi nom</h2>
               <input
-                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
+                className="w-full h-[36px] bg-white/90 text-black rounded-[5px] px-3 outline-none"
                 type="text"
                 value={username}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -68,7 +66,7 @@ const Login: React.FC = () => {
                 </h3>
               </div>
               <input
-                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
+                className="w-full h-[36px] bg-white/90 text-black rounded-[5px] px-3 outline-none"
                 type="password"
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -91,14 +89,14 @@ const Login: React.FC = () => {
             </div>
 
             <button
-              className="w-[372px] h-[38px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
+              className="w-full h-[40px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
               type="submit"
             >
               Kirish
             </button>
           </form>
 
-          <h2 className="text-[15px] text-center">
+          <h2 className="text-[14px] sm:text-[15px] text-center">
             Ro’yxatdan o’tmaganmisiz?{" "}
             <span
               className="text-[#FA8B00] cursor-pointer"
