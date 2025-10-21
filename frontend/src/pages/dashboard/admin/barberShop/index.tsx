@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { Pagination } from "antd";
 import Popup from "../../../../shared/ui/Popup";
-import { Edit, Trash, X } from "lucide-react";
+import { Edit, Trash2, X } from "lucide-react";
 
 const BarberShop = () => {
   const [show, setShow] = useState(false);
@@ -73,25 +73,25 @@ const BarberShop = () => {
         <table className="w-full border-collapse text-[14px]">
           <thead>
             <tr className="bg-[#FA8B00] border-[#FA8B00]">
-              <th className="w-[16.6%] py-4 px-4 text-left text-[18px] border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-left text-[18px] border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Barbershop nomi
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Manzili
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Telefon raqam
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Tavsifi
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Ish vaqti
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
                 Tashkil qilingan sana
               </th>
-              <th className="w-[14.2%] py-4 px-4 text-[18px] text-left font-medium text-[#FFFFFF]">
+              <th className="w-[14.3%] py-4 px-4 text-[18px] text-left font-medium text-[#FFFFFF]">
                 Xolat
               </th>
             </tr>
@@ -123,8 +123,8 @@ const BarberShop = () => {
                 </td>
                 <td className="py-6 px-4 text-[18px] align-middle">
                   <div className="flex gap-6">
-                    <Edit />
-                    <Trash />
+                    <Edit className="text-green-600"/>
+                    <Trash2 className="text-red-600"/>
                   </div>
                 </td>
               </tr>
