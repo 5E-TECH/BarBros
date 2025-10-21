@@ -1,6 +1,6 @@
 import { memo } from "react";
-import { MoreOutlined } from "@ant-design/icons";
 import { Pagination } from "antd";
+import { Edit, Trash2 } from "lucide-react";
 
 const Users = () => {
   const data = [
@@ -9,7 +9,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
     {
@@ -17,7 +16,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
     {
@@ -25,7 +23,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
     {
@@ -33,7 +30,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
     {
@@ -41,7 +37,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
     {
@@ -49,7 +44,6 @@ const Users = () => {
       lastName: "Yaxshimuratov",
       phone: "+998918687100",
       username: "Foydalanuvchi nom",
-      password: "11111111",
       registrationDate: "10.10.2025",
     },
   ];
@@ -77,10 +71,10 @@ const Users = () => {
                 Foydalanuvchi nom
               </th>
               <th className="w-[16.6%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
-                Parol
+                Ro’yxatdan o’tgan sana
               </th>
               <th className="w-[16.6%] py-4 px-4 text-[18px] text-left font-medium text-[#FFFFFF]">
-                Ro’yxatdan o’tgan sana
+                Xolat
               </th>
             </tr>
           </thead>
@@ -103,12 +97,14 @@ const Users = () => {
                 <td className="py-6 px-4 text-[18px] align-middle">
                   {item.username}
                 </td>
-                <td className="py-6 px-4 text-[18px] align-middle">
-                  {item.password}
-                </td>
                 <td className="py-6 px-4 text-[18px] align-middle flex items-center justify-between">
                   <span>{item.registrationDate}</span>
-                  <MoreOutlined className="cursor-pointer text-[28px] text-white hover:text-[#FA8B00] transition ml-2" />
+                </td>
+                <td className="py-6 px-4 text-[18px] align-middle">
+                  <div className="flex gap-6">
+                    <Edit className="text-green-600"/>
+                    <Trash2 className="text-red-600"/>
+                  </div>
                 </td>
               </tr>
             ))}
