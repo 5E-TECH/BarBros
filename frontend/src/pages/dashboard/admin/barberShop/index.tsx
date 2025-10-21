@@ -3,9 +3,6 @@ import { Pagination } from "antd";
 import Popup from "../../../../shared/ui/Popup";
 import { Edit, Trash, X } from "lucide-react";
 import { MoreOutlined } from "@ant-design/icons";
-import { Pagination } from "antd";
-import Popup from "../../../../shared/ui/Popup";
-import { X } from "lucide-react";
 
 const BarberShop = () => {
   const [show, setShow] = useState(false);
