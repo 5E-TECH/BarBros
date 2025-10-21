@@ -1,4 +1,3 @@
-import "./style.css";
 import LoginImg from "../../../shared/assets/login.png";
 import { useNavigate } from "react-router-dom";
 import { useState, type FormEvent, type ChangeEvent } from "react";
@@ -27,18 +26,29 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login">
-      <div className="container login__container">
-        <img className="login__img" src={LoginImg} alt="Login" />
-        <div className="login__content">
-          <h1 className="login__title">BarBrosga Xush Kelibsiz ! 👋</h1>
-          <p className="login__text">Iltimos, hisobingizga kiring</p>
+    <div className="py-[90px] bg-[#0a0a0a] min-h-screen">
+      <div className="container mx-auto flex items-center justify-between px-6">
+        <img
+          className="w-[593px] h-[711px] object-contain"
+          src={LoginImg}
+          alt="Login"
+        />
 
-          <form className="login__form" onSubmit={handleLogin}>
-            <div className="login__input">
-              <h2 className="login__sub-title">Foydalanuvchi nom</h2>
+        <div className="flex flex-col text-white">
+          <h1 className="font-[600] text-[26px] leading-[36px] mb-1">
+            BarBrosga Xush Kelibsiz ! 👋
+          </h1>
+          <p className="font-normal text-[15px] leading-[22px] mb-[30px]">
+            Iltimos, hisobingizga kiring
+          </p>
+
+          <form className="flex flex-col" onSubmit={handleLogin}>
+            <div className="mb-[15px]">
+              <h2 className="font-normal text-[13px] mb-[5px]">
+                Foydalanuvchi nom
+              </h2>
               <input
-                className="login__input-btn"
+                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
                 type="text"
                 value={username}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -47,19 +57,18 @@ const Login: React.FC = () => {
               />
             </div>
 
-            <div className="login__input">
-              <div className="login__row">
-                <h2 className="login__sub-title">Parol</h2>
+            <div className="mb-[15px]">
+              <div className="flex items-center justify-between">
+                <h2 className="font-normal text-[13px] mb-[5px]">Parol</h2>
                 <h3
-                  className="login__sub2-title"
+                  className="text-[#FA8B00] text-[13px] cursor-pointer"
                   onClick={handleForgotPassword}
-                  style={{ cursor: "pointer" }}
                 >
                   Parolni unutdingizmi ?
                 </h3>
               </div>
               <input
-                className="login__input-btn"
+                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
                 type="password"
                 value={password}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -68,11 +77,8 @@ const Login: React.FC = () => {
               />
             </div>
 
-            <div className="login__row2">
-              <label
-                className="login__sub-title"
-                style={{ display: "flex", alignItems: "center", gap: "8px" }}
-              >
+            <div className="flex items-center gap-[8px] mt-[15px] mb-[15px]">
+              <label className="flex items-center gap-[8px] text-[13px]">
                 <input
                   type="checkbox"
                   checked={remember}
@@ -84,17 +90,19 @@ const Login: React.FC = () => {
               </label>
             </div>
 
-            <button className="login__btn" type="submit">
+            <button
+              className="w-[372px] h-[38px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
+              type="submit"
+            >
               Kirish
             </button>
           </form>
 
-          <h2 className="login__sub3-title">
+          <h2 className="text-[15px] text-center">
             Ro’yxatdan o’tmaganmisiz?{" "}
             <span
-              className="login__title-span"
+              className="text-[#FA8B00] cursor-pointer"
               onClick={handleRegister}
-              style={{ cursor: "pointer" }}
             >
               Hisob yaratish
             </span>

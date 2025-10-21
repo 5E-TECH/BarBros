@@ -2,6 +2,10 @@ import { memo, useState } from "react";
 import { Pagination } from "antd";
 import Popup from "../../../../shared/ui/Popup";
 import { Edit, Trash, X } from "lucide-react";
+import { MoreOutlined } from "@ant-design/icons";
+import { Pagination } from "antd";
+import Popup from "../../../../shared/ui/Popup";
+import { X } from "lucide-react";
 
 const BarberShop = () => {
   const [show, setShow] = useState(false);
@@ -94,6 +98,22 @@ const BarberShop = () => {
               <th className="w-[14.2%] py-4 px-4 text-[18px] text-left font-medium text-[#FFFFFF]">
                 Xolat
               </th>
+              <th className="w-[16.6%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+                Manzili
+              </th>
+              <th className="w-[16.6%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+                Telefon raqam
+              </th>
+              <th className="w-[16.6%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+                Tavsifi
+              </th>
+              <th className="w-[16.6%] py-4 px-4 text-[18px] text-left border-r border-[#FFFFFF] font-medium text-[#FFFFFF]">
+                Ish vaqti
+              </th>
+              <th className="w-[16.6%] py-4 px-4 text-[18px] text-left font-medium text-[#FFFFFF]">
+                Tashkil qilingan sana
+              </th>
+
             </tr>
           </thead>
 
@@ -126,6 +146,7 @@ const BarberShop = () => {
                     <Edit />
                     <Trash />
                   </div>
+                  <MoreOutlined className="cursor-pointer text-[28px] text-white hover:text-[#FA8B00] transition ml-2" />
                 </td>
               </tr>
             ))}
@@ -190,6 +211,12 @@ const BarberShop = () => {
               >
                 Bekor qilish
               </button>
+              <button
+                className="bg-[#FA8B00] text-[14px] font-medium py-[6px] px-[16px] rounded-[6px] cursor-pointer"
+              >
+                Xizmat qo'shish
+              </button>
+              <button onClick={() => setShow(false)} className="bg-[#3a3b43] text-[14px] font-medium py-[6px] px-[16px] rounded-[6px] cursor-pointer">Bekor qilish</button>
             </div>
           </form>
         </div>
