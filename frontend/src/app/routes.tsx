@@ -10,6 +10,8 @@ const Profile = lazy(() => import("../pages/profile"));
 const Login = lazy(() => import("../pages/auth/login"));
 const Register = lazy(() => import("../pages/auth/register"));
 
+const NotFound = lazy(() => import("../shared/ui/Notfound"))
+
 const AppRouter = () => {
   return useRoutes([
     {
@@ -31,6 +33,7 @@ const AppRouter = () => {
         { path: "profile", element: <Profile /> },
       ],
     },
+    {path: "*", element: <NotFound/>}
   ]);
 };
 
