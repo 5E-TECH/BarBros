@@ -113,7 +113,7 @@ const Profile = ({ data }: ProfileProps) => {
           {!editMode ? (
             <button
               onClick={() => setEditMode(true)}
-              className="bg-[#7B3FE4] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer flex items-center gap-2"
+              className="bg-[#FA8B00] px-[20px] py-[10px] rounded-[6px] font-medium text-[15px] cursor-pointer flex items-center gap-2"
             >
               <Edit size={16} /> Edit
             </button>
