@@ -24,11 +24,11 @@ const AppRouter = () => {
       path: "/",
       element: <DashboardLayout />,
       children: [
+        { index: true, element: <Calendar /> },
         { path: "booking", element: <Booking /> },
         { path: "service", element: <Service /> },
         { path: "comment", element: <Comment /> },
         { path: "profile", element: <Profile /> },
-        { index: true, element: <Calendar /> },
       ],
     },
   ]);
