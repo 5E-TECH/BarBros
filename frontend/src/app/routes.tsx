@@ -10,6 +10,11 @@ const Profile = lazy(() => import("../pages/profile"));
 const Login = lazy(() => import("../pages/auth/login"));
 const Register = lazy(() => import("../pages/auth/register"));
 
+const BarberShop = lazy(() => import("../pages/dashboard/admin/barberShop"))
+const Users = lazy(() => import("../pages/dashboard/admin/users"))
+const Statistic = lazy(() => import("../pages/dashboard/admin/statistic"))
+const AuditLogs = lazy(() => import("../pages/dashboard/admin/auditLogs"))
+
 const AppRouter = () => {
   return useRoutes([
     {
@@ -31,6 +36,17 @@ const AppRouter = () => {
         { index: true, element: <Calendar /> },
       ],
     },
+    {
+      path: "/",
+      element: <DashboardLayout />,
+      children: [
+        { path: "barbershop", element: <BarberShop /> },
+        { path: "users", element: <Users /> },
+        { path: "statistics", element: <Statistic /> },
+        { path: "audit-logs", element: <AuditLogs /> },
+      ],
+    },
+
   ]);
 };
 
