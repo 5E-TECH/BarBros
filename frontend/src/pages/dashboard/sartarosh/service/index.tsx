@@ -1,5 +1,6 @@
 import { memo, useState, type FormEvent } from "react";
 import Popup from "../../../../shared/ui/Popup";
+import PrimaryButton from "../../lib/button";
 import { X } from "lucide-react";
 
 interface ServiceType {
@@ -134,12 +135,7 @@ const Service = () => {
             </div>
 
             <div className="flex gap-[14px]">
-              <button
-                type="submit"
-                className="bg-[#FA8B00] text-[14px] font-medium py-[6px] px-[16px] rounded-[6px] cursor-pointer"
-              >
-                Xizmat qo'shish
-              </button>
+              <PrimaryButton type="submit">Xizmat qo'shish</PrimaryButton>
               <button
                 type="button"
                 onClick={() => setShow(false)}
