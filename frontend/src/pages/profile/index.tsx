@@ -77,32 +77,32 @@ const Profile = () => {
         </span>
       </div>
 
-      <div className="w-[300px] bg-[#14151F] py-8 px-6 rounded-2xl flex flex-col gap-6">
+      <div className="w-[800px] bg-[#14151F] py-8 px-6 rounded-2xl flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-6">
           <div className="flex flex-col">
             <span className="pb-1 text-gray-400 text-sm">Ism</span>
-            <div className="w-full py-1 px-2 rounded-md bg-[#0A0B16] text-white">
+            <div className="w-full py-1 px-2 rounded-md border border-[#DBDADE] text-white">
               Bahodir
             </div>
           </div>
 
           <div className="flex flex-col">
             <span className="pb-1 text-gray-400 text-sm">Familiya</span>
-            <div className="w-full py-1 px-2 rounded-md bg-[#0A0B16] text-white">
+            <div className="w-full py-1 px-2 rounded-md border border-[#DBDADE] text-white">
               Nabijanov
             </div>
           </div>
 
           <div className="flex flex-col">
             <span className="pb-1 text-gray-400 text-sm">Telefon</span>
-            <div className="w-full py-1 px-2 rounded-md bg-[#0A0B16] text-white">
+            <div className="w-full py-1 px-2 rounded-md border border-[#DBDADE] text-white">
               +998 90 123 45 67
             </div>
           </div>
 
           <div className="flex flex-col">
             <span className="pb-1 text-gray-400 text-sm">Hudud</span>
-            <div className="w-full py-1 px-2 rounded-md bg-[#0A0B16] text-white">
+            <div className="w-full py-1 px-2 rounded-md border border-[#DBDADE] text-white">
               Toshkent
             </div>
           </div>
