@@ -12,6 +12,11 @@ const Register = lazy(() => import("../pages/auth/register"));
 
 const NotFound = lazy(() => import("../shared/ui/Notfound"))
 
+const BarberShop = lazy(() => import("../pages/dashboard/admin/barberShop"))
+const Users = lazy(() => import("../pages/dashboard/admin/users"))
+const Statistic = lazy(() => import("../pages/dashboard/admin/statistic"))
+const AuditLogs = lazy(() => import("../pages/dashboard/admin/auditLogs"))
+
 const AppRouter = () => {
   return useRoutes([
     {
@@ -34,6 +39,17 @@ const AppRouter = () => {
       ],
     },
     {path: "*", element: <NotFound/>}
+    {
+      path: "/",
+      element: <DashboardLayout />,
+      children: [
+        { path: "barbershop", element: <BarberShop /> },
+        { path: "users", element: <Users /> },
+        { path: "statistics", element: <Statistic /> },
+        { path: "audit-logs", element: <AuditLogs /> },
+      ],
+    },
+
   ]);
 };
 
