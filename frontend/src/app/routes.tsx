@@ -10,6 +10,8 @@ const Profile = lazy(() => import("../pages/profile"));
 const Login = lazy(() => import("../pages/auth/login"));
 const Register = lazy(() => import("../pages/auth/register"));
 
+const NotFound = lazy(() => import("../shared/ui/Notfound"))
+
 const BarberShop = lazy(() => import("../pages/dashboard/admin/barberShop"))
 const Users = lazy(() => import("../pages/dashboard/admin/users"))
 const Statistic = lazy(() => import("../pages/dashboard/admin/statistic"))
@@ -36,6 +38,7 @@ const AppRouter = () => {
         { path: "profile", element: <Profile /> },
       ],
     },
+    {path: "*", element: <NotFound/>}
     {
       path: "/",
       element: <DashboardLayout />,
