@@ -1,104 +1,75 @@
-import RegisterImg from "../../../shared/assets/register.png"
-import { useState, type FormEvent, type ChangeEvent } from "react"
-import { useNavigate } from "react-router-dom"
+import RegisterImg from "../../../shared/assets/register.png";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register: React.FC = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
-    const [firstName, setFirstName] = useState<string>("")
-    const [lastName, setLastName] = useState<string>("")
-    const [username, setUsername] = useState<string>("")
-    const [phone, setPhone] = useState<string>("")
-    const [password, setPassword] = useState<string>("")
-    const [agree, setAgree] = useState<boolean>(false)
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
+    const [username, setUsername] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [agree, setAgree] = useState<boolean>(false);
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+        e.preventDefault();
 
         if (!firstName || !lastName || !username || !phone || !password) {
-            alert("Iltimos, barcha maydonlarni to‘ldiring!")
-            return
+            alert("Iltimos, barcha maydonlarni to‘ldiring!");
+            return;
         }
 
         if (!agree) {
-            alert("Ro‘yxatdan o‘tishdan oldin shartlarga rozilik bildiring!")
-            return
+            alert("Ro‘yxatdan o‘tishdan oldin shartlarga rozilik bildiring!");
+            return;
         }
 
-        navigate("/")
-    }
+        navigate("/");
+    };
 
     const handleLoginRedirect = () => {
-        navigate("/login")
-    }
+        navigate("/login");
+    };
 
     return (
-        <section className="py-[90px] bg-[#0a0a0a] min-h-screen">
-            <div className="container mx-auto flex items-center justify-between px-6">
+        <section className="py-[60px] sm:py-[90px] bg-[#0a0a0a] min-h-screen flex items-center">
+            <div className="container mx-auto flex flex-col-reverse md:flex-row items-center justify-between px-6 gap-10">
                 <img
-                    className="w-[560px] h-[811px] object-contain"
+                    className="w-[300px] sm:w-[400px] md:w-[560px] h-auto object-contain"
                     src={RegisterImg}
                     alt="register"
                 />
 
-                <div className="flex flex-col text-white">
-                    <h2 className="font-semibold text-[26px] leading-[36px] mb-[15px]">
+                <div className="flex flex-col text-white max-w-[400px] w-full">
+                    <h2 className="font-semibold text-[22px] sm:text-[26px] leading-[36px] mb-[15px] text-center md:text-left">
                         Ro’yxatdan o’tishni boshlang 🚀
                     </h2>
 
                     <form className="flex flex-col" onSubmit={handleSubmit}>
-                        <div className="mb-[15px]">
-                            <h3 className="font-normal text-[13px] mb-[5px]">Ism</h3>
-                            <input
-                                className="w-[372px] h-[34px] rounded-[5px] bg-white/90 text-black px-2 outline-none"
-                                type="text"
-                                value={firstName}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setFirstName(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-[15px]">
-                            <h3 className="font-normal text-[13px] mb-[5px]">Familiya</h3>
-                            <input
-                                className="w-[372px] h-[34px] rounded-[5px] bg-white/90 text-black px-2 outline-none"
-                                type="text"
-                                value={lastName}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setLastName(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-[15px]">
-                            <h3 className="font-normal text-[13px] mb-[5px]">Foydalanuvchi nomi</h3>
-                            <input
-                                className="w-[372px] h-[34px] rounded-[5px] bg-white/90 text-black px-2 outline-none"
-                                type="text"
-                                value={username}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setUsername(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        <div className="mb-[15px]">
-                            <h3 className="font-normal text-[13px] mb-[5px]">Telefon raqam</h3>
-                            <input
-                                className="w-[372px] h-[34px] rounded-[5px] bg-white/90 text-black px-2 outline-none"
-                                type="text"
-                                value={phone}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                    setPhone(e.target.value)
-                                }
-                            />
-                        </div>
+                        {[
+                            { label: "Ism", value: firstName, set: setFirstName },
+                            { label: "Familiya", value: lastName, set: setLastName },
+                            { label: "Foydalanuvchi nomi", value: username, set: setUsername },
+                            { label: "Telefon raqam", value: phone, set: setPhone },
+                        ].map((field, idx) => (
+                            <div key={idx} className="mb-[15px]">
+                                <h3 className="font-normal text-[13px] mb-[5px]">{field.label}</h3>
+                                <input
+                                    className="w-full h-[36px] bg-white/90 text-black rounded-[5px] px-3 outline-none"
+                                    type="text"
+                                    value={field.value}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                        field.set(e.target.value)
+                                    }
+                                />
+                            </div>
+                        ))}
 
                         <div className="mb-[15px]">
                             <h3 className="font-normal text-[13px] mb-[5px]">Parol</h3>
                             <input
-                                className="w-[372px] h-[34px] rounded-[5px] bg-white/90 text-black px-2 outline-none"
+                                className="w-full h-[36px] bg-white/90 text-black rounded-[5px] px-3 outline-none"
                                 type="password"
                                 value={password}
                                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -115,7 +86,7 @@ const Register: React.FC = () => {
                                     setAgree(e.target.checked)
                                 }
                             />
-                            <h4 className="text-[15px] leading-[22px]">
+                            <h4 className="text-[14px] sm:text-[15px] leading-[22px]">
                                 Men{" "}
                                 <span className="text-[#FA8B00] cursor-pointer">
                                     maxfiylik siyosati
@@ -125,14 +96,14 @@ const Register: React.FC = () => {
                         </div>
 
                         <button
-                            className="w-[372px] h-[38px] rounded-[6px] bg-[#FA8B00] text-white font-medium text-[15px] tracking-[0.43px] mb-[15px] hover:bg-[#ff9c1a] transition"
+                            className="w-full h-[40px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
                             type="submit"
                         >
                             Ro’yxatdan o’tish
                         </button>
                     </form>
 
-                    <h4 className="text-[15px] text-center">
+                    <h4 className="text-[14px] sm:text-[15px] text-center">
                         Hisobingiz bormi?{" "}
                         <span
                             className="text-[#FA8B00] cursor-pointer"
@@ -144,7 +115,7 @@ const Register: React.FC = () => {
                 </div>
             </div>
         </section>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;
