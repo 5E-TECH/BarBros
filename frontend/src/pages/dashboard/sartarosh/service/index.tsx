@@ -1,7 +1,6 @@
 import { memo, useState, type FormEvent } from "react";
-import Popup from "../../../../shared/ui/Popup";
-import PrimaryButton from "../../lib/button";
-import { X } from "lucide-react";
+import PrimaryButton from "../../../../shared/components/button";
+import FormPopup from "../../../../shared/components/popup";
 
 interface ServiceType {
   name: string;
@@ -30,22 +29,49 @@ const Service = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.price || !form.duration) return;
-
     setServices((prev) => [...prev, form]);
     setForm({ name: "", price: 0, duration: "", description: "" });
     setShow(false);
   };
 
+  const inputs = [
+    {
+      name: "name",
+      label: "Xizmat nomi",
+      type: "text",
+      value: form.name,
+      placeholder: "Masalan, Soch olish",
+    },
+    {
+      name: "price",
+      label: "Narxi (so‘m)",
+      type: "number",
+      value: form.price,
+      placeholder: "100000",
+    },
+    {
+      name: "duration",
+      label: "Vaqti (daqiqa)",
+      type: "number",
+      value: form.duration,
+      placeholder: "45",
+    },
+    {
+      name: "description",
+      label: "Tavsif",
+      type: "textarea",
+      value: form.description,
+      placeholder: "Xizmat haqida qisqacha",
+    },
+  ];
+
   return (
     <div>
       <div className="flex justify-between mb-6">
         <h3 className="font-medium text-[20px]">Xizmatlar ro’yxati</h3>
-        <button
-          onClick={() => setShow(true)}
-          className="bg-[#FA8B00] text-[14px] font-medium py-[6px] px-[16px] rounded-[6px] cursor-pointer"
-        >
+        <PrimaryButton onClick={() => setShow(true)}>
           Xizmat qo'shish
-        </button>
+        </PrimaryButton>
       </div>
 
       {services.length === 0 ? (
@@ -74,79 +100,16 @@ const Service = () => {
         </div>
       )}
 
-      <Popup isShow={show} onClose={() => setShow(false)}>
-        <div className="w-[639px] rounded-[8px] p-[32px] bg-[#14151F]">
-          <div className="flex justify-between items-center mb-[16px]">
-            <h2 className="font-medium text-[28px]">Xizmat qo'shish</h2>
-            <div
-              onClick={() => setShow(false)}
-              className="cursor-pointer hover:bg-[#0A0B16]"
-            >
-              <X size={30} />
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px]">
-              <label>Xizmat nomi</label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Xizmat nomi"
-                className="border border-[#C2C2C2] rounded-[8px] w-full px-[16px] py-[11px] text-[#9E9E9E] outline-0 bg-transparent"
-              />
-            </div>
-
-            <div className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px]">
-              <label>Narxi (so‘m)</label>
-              <input
-                type="number"
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                placeholder="100000"
-                className="border border-[#C2C2C2] rounded-[8px] w-full px-[16px] py-[11px] text-[#9E9E9E] outline-0 bg-transparent"
-              />
-            </div>
-
-            <div className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px]">
-              <label>Vaqti (daqiqa)</label>
-              <input
-                type="number"
-                name="duration"
-                value={form.duration}
-                onChange={handleChange}
-                placeholder="daq"
-                className="border border-[#C2C2C2] rounded-[8px] w-full px-[16px] py-[11px] text-[#9E9E9E] outline-0 bg-transparent"
-              />
-            </div>
-
-            <div className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px]">
-              <label>Tavsif</label>
-              <textarea
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                placeholder="Xizmat haqida qisqacha"
-                className="border border-[#C2C2C2] rounded-[8px] w-full px-[16px] py-[11px] text-[#9E9E9E] outline-0 bg-transparent"
-              ></textarea>
-            </div>
-
-            <div className="flex gap-[14px]">
-              <PrimaryButton type="submit">Xizmat qo'shish</PrimaryButton>
-              <button
-                type="button"
-                onClick={() => setShow(false)}
-                className="bg-[#3a3b43] text-[14px] font-medium py-[6px] px-[16px] rounded-[6px] cursor-pointer"
-              >
-                Bekor qilish
-              </button>
-            </div>
-          </form>
-        </div>
-      </Popup>
+      <FormPopup
+        isShow={show}
+        title="Yangi xizmat qo‘shish"
+        inputs={inputs}
+        onChange={handleChange}
+        onSubmit={handleSubmit}
+        onClose={() => setShow(false)}
+        submitText="Xizmat Qo'shish"
+        cancelText="Bekor qilish"
+      />
     </div>
   );
 };
