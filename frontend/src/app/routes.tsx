@@ -38,7 +38,7 @@ const AppRouter = () => {
         { path: "profile", element: <Profile /> },
       ],
     },
-    {path: "*", element: <NotFound/>}
+    {path: "*", element: <NotFound/>},
     {
       path: "/",
       element: <DashboardLayout />,
