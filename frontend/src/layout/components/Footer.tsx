@@ -5,7 +5,7 @@ import { Trans } from "react-i18next";
 
 const Footer = () => {
   return (
-    <div className="flex justify-center items-center gap-4 bg-[#14151F] py-2">
+    <div className="flex justify-center items-center gap-4 bg-[#14151F] py-2 max-sm:hidden">
       <div className="flex gap-[40px]">
         <div className="flex gap-[20px] mb-[15px]"></div>
       </div>
