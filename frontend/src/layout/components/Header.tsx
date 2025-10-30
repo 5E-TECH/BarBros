@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <>
       <div className="flex justify-between items-center text-white px-[20px] md:px-[45px] py-[14px] bg-[#14151F] relative z-50">
-        <div className="flex items-center gap-[10px]">
+        <div className="flex gap-55 items-center">
           <div className="flex md:hidden items-center">
             {burger ? (
               <X
@@ -23,7 +23,7 @@ const Header = () => {
               />
             ) : (
               <Menu
-                size={28}
+                size={35}
                 onClick={() => setBurger(true)}
                 className="cursor-pointer bg-[#FA8B004D] text-[#FA8B00] px-1 py-1 rounded-xl"
               />
