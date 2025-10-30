@@ -109,7 +109,7 @@ const Profile = () => {
 
   return (
     <div>
-      <div className="flex gap-12 max-sm:flex flex-col">
+      <div className="flex gap-12 max-sm:flex-col">
         <div className="w-[300px] bg-[#14151F] py-8 rounded-2xl flex flex-col items-center max-sm:w-full">
           <div className="mb-[10px]">
             <Upload

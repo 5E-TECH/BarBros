@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <>
       <div className="flex justify-between items-center text-white px-[20px] md:px-[45px] py-[14px] bg-[#14151F] relative z-50">
-        <div className="flex gap-55 items-center">
+        <div className="flex items-center md:flex gap-52">
           <div className="flex md:hidden items-center">
             {burger ? (
               <X
@@ -86,7 +86,7 @@ const Header = () => {
 
             <div className="p-6">
               <NavLink
-                to="/"
+                to="/booking"
                 onClick={() => setBurger(false)}
                 className={({ isActive }) =>
                   `text-[18px] font-medium hover:text-[#f69a29] flex items-center gap-[24px] transition mb-[30px] ${
