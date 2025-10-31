@@ -109,8 +109,8 @@ const Profile = () => {
 
   return (
     <div>
-      <div className="flex gap-12">
-        <div className="w-[300px] bg-[#14151F] py-8 rounded-2xl flex flex-col items-center">
+      <div className="flex gap-12 max-sm:flex-col">
+        <div className="w-[300px] bg-[#14151F] py-8 rounded-2xl flex flex-col items-center max-sm:w-full">
           <div className="mb-[10px]">
             <Upload
               listType="picture-circle"
@@ -140,8 +140,8 @@ const Profile = () => {
           </span>
         </div>
 
-        <div className="w-[800px] bg-[#14151F] py-8 px-6 rounded-2xl flex flex-col gap-6">
-          <div className="grid grid-cols-2 gap-6">
+        <div className="w-[800px] bg-[#14151F] py-8 px-6 rounded-2xl flex flex-col gap-6 max-sm:w-full">
+          <div className="grid grid-cols-2 gap-6 max-sm:grid-cols-1">
             <div className="flex flex-col">
               <span className="pb-1 text-gray-400 text-sm">Ism</span>
               <div className="w-full py-1 px-2 rounded-md border border-[#DBDADE] text-white">

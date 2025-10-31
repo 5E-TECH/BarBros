@@ -51,7 +51,7 @@ const Sidebar = ({ role }: SidebarProps) => {
   const links = sidebarConfig[role] || [];
 
   return (
-    <div className="w-[289px] border-r border-[#2d2e36]">
+    <div className="w-[289px] border-r border-[#2d2e36] max-sm:hidden">
       <ul className="flex flex-col">
         {links.map((link, i) => (
           <li key={i} className="mb-[12px]">
