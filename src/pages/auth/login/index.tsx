@@ -1,0 +1,116 @@
+import LoginImg from "../../../shared/assets/login.png";
+import { useNavigate } from "react-router-dom";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [remember, setRemember] = useState<boolean>(false);
+
+  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (username.trim() && password.trim()) {
+      navigate("/");
+    } else {
+      alert("Iltimos, barcha maydonlarni to‘ldiring!");
+    }
+  };
+
+  const handleForgotPassword = () => {
+    alert("Parolni tiklash funksiyasi hali qo‘shilmagan.");
+  };
+
+  const handleRegister = () => {
+    navigate("/register");
+  };
+
+  return (
+    <div className="py-[90px] bg-[#0a0a0a] min-h-screen">
+      <div className="container mx-auto flex items-center justify-between px-6">
+        <img
+          className="w-[593px] h-[711px] object-contain"
+          src={LoginImg}
+          alt="Login"
+        />
+
+        <div className="flex flex-col text-white">
+          <h1 className="font-[600] text-[26px] leading-[36px] mb-1">
+            BarBrosga Xush Kelibsiz ! 👋
+          </h1>
+          <p className="font-normal text-[15px] leading-[22px] mb-[30px]">
+            Iltimos, hisobingizga kiring
+          </p>
+
+          <form className="flex flex-col" onSubmit={handleLogin}>
+            <div className="mb-[15px]">
+              <h2 className="font-normal text-[13px] mb-[5px]">
+                Foydalanuvchi nom
+              </h2>
+              <input
+                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
+                type="text"
+                value={username}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setUsername(e.target.value)
+                }
+              />
+            </div>
+
+            <div className="mb-[15px]">
+              <div className="flex items-center justify-between">
+                <h2 className="font-normal text-[13px] mb-[5px]">Parol</h2>
+                <h3
+                  className="text-[#FA8B00] text-[13px] cursor-pointer"
+                  onClick={handleForgotPassword}
+                >
+                  Parolni unutdingizmi ?
+                </h3>
+              </div>
+              <input
+                className="w-[372px] h-[34px] bg-white/90 text-black rounded-[5px] px-2 outline-none"
+                type="password"
+                value={password}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
+              />
+            </div>
+
+            <div className="flex items-center gap-[8px] mt-[15px] mb-[15px]">
+              <label className="flex items-center gap-[8px] text-[13px]">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setRemember(e.target.checked)
+                  }
+                />
+                Eslab qolish
+              </label>
+            </div>
+
+            <button
+              className="w-[372px] h-[38px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
+              type="submit"
+            >
+              Kirish
+            </button>
+          </form>
+
+          <h2 className="text-[15px] text-center">
+            Ro’yxatdan o’tmaganmisiz?{" "}
+            <span
+              className="text-[#FA8B00] cursor-pointer"
+              onClick={handleRegister}
+            >
+              Hisob yaratish
+            </span>
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
