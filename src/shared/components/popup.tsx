@@ -37,11 +37,11 @@ const FormPopup: React.FC<FormPopupProps> = ({
   return (
     <Popup isShow={isShow} onClose={onClose}>
       <div
-        className="w-[639px] rounded-[8px] p-[32px] bg-[#14151F]"
+        className="w-[639px] rounded-[8px] p-[32px] bg-[#14151F] max-sm:w-[350px]"
         onClick={(e) => e.stopPropagation()} 
       >
         <div className="flex justify-between items-center mb-[16px]">
-          <h2 className="font-medium text-[28px]">{title}</h2>
+          <h2 className="font-medium text-[28px] max-sm:text-[22px]">{title}</h2>
           <div
             onClick={onClose}
             className="cursor-pointer hover:bg-[#0A0B16] p-1 rounded"
@@ -54,7 +54,7 @@ const FormPopup: React.FC<FormPopupProps> = ({
           {inputs.map((field) => (
             <div
               key={field.name}
-              className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px]"
+              className="flex flex-col gap-[8px] font-normal text-[14px] mb-[24px] max-sm:mb-[20px]"
             >
               <label>{field.label}</label>
 

@@ -50,7 +50,7 @@ const Profile = () => {
       placeholder: "Ismingizni kiriting",
     },
     {
-      name: "familiya",
+      name: "surname",
       label: "Familiya",
       value: form.surname,
       placeholder: "Familiyangizni kiriting",
