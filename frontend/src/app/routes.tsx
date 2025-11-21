@@ -1,5 +1,6 @@
 import { lazy, memo } from "react";
 import { useRoutes } from "react-router-dom";
+import Auth from "../pages/auth";
 
 const DashboardLayout = lazy(() => import("../layout/DashboardLayout"));
 const Calendar = lazy(() => import("../pages/dashboard/sartarosh/calendar"));
@@ -20,25 +21,31 @@ const AuditLogs = lazy(() => import("../pages/dashboard/admin/auditLogs"))
 const AppRouter = () => {
   return useRoutes([
     {
-      path: "login",
-      element: <Login />, 
+      path: "/login",
+      element: <Login />,
     },
     {
-      path: "register",
+      path: "/register",
       element: <Register />,
     },
     {
       path: "/",
-      element: <DashboardLayout />,
+      element: <Auth />,
       children: [
-        { index: true, element: <Calendar /> },
-        { path: "booking", element: <Booking /> },
-        { path: "service", element: <Service /> },
-        { path: "comment", element: <Comment /> },
-        { path: "profile", element: <Profile /> },
-      ],
+        {
+          path: "/",
+          element: <DashboardLayout />,
+          children: [
+            { index: true, element: <Calendar /> },
+            { path: "booking", element: <Booking /> },
+            { path: "service", element: <Service /> },
+            { path: "comment", element: <Comment /> },
+            { path: "profile", element: <Profile /> },
+          ],
+        },
+      ]
     },
-    {path: "*", element: <NotFound/>},
+    { path: "*", element: <NotFound /> },
     {
       path: "/",
       element: <DashboardLayout />,
