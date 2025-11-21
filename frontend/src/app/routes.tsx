@@ -41,21 +41,25 @@ const AppRouter = () => {
             { path: "service", element: <Service /> },
             { path: "comment", element: <Comment /> },
             { path: "profile", element: <Profile /> },
+            { path: "barbershop", element: <BarberShop /> },
+            { path: "users", element: <Users /> },
+            { path: "statistics", element: <Statistic /> },
+            { path: "audit-logs", element: <AuditLogs /> },
           ],
         },
       ]
     },
     { path: "*", element: <NotFound /> },
-    {
-      path: "/",
-      element: <DashboardLayout />,
-      children: [
-        { path: "barbershop", element: <BarberShop /> },
-        { path: "users", element: <Users /> },
-        { path: "statistics", element: <Statistic /> },
-        { path: "audit-logs", element: <AuditLogs /> },
-      ],
-    },
+    // {
+    //   path: "/",
+    //   element: <DashboardLayout />,
+    //   children: [
+    //     { path: "barbershop", element: <BarberShop /> },
+    //     { path: "users", element: <Users /> },
+    //     { path: "statistics", element: <Statistic /> },
+    //     { path: "audit-logs", element: <AuditLogs /> },
+    //   ],
+    // },
 
   ]);
 };

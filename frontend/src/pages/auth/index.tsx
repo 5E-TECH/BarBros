@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 import type { RootState } from "../../app/store";
 import { api } from "../../shared/api";
-import { setId, setRole } from "./store/roleSlice";
 import { setToken } from "./login/store/tokenSlice";
+import { setRole } from "./store/roleSlice";
 // import { setTarif, setToken, setUserData } from "../../shared/lib/features/login/authSlice";
 // import Suspensee from "../../shared/ui/Suspensee";
 // Test for deployment
@@ -23,9 +23,10 @@ const Auth = () => {
     api
       .get("admin/My_Accaunt") // 🔑 backendda token tekshirish
       .then((res) => {
+        dispatch(setRole(res?.data?.data?.role));
         setValid(true); // token to‘g‘ri bo‘lsa
-        dispatch(setRole(res.data.data.role));
-        dispatch(setId(res.data.data.id));
+        console.log(res?.data);
+        
       })
       .catch(() => {
         dispatch(setToken(null)); // ❌ noto‘g‘ri token → localStorage va reduxdan o‘chir
