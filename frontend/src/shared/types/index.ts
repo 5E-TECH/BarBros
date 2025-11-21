@@ -30,3 +30,14 @@ export const testData = [
     date: "08.10.2025",
   },
 ];
+
+
+
+
+export interface ISidebarTab {
+  id: number;
+  path: string;
+  icon: any;
+  text: string;
+  end?: boolean;
+}

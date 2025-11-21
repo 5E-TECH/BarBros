@@ -1,5 +1,5 @@
   import { memo } from "react";
-  import { testData } from "../../../../types";
+  import { testData } from "../../../../shared/types";
 
   type BookingData = {
     time: string;

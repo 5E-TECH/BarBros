@@ -8,7 +8,7 @@ interface IState {
 
 const initialState: IState = {
   id: null,
-  role: null,
+  role: localStorage.getItem("role") || null,
   region:null
 };
 
@@ -17,10 +17,8 @@ export const roleSlice = createSlice({
   initialState,
   reducers: {
     setRole: (state, action: PayloadAction<string>) => {
+      localStorage.setItem("role", action.payload);
       state.role = action.payload;
-    },
-    setRegion: (state, action: PayloadAction<string>) => {
-      state.region = action.payload;
     },
     removeRole: (state) => {
       state.id = null;
@@ -32,5 +30,5 @@ export const roleSlice = createSlice({
   },
 });
 
-export const { setRole, removeRole, setId, setRegion} = roleSlice.actions;
+export const { setRole, removeRole, setId,} = roleSlice.actions;
 export default roleSlice.reducer;
