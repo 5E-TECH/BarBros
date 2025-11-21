@@ -1,17 +1,42 @@
 import LoginImg from "../../../shared/assets/login.png";
 import { useNavigate } from "react-router-dom";
 import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useLogin } from "./service/useLogin";
+import { useDispatch } from "react-redux";
+import { setToken } from "./store/tokenSlice";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [remember, setRemember] = useState<boolean>(false);
+  const { signinUser } = useLogin()
+
+
+  const handleSignin = () => {
+    const data = {
+      email: username,
+      password: password
+    }
+    signinUser.mutate(data, {
+      onSuccess: (res:any) => {
+        const token = res?.data?.acsesToken; 
+        console.log(token);
+        dispatch(setToken(token));
+        navigate("/")
+      }
+    })
+  }
+
+
+
+
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (username.trim() && password.trim()) {
-      navigate("/");
+      // navigate("/");
     } else {
       alert("Iltimos, barcha maydonlarni to‘ldiring!");
     }
@@ -89,6 +114,7 @@ const Login: React.FC = () => {
             </div>
 
             <button
+              onClick={() => handleSignin()}
               className="w-full h-[40px] bg-[#FA8B00] text-white font-medium text-[15px] rounded-[6px] mb-[15px] hover:bg-[#ff9c1a] transition"
               type="submit"
             >
