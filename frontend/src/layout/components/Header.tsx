@@ -1,14 +1,22 @@
 import { memo, useState } from "react";
 import logoo from "../../shared/assets/logoo.svg";
 import profile from "../../shared/assets/profil.jpg";
-import { Bell, Globe, Home, Menu, User, X } from "lucide-react";
+import { Bell, Globe, Home, LogOut, Menu, User, X } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Select } from "antd";
 import shelbi from "../../shared/assets/profil.jpg";
+import { useDispatch } from "react-redux";
+import { removeToken } from "../../pages/auth/login/store/tokenSlice";
 
 const Header = () => {
   const navigate = useNavigate();
   const [burger, setBurger] = useState(false);
+  const dispatch = useDispatch()
+  const handleSignOut = () => {
+    dispatch(removeToken())
+    navigate("/login")
+  }
+
 
   return (
     <>
@@ -51,6 +59,7 @@ const Header = () => {
             />
           </div>
           <Bell />
+          <LogOut onClick={() => handleSignOut()} className="cursor-pointer"/>
           <NavLink to={"profile"}>
             <img
               src={profile}
