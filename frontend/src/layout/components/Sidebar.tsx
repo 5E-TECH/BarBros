@@ -10,16 +10,18 @@ import {
 } from "lucide-react";
 import SideBarLink from "./SideBarLink";
 import { UserRole } from "../../shared/enum";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store";
 
-interface SidebarProps {
-  role: UserRole;
-}
+// interface SidebarProps {
+//   role: UserRole;
+// }
 
 interface LinkItem {
   to: string;
   icon: React.ReactNode;
   label: string;
-  end?: boolean; 
+  end?: boolean;
 }
 
 const sidebarConfig: Record<UserRole, LinkItem[]> = {
@@ -47,8 +49,19 @@ const sidebarConfig: Record<UserRole, LinkItem[]> = {
   ],
 };
 
-const Sidebar = ({ role }: SidebarProps) => {
-  const links = sidebarConfig[role] || [];
+const Sidebar = () => {
+
+  const userRole = useSelector((state: RootState) => state.roleSlice.role);
+
+  let role: UserRole | undefined = undefined;
+  if (userRole === "supperadmin") {
+    role = UserRole.Admin
+  }else if(userRole === "barber"){
+    role = UserRole.Sartarosh
+  }
+
+  const links = role ? sidebarConfig[role] : [];
+
 
   return (
     <div className="w-[289px] border-r border-[#2d2e36] max-sm:hidden">
