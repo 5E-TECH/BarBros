@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../../../app/store";
 
-const Calendar = () => {
-
-  const role = useSelector((state: RootState) => state.roleSlice.role);
-  console.log(role);
-  
+const Calendar = () => {  
 
   const [currentMonth] = useState("August 2022");
   const [activeTab, setActiveTab] = useState("Oy");
