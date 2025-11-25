@@ -20,6 +20,7 @@ import { OtpGenerate } from 'src/infrostructure/otp_generet/otp_generate';
 import { MailService } from 'src/common/mail/mail.service';
 import { Request } from 'express';
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+import { JWTPayload } from 'src/infrostructure/utils/user.type';
 
 @Injectable()
 export class UserService {
@@ -67,9 +68,9 @@ export class UserService {
       if (!(await this.Bcrypt.Verify(loginUserDto.password, data.password))) {
         throw new ForbiddenException('Wrong password');
       }
-      const acsesToken = this.AcsesToken({ 
-        id: data.id, 
-        role: data.role 
+      const acsesToken = this.AcsesToken({
+        id: data.id,
+        role: data.role,
       });
       const refreshToken = this.RefreshToken({
         id: data.id,
@@ -81,7 +82,7 @@ export class UserService {
     }
   }
 
-async findAll(query: Record<string, any>) {
+  async findAll(query: Record<string, any>) {
     try {
       const {
         phone_number,
@@ -94,19 +95,19 @@ async findAll(query: Record<string, any>) {
       } = query;
 
       const skip = (Number(page) - 1) * Number(limit);
-      const role = UserRole.USER
-      const userRepo = await this.User.find()
-      if(!userRepo.length){
-        throw new NotFoundException("Not faund data")
+      const role = UserRole.USER;
+      const userRepo = await this.User.find();
+      if (!userRepo.length) {
+        throw new NotFoundException('Not faund data');
       }
       const [data, total] = await this.User.findAndCount({
         where: {
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(email && {email: ILike(`%${email}%`)}),
-          ...(role && {role: ILike(`%${role}%`)}),
+          ...(email && { email: ILike(`%${email}%`) }),
+          ...(role && { role: ILike(`%${role}%`) }),
         },
-        relations:["booking","notifikation", "reyting"],
+        relations: ['booking', 'notifikation', 'reyting'],
         select: ['full_name', 'email', 'phone_number', 'role', 'id'],
         order: {
           [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
@@ -133,7 +134,10 @@ async findAll(query: Record<string, any>) {
       if (user.role != UserRole.USER) {
         throw new ForbiddenException('Forbidden');
       }
-      const data = await this.User.findOne({where:{id:user.id},relations:["booking","notifikation", "reyting"] });
+      const data = await this.User.findOne({
+        where: { id: user.id },
+        relations: ['booking', 'notifikation', 'reyting'],
+      });
       return successRes(data);
     } catch (error) {
       return ErrorHender(error);
@@ -144,7 +148,7 @@ async findAll(query: Record<string, any>) {
     try {
       const data = await this.User.findOne({
         where: { id, role: UserRole.USER },
-        relations:["booking","notifikation", "reyting"],
+        relations: ['booking', 'notifikation', 'reyting'],
         select: ['full_name', 'email', 'phone_number', 'role', 'id'],
       });
       if (!data) {
@@ -170,6 +174,21 @@ async findAll(query: Record<string, any>) {
     } catch (error) {
       return ErrorHender(error);
     }
+  }
+
+  async profile(user: JWTPayload): Promise<object> {
+    try {
+      const { id } = user;
+      console.log("salommmmmm",user);
+      const myProlile = await this.User.findOne({
+        where: { id },
+      });
+      
+      return successRes(myProlile);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+    
   }
 
   async RefreshPassword(refreshPasswortDto: RefreshPasswortDto) {

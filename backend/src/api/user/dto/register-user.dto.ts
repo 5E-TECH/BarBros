@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from 'src/common/enum';
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsString,
   MaxLength,
@@ -30,6 +29,6 @@ export class RegisterUserDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(15)
-  @MinLength(5)
+  @MinLength(4)
   password: string;
 }

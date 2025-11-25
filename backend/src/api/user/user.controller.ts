@@ -21,7 +21,14 @@ import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
-import { ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { CurrentUser } from 'src/common/Decorator/user.decarator';
+import { JWTPayload } from 'src/infrostructure/utils/user.type';
 
 @Controller('user')
 export class UserController {
@@ -36,25 +43,29 @@ export class UserController {
   login(@Body() loginUserDto: LoginUserDto) {
     return this.userService.login(loginUserDto);
   }
-  @ApiOperation({summary:"Supper admin uchum"})
+  @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'full_name', required: false })
-  @ApiQuery({name: "phone_number", required: false})
-  @ApiQuery({name: "email", required: false})
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['phone_number', 'full_name', "email"] })
-  @ApiQuery({name: "order", required: false, enum:["asc","desc"]})
+  @ApiQuery({ name: 'phone_number', required: false })
+  @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['phone_number', 'full_name', 'email'],
+  })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
   findAll(@Query() query: Record<string, any>) {
     return this.userService.findAll(query);
   }
 
- @UseGuards(AuthGuard)
-  @Get("My_Accaunt")
-  my_accaunt(@Req()req:Request){
-    return this.userService.My_accaunt(req)
+  @UseGuards(AuthGuard)
+  @Get('My_Accaunt')
+  my_accaunt(@Req() req: Request) {
+    return this.userService.My_accaunt(req);
   }
 
   @UseGuards(AuthGuard, SelfGuard)
@@ -74,8 +85,24 @@ export class UserController {
     return this.userService.delet(id);
   }
 
-  @Post("Refresh_password")
-  refresh_password(@Body() data: RefreshPasswortDto){
-    return this.userService.RefreshPassword(data)
+  @Post('Refresh_password')
+  refresh_password(@Body() data: RefreshPasswortDto) {
+    return this.userService.RefreshPassword(data);
   }
+
+  @ApiOperation({
+    summary: 'Get user profile',
+    description: 'Get current user profile information',
+  })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard,SelfGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @Get('profile')
+  profile(@CurrentUser() user: JWTPayload) {
+    return this.userService.profile(user);
+  }
+  
+  
 }

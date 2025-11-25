@@ -3,8 +3,6 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class LoginUserDto {
@@ -17,7 +15,5 @@ export class LoginUserDto {
   @ApiProperty({ example: '50803006730015' })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(15)
-  @MinLength(5)
   password: string;
 }
