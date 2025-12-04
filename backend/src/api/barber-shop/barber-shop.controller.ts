@@ -83,10 +83,7 @@ export class BarberShopController {
   login(@Body() logimBarberShopDto: LogimBarberShopDto) {
     return this.barberShopService.login(logimBarberShopDto);
   }
-  @Post("verify_otp")
-  verifyOtp(@Body() data: OtpBarberShopDto){
-    return this.barberShopService.verifyOtp(data)
-  }
+
 
   @UseGuards(AuthGuard)
   @Get()

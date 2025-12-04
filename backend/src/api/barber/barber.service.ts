@@ -4,7 +4,6 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
 } from '@nestjs/common';
 import { UpdateBarberDto } from './dto/update-barber.dto';
 import { RegisterBarberDto } from './dto/register-barber.dto';
@@ -15,29 +14,31 @@ import { ILike, Repository } from 'typeorm';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { successRes } from 'src/infrostructure/utils/succesResponse';
 import { ErrorHender } from 'src/infrostructure/utils/catchError';
-import { UserService } from '../user/user.service';
-import { OtpBarberDto } from './dto/Otp-barber.dto';
 import { OtpGenerate } from 'src/infrostructure/otp_generet/otp_generate';
-import { MailModule } from 'src/common/mail/mail.module';
 import { MailService } from 'src/common/mail/mail.service';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
 import { Request } from 'express';
 import { BarberRole } from 'src/common/enum';
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+import {
+  AccessToken,
+  RefreshToken,
+} from '../../infrostructure/utils/Acses-Refresh-token';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class BarberService {
-  constructor(
+constructor(
     @InjectRepository(BarberEntity)
     private readonly BarberRepo: Repository<BarberEntity>,
     private readonly Bcrypt: BcryptEncryption,
-    private readonly UserRepo: UserService,
     private readonly Otp: OtpGenerate,
     private readonly Mail: MailService,
     private readonly fileServis: FileService,
-  ) {}
-
+    private readonly jwtService: JwtService,
+) {}
+  
   async register(
     registerBarberDto: RegisterBarberDto,
     file: Express.Multer.File,
@@ -74,24 +75,23 @@ export class BarberService {
       const data = await this.BarberRepo.findOne({
         where: { email: loginBarberDto.email },
       });
-      if (!data) {
-        throw new ForbiddenException('Wrong email');
-      }
-      if(data.role != BarberRole.BARBER){
-        throw new ForbiddenException("Forbidden")
-      }
-      if (!(await this.Bcrypt.Verify(loginBarberDto.password, data.password))) {
+      if (!data) throw new ForbiddenException('Wrong email');
+      if (data.role != BarberRole.BARBER)
+        throw new ForbiddenException('Forbidden');
+      if (!(await this.Bcrypt.Verify(loginBarberDto.password, data.password)))
         throw new ForbiddenException('Wrong password');
-      }
-      let otp = await this.Otp.Generate(String(data.email));
-      await this.Mail.sendMail(
-        data.email,
-        'Barbeshop dan salom',
-        `<div><h3>Ushbu kodni hechkimga bermayng uni faqat firibgarlar so'raydi Kod:<h1><b>${otp}</b></h1><h3></div>`,
-      );
-      return {
-        message: `Akauntingizni tasdiqlash uchun quyidagi emailga ${data.email} habar yuborildi.`,
-      };
+
+      const accessToken = AccessToken(this.jwtService, {
+        id: data.id,
+        role: data.role,
+      });
+
+      const refreshToken = RefreshToken(this.jwtService, {
+        id: data.id,
+        role: data.role,
+      });
+
+      return { accessToken, refreshToken };
     } catch (error) {
       return ErrorHender(error);
     }
@@ -111,20 +111,27 @@ export class BarberService {
       } = query;
 
       const skip = (Number(page) - 1) * Number(limit);
-      const role = BarberRole.BARBER
-      const barberRepo = await this.BarberRepo.find()
-      if(!barberRepo.length){
-        throw new NotFoundException("Not faund data")
+      const role = BarberRole.BARBER;
+      const barberRepo = await this.BarberRepo.find();
+      if (!barberRepo.length) {
+        throw new NotFoundException('Not faund data');
       }
       const [data, total] = await this.BarberRepo.findAndCount({
         where: {
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(email && {email: ILike(`%${email}%`)}),
-          ...(bio && {bio: ILike(`%${bio}%`)}),
-          ...(role && {role: ILike(`%${role}%`)}),
+          ...(email && { email: ILike(`%${email}%`) }),
+          ...(bio && { bio: ILike(`%${bio}%`) }),
+          ...(role && { role: ILike(`%${role}%`) }),
         },
-        relations:["reyting","service","barberShop","barberSchuld", "barberImage","booking"],
+        relations: [
+          'reyting',
+          'service',
+          'barberShop',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
         select: [
           'full_name',
           'email',
@@ -154,17 +161,17 @@ export class BarberService {
       return ErrorHender(error);
     }
   }
-  async My_accaunt(req: Request){
+  async My_accaunt(req: Request) {
     try {
-      let user = req["user"]
-      
-      if(user.role != BarberRole.BARBER){
-        throw new ForbiddenException("Forbidden")
+      let user = req['user'];
+
+      if (user.role != BarberRole.BARBER) {
+        throw new ForbiddenException('Forbidden');
       }
-      const data = await this.BarberRepo.findOneBy({id:user.id})
-      return successRes(data)
+      const data = await this.BarberRepo.findOneBy({ id: user.id });
+      return successRes(data);
     } catch (error) {
-      return ErrorHender(error)
+      return ErrorHender(error);
     }
   }
 
@@ -172,7 +179,14 @@ export class BarberService {
     try {
       const data = await this.BarberRepo.findOne({
         where: { id },
-        relations:["reyting","service","barberShop","barberSchuld", "barberImage","booking"],
+        relations: [
+          'reyting',
+          'service',
+          'barberShop',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
         select: [
           'full_name',
           'email',
@@ -183,7 +197,7 @@ export class BarberService {
           'is_avaylbl',
           'avg_reyting',
           'barberShop_id',
-        ]
+        ],
       });
       if (!data) {
         throw new NotFoundException('Not Fount barber');
@@ -263,60 +277,36 @@ export class BarberService {
     }
   }
 
-  async VarifyOtp(data: OtpBarberDto) {
+  async RefreshPassword(refreshPasswortDto: RefreshPasswortDto) {
     try {
-      let Otp = await this.Otp.verify(String(data.email), data.otp);
-      if (!Otp) {
-        throw new UnprocessableEntityException('Wrong otp');
+      const data = await this.BarberRepo.findOne({
+        where: { email: refreshPasswortDto.email },
+      });
+      if (!data) {
+        throw new NotFoundException('Not fount data');
       }
-      const Barber = await this.BarberRepo.findOne({
-        where: { email: data.email },
-      });
-      if (!Barber) {
-        throw new NotFoundException('Barber email not fount');
+      if (data.role != BarberRole.BARBER) {
+        throw new ForbiddenException('Forbidden');
       }
-      const acsesToken = this.UserRepo.AcsesToken({
-        id: Barber.id,
-        role: Barber.role,
-      });
-      const refreshToken = this.UserRepo.RefreshToken({
-        id: Barber.id,
-        role: Barber.role,
-      });
-      return { acsesToken, refreshToken };
+      if (refreshPasswortDto.otp && refreshPasswortDto.new_password) {
+        let isOtp = await this.Otp.verify(
+          refreshPasswortDto.email,
+          refreshPasswortDto.otp,
+        );
+        if (!isOtp) {
+          throw new BadRequestException('Wrong otp');
+        }
+        let hashPass = await this.Bcrypt.Generate(
+          refreshPasswortDto.new_password,
+        );
+        await this.BarberRepo.update({ id: data.id }, { password: hashPass });
+        return {
+          message: "Parolingiz muvofiyaqatliy o'zgartirildi",
+          statusCode: 201,
+        };
+      }
     } catch (error) {
       return ErrorHender(error);
     }
   }
-
-   async RefreshPassword(refreshPasswortDto: RefreshPasswortDto){
-      try {
-        const data = await this.BarberRepo.findOne({where: {email: refreshPasswortDto.email}})
-        if(!data){
-          throw new NotFoundException("Not fount data")
-        }
-        if(data.role != BarberRole.BARBER){
-          throw new ForbiddenException("Forbidden")
-        }
-        if(refreshPasswortDto.otp && refreshPasswortDto.new_password){
-          let isOtp = await this.Otp.verify(refreshPasswortDto.email, refreshPasswortDto.otp)
-          if(!isOtp){
-            throw new BadRequestException("Wrong otp")
-          }
-          let hashPass = await this.Bcrypt.Generate(refreshPasswortDto.new_password)
-          await this.BarberRepo.update({id: data.id},{password: hashPass})
-          return {message: "Parolingiz muvofiyaqatliy o'zgartirildi",statusCode: 201}
-  
-        }
-        let otp = await this.Otp.Generate(data.email)
-        await this.Mail.sendMail(data.email, 'Salom Sizning tasdiqlash kodingiz',
-          `<div><h3>Ushbu kodni kichkimga bermayng uni faqat firibgarlar so'raydi Kod:<h1><b>${otp}</b></h1><h3></div>`,);
-  
-          return {
-            message: `Akauntingizni tasdiqlash uchun quyidagi emailga ${data.email} habar yuborildi.`,
-          };
-      } catch (error) {
-        return ErrorHender(error)
-      }
-    }
 }

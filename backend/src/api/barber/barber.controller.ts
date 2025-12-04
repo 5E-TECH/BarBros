@@ -89,10 +89,7 @@ export class BarberController {
   login(@Body() loginBarberDto: LoginBarberDto) {
     return this.barberService.login(loginBarberDto);
   }
-  @Post('verify_otp')
-  verify_otp(@Body() data: OtpBarberDto) {
-    return this.barberService.VarifyOtp(data);
-  }
+
 
   @UseGuards(AuthGuard)
   @Get('all')

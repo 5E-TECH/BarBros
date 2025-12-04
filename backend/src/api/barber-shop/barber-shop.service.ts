@@ -3,10 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  UnprocessableEntityException,
-  ValidationPipe,
 } from '@nestjs/common';
 import { CreateBarberShopDto } from './dto/create-barber-shop.dto';
 import { UpdateBarberShopDto } from './dto/update-barber-shop.dto';
@@ -15,7 +12,6 @@ import { BarberShopEntity } from '../../core/entity/barber-shop.entity';
 import { ILike, Repository } from 'typeorm';
 import { ErrorHender } from 'src/infrostructure/utils/catchError';
 import { successRes } from 'src/infrostructure/utils/succesResponse';
-import { error } from 'console';
 import { UpdateBarberShopStatus } from './dto/update-status';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
@@ -23,23 +19,21 @@ import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { OtpGenerate } from 'src/infrostructure/otp_generet/otp_generate';
 import { MailService } from 'src/common/mail/mail.service';
-import { OtpBarberShopDto } from './dto/Otp-barber-shop.dto';
-import { UserService } from '../user/user.service';
 import { Request } from 'express';
 import { BarberRole } from 'src/common/enum';
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
 
 @Injectable()
 export class BarberShopService {
-  constructor(
+constructor(
     @InjectRepository(BarberShopEntity)
     private barberRepo: Repository<BarberShopEntity>,
     private readonly fileservis: FileService,
     private readonly Bcrypt: BcryptEncryption,
     private readonly Otp: OtpGenerate,
     private readonly Mail: MailService,
-    private readonly UserRepo: UserService,
   ) {}
+
   async create(
     createBarberShopDto: CreateBarberShopDto,
     file: Express.Multer.File,
@@ -96,31 +90,6 @@ export class BarberShopService {
       return {
         message: `Akauntingizni tasdiqlash uchun quyidagi emailga ${data.email} habar yuborildi.`,
       };
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
-  async verifyOtp(data: OtpBarberShopDto) {
-    try {
-      let Otp = await this.Otp.verify(String(data.email), data.otp);
-      if (!Otp) {
-        throw new UnprocessableEntityException('Wrong otp');
-      }
-      const BarberShop = await this.barberRepo.findOne({
-        where: { email: data.email },
-      });
-      if (!BarberShop) {
-        throw new NotFoundException('BarberShop email not fount');
-      }
-      const acsesToken = this.UserRepo.AcsesToken({
-        id: BarberShop.id,
-        role: BarberShop.role,
-      });
-      const refreshToken = this.UserRepo.RefreshToken({
-        id: BarberShop.id,
-        role: BarberShop.role,
-      });
-      return { acsesToken, refreshToken };
     } catch (error) {
       return ErrorHender(error);
     }

@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { RegisterUserDto } from '../user/dto/register-user.dto';
-import { LoginUserDto } from '../user/dto/login-user.dto';
+import { LoginAdminDto } from './dto/login -admin.dto';
 import { OtpBarberDto } from '../barber/dto/Otp-barber.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
@@ -27,24 +27,9 @@ import { RefreshPasswortDto } from './dto/RefreshPassword.dto';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @ApiOperation({
-    summary: 'Admin Creyted Supper_admin tomonidan',
-  })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN)
-  @Post('signup')
-  register(@Body() registerUserDti: RegisterUserDto) {
-    return this.adminService.register(registerUserDti);
-  }
-
   @Post('signin')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.adminService.login(loginUserDto);
-  }
-
-  @Post('verify_otp')
-  verify(@Body() data: OtpBarberDto) {
-    return this.adminService.VarifyOtp(data);
+  login(@Body() loginAdminDto: LoginAdminDto) {
+    return this.adminService.login(loginAdminDto);
   }
 
   @ApiOperation({summary:"Supper admin uchum"})
@@ -99,7 +84,7 @@ export class AdminController {
 
 
   @ApiOperation({summary: "Supper admin va admin uchun"})
-  @Post("Refresh_Password")
+  @Post("refresh_rassword")
   RefreshPassword(@Body() data: RefreshPasswortDto){
     return this.adminService.RefreshPassword(data)
   }

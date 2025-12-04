@@ -11,7 +11,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
@@ -29,20 +28,52 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/common/Decorator/user.decarator';
 import { JWTPayload } from 'src/infrostructure/utils/user.type';
+import { FullNameDto, RegisterDto, VerifyDto } from './dto/auth-dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('Siginup')
-  register(@Body() registerUserDti: RegisterUserDto) {
-    return this.userService.register(registerUserDti);
+  @ApiOperation({ summary: 'Register user (send phone number)' })
+  @ApiResponse({
+    status: 201,
+    description: 'Code sent successfully (0000 test code)',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid phone number' })
+  @Post('register')
+  register(@Body() data: RegisterDto) {
+    return this.userService.register(data.phone_number);
+  }
+
+  @ApiOperation({ summary: 'Verify code and get access token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Code verified, token generated',
+  })
+  @ApiResponse({ status: 403, description: 'Wrong code or user not found' })
+  @Post('verify')
+  verify(@Body() data: VerifyDto) {
+    return this.userService.verifyCode(data.phone_number, data.code);
+  }
+
+  @ApiOperation({ summary: 'Set full name for user' })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Full name saved successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @UseGuards(AuthGuard)
+  @Post('set-fullname')
+  setFullName(@CurrentUser() user: JWTPayload, @Body() data: FullNameDto) {
+    return this.userService.setFullName(user.id, data.full_name);
   }
 
   @Post('Signin')
   login(@Body() loginUserDto: LoginUserDto) {
     return this.userService.login(loginUserDto);
   }
+
   @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
@@ -63,7 +94,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('My_Accaunt')
+  @Get('my_accaunt')
   my_accaunt(@Req() req: Request) {
     return this.userService.My_accaunt(req);
   }
@@ -85,11 +116,6 @@ export class UserController {
     return this.userService.delet(id);
   }
 
-  @Post('Refresh_password')
-  refresh_password(@Body() data: RefreshPasswortDto) {
-    return this.userService.RefreshPassword(data);
-  }
-
   @ApiOperation({
     summary: 'Get user profile',
     description: 'Get current user profile information',
@@ -97,12 +123,10 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard,SelfGuard)
+  @UseGuards(AuthGuard, SelfGuard)
   @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
   @Get('profile')
   profile(@CurrentUser() user: JWTPayload) {
     return this.userService.profile(user);
   }
-  
-  
 }
