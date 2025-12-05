@@ -11,7 +11,6 @@ import {
 export class RegisterUserDto {
   @ApiProperty({ example: 'Faxriddin Maripov' })
   @IsString()
-  @IsNotEmpty()
   full_name: string;
 
   @ApiProperty({ example: '+998930451852' })
@@ -19,16 +18,6 @@ export class RegisterUserDto {
   @IsNotEmpty()
   phone_number: string;
 
-  @ApiProperty({ example: 'karalevstvabitva@gmail.com' })
-  @IsString()
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
 
-  @ApiProperty({ example: '50803006730015' })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(15)
-  @MinLength(4)
-  password: string;
+
 }

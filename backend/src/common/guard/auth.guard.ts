@@ -30,7 +30,7 @@ import { Request } from "express";
   
       try {
         const data = this.jwtService.verify(token, {
-          secret: String(process.env.ACSES_SECRET),
+          secret: String(process.env.JWT_SECRET),
         });
   
         request["user"] = data

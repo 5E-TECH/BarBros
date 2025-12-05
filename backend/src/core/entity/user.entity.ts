@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRole } from 'src/common/enum';
 import { BaseEntity } from 'src/common/database/baseEntity';
 import { ReytingEntity } from './reyting.entity';
@@ -8,10 +8,13 @@ import { BookingEntity } from './booking.entity';
 @Entity('user')
 export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
-  full_name: string;
+  full_name?: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar',unique: true })
   phone_number: string;
+
+  @Column({ type: 'varchar'})  // email unique bo‘lishi kerak
+  email: string;
 
   @Column({ type: 'varchar' })
   password: string;

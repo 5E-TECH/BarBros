@@ -15,7 +15,7 @@ import { successRes } from 'src/infrostructure/utils/succesResponse';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
-import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 import { JWTPayload } from 'src/infrostructure/utils/user.type';
 import {
   AccessToken,

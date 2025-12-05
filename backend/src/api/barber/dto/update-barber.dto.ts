@@ -37,4 +37,8 @@ export class UpdateBarberDto {
     return value;
   })
   is_avaylbl: boolean;
+
+  @IsString()
+  @IsOptional()
+  img: string; // <-- img maydoni qo‘shildi
 }

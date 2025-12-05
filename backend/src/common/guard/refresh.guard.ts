@@ -31,7 +31,7 @@ import { Request } from "express";
   
       try {
         const data = this.jwtService.verify(token, {
-          secret: String(process.env.REFRESG_SEKRET),
+          secret: String(process.env.JWT_REFRESH_SECRET),
         });
   
         request["user"] = data;

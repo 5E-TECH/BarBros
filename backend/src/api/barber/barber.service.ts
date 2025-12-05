@@ -5,91 +5,75 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateBarberDto } from './dto/update-barber.dto';
-import { RegisterBarberDto } from './dto/register-barber.dto';
-import { LoginBarberDto } from './dto/login-barber.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, ILike } from 'typeorm';
+import { Request } from 'express';
+
 import { BarberEntity } from 'src/core/entity/barber.entity';
-import { ILike, Repository } from 'typeorm';
+import { BarberRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
-import { successRes } from 'src/infrostructure/utils/succesResponse';
-import { ErrorHender } from 'src/infrostructure/utils/catchError';
-import { OtpGenerate } from 'src/infrostructure/otp_generet/otp_generate';
-import { MailService } from 'src/common/mail/mail.service';
+import { JwtService } from '@nestjs/jwt';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
-import { Request } from 'express';
-import { BarberRole } from 'src/common/enum';
-import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
-import {
-  AccessToken,
-  RefreshToken,
-} from '../../infrostructure/utils/Acses-Refresh-token';
-import { JwtService } from '@nestjs/jwt';
+
+import { RegisterBarberDto } from './dto/register-barber.dto';
+import { LoginBarberDto } from './dto/login-barber.dto';
+import { UpdateBarberDto } from './dto/update-barber.dto';
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
+
+import { AccessToken, RefreshToken } from 'src/infrostructure/utils/Acses-Refresh-token';
+import { successRes } from 'src/infrostructure/utils/succesResponse';
+import { ErrorHender } from 'src/infrostructure/utils/catchError';
 
 @Injectable()
 export class BarberService {
-constructor(
+  constructor(
     @InjectRepository(BarberEntity)
     private readonly BarberRepo: Repository<BarberEntity>,
     private readonly Bcrypt: BcryptEncryption,
-    private readonly Otp: OtpGenerate,
-    private readonly Mail: MailService,
     private readonly fileServis: FileService,
     private readonly jwtService: JwtService,
-) {}
-  
-  async register(
-    registerBarberDto: RegisterBarberDto,
-    file: Express.Multer.File,
-  ) {
+  ) {}
+
+  // Barber ro'yxatdan o'tkazish
+  async register(registerBarberDto: RegisterBarberDto, file?: Express.Multer.File) {
     try {
-      const data = await this.BarberRepo.findOne({
-        where: { email: registerBarberDto.email },
-      });
-      if (data) {
-        throw new ConflictException('Barber email alredy exists');
-      }
+      const existing = await this.BarberRepo.findOne({ where: { email: registerBarberDto.email } });
+      if (existing) throw new ConflictException('Barber email already exists');
+
       const hashPass = await this.Bcrypt.Generate(registerBarberDto.password);
-      let newBarber = {
+
+      const newBarber = this.BarberRepo.create({
         ...registerBarberDto,
         password: hashPass,
-      };
+        role: BarberRole.BARBER,
+      });
+
       if (file && new ImageValidationPipe().transform(file)) {
         const img = await this.fileServis.createFile(file);
-        const Barber = this.BarberRepo.create({ ...newBarber, img });
-        await this.BarberRepo.save(Barber);
-        return successRes(Barber, 201);
-      } else {
-        const Barber = this.BarberRepo.create(newBarber);
-        await this.BarberRepo.save(Barber);
-        return successRes(Barber, 201);
+        newBarber.img = img;
       }
+
+      await this.BarberRepo.save(newBarber);
+      return successRes(newBarber, 201);
     } catch (error) {
       return ErrorHender(error);
     }
   }
 
+  // Barber login
   async login(loginBarberDto: LoginBarberDto) {
     try {
-      const data = await this.BarberRepo.findOne({
-        where: { email: loginBarberDto.email },
-      });
-      if (!data) throw new ForbiddenException('Wrong email');
-      if (data.role != BarberRole.BARBER)
-        throw new ForbiddenException('Forbidden');
-      if (!(await this.Bcrypt.Verify(loginBarberDto.password, data.password)))
-        throw new ForbiddenException('Wrong password');
+      const barber = await this.BarberRepo.findOne({ where: { email: loginBarberDto.email } });
+      if (!barber) throw new ForbiddenException('Wrong email');
 
-      const accessToken = AccessToken(this.jwtService, {
-        id: data.id,
-        role: data.role,
-      });
+      if (barber.role !== BarberRole.BARBER) throw new ForbiddenException('Forbidden');
 
-      const refreshToken = RefreshToken(this.jwtService, {
-        id: data.id,
-        role: data.role,
-      });
+      const isMatch = await this.Bcrypt.Verify(loginBarberDto.password, barber.password);
+      if (!isMatch) throw new ForbiddenException('Wrong password');
+
+      const accessToken = AccessToken(this.jwtService, { id: barber.id, role: barber.role });
+      const refreshToken = RefreshToken(this.jwtService, { id: barber.id, role: barber.role });
 
       return { accessToken, refreshToken };
     } catch (error) {
@@ -97,55 +81,35 @@ constructor(
     }
   }
 
+  // Barber account malumotlarini olish
+  async myAccount(req: Request) {
+    try {
+      const user = req['user'];
+      if (user.role !== BarberRole.BARBER) throw new ForbiddenException('Forbidden');
+
+      const barber = await this.BarberRepo.findOne({ where: { id: user.id } });
+      return successRes(barber);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  // Barcha barberlarni olish
   async findAll(query: Record<string, any>) {
     try {
-      const {
-        phone_number,
-        full_name,
-        email,
-        bio,
-        sortBy = 'full_name',
-        order = 'DESC',
-        page = 1,
-        limit = 10,
-      } = query;
-
+      const { full_name, phone_number, email, bio, sortBy = 'full_name', order = 'DESC', page = 1, limit = 10 } = query;
       const skip = (Number(page) - 1) * Number(limit);
-      const role = BarberRole.BARBER;
-      const barberRepo = await this.BarberRepo.find();
-      if (!barberRepo.length) {
-        throw new NotFoundException('Not faund data');
-      }
+
       const [data, total] = await this.BarberRepo.findAndCount({
         where: {
+          role: BarberRole.BARBER,
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
           ...(email && { email: ILike(`%${email}%`) }),
           ...(bio && { bio: ILike(`%${bio}%`) }),
-          ...(role && { role: ILike(`%${role}%`) }),
         },
-        relations: [
-          'reyting',
-          'service',
-          'barberShop',
-          'barberSchuld',
-          'barberImage',
-          'booking',
-        ],
-        select: [
-          'full_name',
-          'email',
-          'img',
-          'phone_number',
-          'bio',
-          'id',
-          'is_avaylbl',
-          'avg_reyting',
-          'barberShop_id',
-        ],
-        order: {
-          [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
-        },
+        relations: ['reyting', 'service', 'barberShop', 'barberSchuld', 'barberImage', 'booking'],
+        order: { [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC' },
         skip,
         take: Number(limit),
       });
@@ -161,150 +125,68 @@ constructor(
       return ErrorHender(error);
     }
   }
-  async My_accaunt(req: Request) {
-    try {
-      let user = req['user'];
 
-      if (user.role != BarberRole.BARBER) {
-        throw new ForbiddenException('Forbidden');
-      }
-      const data = await this.BarberRepo.findOneBy({ id: user.id });
-      return successRes(data);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
-
-  async findOne(id: string) {
+  // Barber malumotlarini yangilash
+  async update(id: string, updateBarberDto: UpdateBarberDto, file?: Express.Multer.File) {
     try {
-      const data = await this.BarberRepo.findOne({
-        where: { id },
-        relations: [
-          'reyting',
-          'service',
-          'barberShop',
-          'barberSchuld',
-          'barberImage',
-          'booking',
-        ],
-        select: [
-          'full_name',
-          'email',
-          'img',
-          'phone_number',
-          'bio',
-          'id',
-          'is_avaylbl',
-          'avg_reyting',
-          'barberShop_id',
-        ],
-      });
-      if (!data) {
-        throw new NotFoundException('Not Fount barber');
-      }
-      return successRes(data);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
+      const barber = await this.BarberRepo.findOne({ where: { id } });
+      if (!barber) throw new NotFoundException('Barber not found');
 
-  async update(
-    id: string,
-    updateBarberDto: UpdateBarberDto,
-    file: Express.Multer.File,
-  ) {
-    try {
-      const data = await this.BarberRepo.findOneBy({ id });
-      if (!data) {
-        throw new NotFoundException('Not Fount barber');
-      }
       if (file) {
-        if (data.img) {
-          if (await this.fileServis.existFile(data.img)) {
-            await this.fileServis.deleteFile(data.img);
-          }
+        if (barber.img && await this.fileServis.existFile(barber.img)) {
+          await this.fileServis.deleteFile(barber.img);
         }
         const img = await this.fileServis.createFile(file);
-        await this.BarberRepo.update(id, { ...updateBarberDto, img: img });
-        let newBarber = await this.BarberRepo.findOne({
-          where: { id },
-          select: [
-            'full_name',
-            'email',
-            'img',
-            'phone_number',
-            'bio',
-            'id',
-            'is_avaylbl',
-            'avg_reyting',
-            'barberShop_id',
-          ],
-        });
-        return successRes(newBarber);
-      } else {
-        await this.BarberRepo.update(id, updateBarberDto);
-        let newBarber = await this.BarberRepo.findOne({
-          where: { id },
-          select: [
-            'full_name',
-            'email',
-            'img',
-            'phone_number',
-            'bio',
-            'id',
-            'is_avaylbl',
-            'avg_reyting',
-            'barberShop_id',
-          ],
-        });
-        return successRes(newBarber);
+        updateBarberDto.img = img;
       }
+
+      await this.BarberRepo.update(id, updateBarberDto);
+      const updated = await this.BarberRepo.findOne({ where: { id } });
+      return successRes(updated);
     } catch (error) {
       return ErrorHender(error);
     }
   }
 
+  // Barberni o'chirish
   async remove(id: string) {
     try {
-      const data = await this.BarberRepo.findOneBy({ id });
-      if (!data) {
-        throw new NotFoundException('Not Fount barber');
-      }
-      let deleted = await this.BarberRepo.remove(data);
-      return successRes(deleted);
+      const barber = await this.BarberRepo.findOne({ where: { id } });
+      if (!barber) throw new NotFoundException('Barber not found');
+
+      await this.BarberRepo.remove(barber);
+      return successRes(barber);
     } catch (error) {
       return ErrorHender(error);
     }
   }
 
-  async RefreshPassword(refreshPasswortDto: RefreshPasswortDto) {
+  // Parolni yangilash
+  async refreshPassword(data: RefreshPasswordDto) {
     try {
-      const data = await this.BarberRepo.findOne({
-        where: { email: refreshPasswortDto.email },
+      const barber = await this.BarberRepo.findOne({ where: { email: data.email } });
+      if (!barber) throw new NotFoundException('Barber not found');
+
+      if (!data.new_password) throw new BadRequestException('New password is required');
+
+      const hashPass = await this.Bcrypt.Generate(data.new_password);
+      await this.BarberRepo.update({ id: barber.id }, { password: hashPass });
+
+      return { message: "Password updated successfully", statusCode: 201 };
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  // Id orqali barber olish
+  async findOne(id: string) {
+    try {
+      const barber = await this.BarberRepo.findOne({
+        where: { id },
+        relations: ['reyting', 'service', 'barberShop', 'barberSchuld', 'barberImage', 'booking'],
       });
-      if (!data) {
-        throw new NotFoundException('Not fount data');
-      }
-      if (data.role != BarberRole.BARBER) {
-        throw new ForbiddenException('Forbidden');
-      }
-      if (refreshPasswortDto.otp && refreshPasswortDto.new_password) {
-        let isOtp = await this.Otp.verify(
-          refreshPasswortDto.email,
-          refreshPasswortDto.otp,
-        );
-        if (!isOtp) {
-          throw new BadRequestException('Wrong otp');
-        }
-        let hashPass = await this.Bcrypt.Generate(
-          refreshPasswortDto.new_password,
-        );
-        await this.BarberRepo.update({ id: data.id }, { password: hashPass });
-        return {
-          message: "Parolingiz muvofiyaqatliy o'zgartirildi",
-          statusCode: 201,
-        };
-      }
+      if (!barber) throw new NotFoundException('Barber not found');
+      return successRes(barber);
     } catch (error) {
       return ErrorHender(error);
     }

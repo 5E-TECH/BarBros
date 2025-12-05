@@ -24,7 +24,7 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
-import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 import { OtpBarberShopDto } from './dto/Otp-barber-shop.dto';
 
 @Controller('barber-shop')
@@ -100,7 +100,7 @@ export class BarberShopController {
   @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
-    return this.barberShopService.My_accaunt(req);
+    return this.barberShopService.myAccount(req);
   }
 
   @UseGuards(AuthGuard)
@@ -175,7 +175,7 @@ export class BarberShopController {
   }
 
   @Post('Refresh_password')
-  refresh_password(data: RefreshPasswortDto) {
-    return this.barberShopService.RefreshPassword(data);
+  refresh_password(data: RefreshPasswordDto) {
+    return this.barberShopService.refreshPassword(data);
   }
 }

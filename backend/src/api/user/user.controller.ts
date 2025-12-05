@@ -19,7 +19,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
-import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 import {
   ApiBearerAuth,
   ApiOperation,

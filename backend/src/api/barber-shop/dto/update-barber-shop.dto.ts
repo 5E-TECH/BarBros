@@ -5,6 +5,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+
 export class UpdateBarberShopDto {
   @IsString()
   @IsOptional()
@@ -26,4 +27,7 @@ export class UpdateBarberShopDto {
   @IsOptional()
   phoneNumber: string;
 
+  @IsString()
+  @IsOptional()
+  img: string; // <-- bu qatorni qo‘shish kerak
 }
