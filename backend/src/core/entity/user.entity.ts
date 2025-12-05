@@ -13,7 +13,7 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar',unique: true })
   phone_number: string;
 
-  @Column({ type: 'varchar'})  // email unique bo‘lishi kerak
+  @Column({ type: 'varchar',unique:true})  // email unique bo‘lishi kerak
   email: string;
 
   @Column({ type: 'varchar' })

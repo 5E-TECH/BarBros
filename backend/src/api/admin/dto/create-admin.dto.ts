@@ -28,6 +28,6 @@ export class CreateAdminDto {
     description: "Adminning paroli (kamida 6ta belgi)"
   })
   @IsString()
-  @MinLength(6)
+  @MinLength(4)
   password: string;
 }
