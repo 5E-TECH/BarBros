@@ -32,40 +32,58 @@ export class UserService {
 async register(phone_number: string) {
   try {
     let user = await this.userRepo.findOne({ where: { phone_number } });
-    let isNewUser = false;
+
+    const code = '0000'; // Hozircha test
 
     if (!user) {
       user = this.userRepo.create({
         phone_number,
-        code: '0000',
+        code,
         role: UserRole.USER,
+        is_completed: false,
       });
+
       await this.userRepo.save(user);
-      isNewUser = true;
-    } else {
-      user.code = '0000';
-      await this.userRepo.save(user);
+
+      return {
+        is_new: true,
+        message: 'New user created, code sent',
+        user_id: user.id,
+      };
     }
 
+    // Eski user bo‘lsa — code yangilanadi
+    user.code = code;
+    await this.userRepo.save(user);
+
     return {
-      message: isNewUser
-        ? 'New user created and code sent (hozircha 0000)'
-        : 'Existing user code sent (hozircha 0000)',
+      is_new: false,
+      message: 'Existing user code sent',
       user_id: user.id,
-      code: user.code,
     };
+
   } catch (error) {
     return ErrorHender(error);
   }
 }
 
+
 async verifyCode(phone_number: string, code: string) {
   try {
     const user = await this.userRepo.findOne({ where: { phone_number } });
     if (!user) throw new ForbiddenException('User not found');
-
     if (code !== user.code) throw new ForbiddenException('Wrong code');
 
+    // Yangi user hali full_name kiritmagan → token bermaymiz
+    if (!user.is_completed) {
+      return {
+        step: 'set_full_name',
+        message: 'Please set your full name',
+        user_id: user.id,
+      };
+    }
+
+    // Eski user → to‘liq ro‘yxatdan o‘tgan → token beramiz
     const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
     const refreshToken = RefreshToken(this.jwtService, { id: user.id, role: user.role });
 
@@ -75,22 +93,29 @@ async verifyCode(phone_number: string, code: string) {
   }
 }
 
+
 async setFullName(user_id: string, full_name: string) {
   try {
     const user = await this.userRepo.findOne({ where: { id: user_id } });
     if (!user) throw new NotFoundException('User not found');
 
     user.full_name = full_name;
+    user.is_completed = true; // Endi to‘liq ro‘yxatdan o‘tdi
     await this.userRepo.save(user);
+
+    const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
+    const refreshToken = RefreshToken(this.jwtService, { id: user.id, role: user.role });
 
     return {
       message: 'Full name set successfully',
-      user_id: user.id
+      accessToken,
+      refreshToken,
     };
   } catch (error) {
     return ErrorHender(error);
   }
 }
+
 
   async findAll(query: Record<string, any>) {
     try {

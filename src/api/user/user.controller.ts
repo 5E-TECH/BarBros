@@ -63,7 +63,7 @@ export class UserController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard)
-  @Post('set-fullname')
+  @Patch('set-fullname')
   setFullName(@CurrentUser() user: JWTPayload, @Body() data: FullNameDto) {
     return this.userService.setFullName(user.id, data.full_name);
   }

@@ -13,10 +13,10 @@ export class NotificationEntity extends BaseEntity {
   @Column({ type: 'uuid' })
   user_id: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.notifikation, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  // @ManyToOne(() => UserEntity, (user) => user.notifikation, {
+  //   onDelete: 'CASCADE',
+  //   onUpdate: 'CASCADE',
+  // })
+  // @JoinColumn({ name: 'user_id' })
+  // user: UserEntity;
 }

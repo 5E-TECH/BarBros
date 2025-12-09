@@ -25,10 +25,10 @@ export class ReytingEntity extends BaseEntity {
   @JoinColumn({ name: 'barber_id' })
   barber: BarberEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.reyting, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  // @ManyToOne(() => UserEntity, (user) => user.reyting, {
+  //   onDelete: 'CASCADE',
+  //   onUpdate: 'CASCADE',
+  // })
+  // @JoinColumn({ name: 'user_id' })
+  // user: UserEntity;
 }
