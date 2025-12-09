@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { UserEntity } from 'src/core/entity/user.entity';
+import { AdminEntity } from 'src/core/entity/admin-entity';
 import { UserRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -24,13 +24,12 @@ import { Request } from 'express';
 @Injectable()
 export class AdminService implements OnModuleInit {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(AdminEntity)
+    private readonly userRepo: Repository<AdminEntity>,
     private readonly bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
   ) {}
 
-  // Supper adminni avtomatik yaratish
 async onModuleInit() {
   const full_name = process.env.SUPPER_ADMIN_FULL_NAME;
   const phone_number = process.env.SUPPER_ADMIN_PHONE_NUMBER;
@@ -63,21 +62,23 @@ async createAdmin(data: CreateAdminDto, req: Request) {
   try {
     const currentUser = req['user'];
 
-    // Faqat SUPPER_ADMIN admin yaratishi mumkin
     if (currentUser.role !== UserRole.SUPPER_ADMIN) {
       throw new ForbiddenException("Only supper admin can create admin");
     }
 
-    // Email borligini tekshirish
-    const candidate = await this.userRepo.findOne({ where: { email: data.email } });
-    if (candidate) {
-      throw new BadRequestException("Admin with this email already exists");
+    const exists = await this.userRepo.findOne({
+      where: [
+        { email: data.email },
+        { phone_number: data.phone_number },
+      ],
+    });
+
+    if (exists) {
+      throw new BadRequestException("Email yoki telefon raqam allaqachon mavjud");
     }
 
-    // Passwordni hash qilish
     const hashPass = await this.bcrypt.Generate(data.password);
 
-    // Admin yaratish
     const newAdmin = this.userRepo.create({
       full_name: data.full_name,
       email: data.email,
@@ -95,11 +96,9 @@ async createAdmin(data: CreateAdminDto, req: Request) {
 }
 
 
-
-  // Login admin
 async login(loginDto: AdminLoginDto) {
   try {
-    const user = await this.userRepo.findOne({ where: { email: loginDto.email } }); // email bo‘yicha
+    const user = await this.userRepo.findOne({ where: { email: loginDto.email } });
     if (!user) throw new ForbiddenException('Wrong email or password');
     if (![UserRole.ADMIN, UserRole.SUPPER_ADMIN].includes(user.role)) throw new ForbiddenException('Forbidden');
 
@@ -115,7 +114,6 @@ async login(loginDto: AdminLoginDto) {
   }
 }
 
-  // Barcha adminlarni olish (supper admin uchun)
   async findAll(query: Record<string, any>) {
     try {
       const { full_name, phone_number, email, sortBy = 'full_name', order = 'DESC', page = 1, limit = 10 } = query;

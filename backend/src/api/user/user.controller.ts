@@ -11,7 +11,6 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { SelfGuard } from 'src/common/guard/self.guard';
@@ -69,10 +68,7 @@ export class UserController {
     return this.userService.setFullName(user.id, data.full_name);
   }
 
-  @Post('Signin')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.userService.login(loginUserDto);
-  }
+
 
   @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)
@@ -82,11 +78,10 @@ export class UserController {
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'full_name', required: false })
   @ApiQuery({ name: 'phone_number', required: false })
-  @ApiQuery({ name: 'email', required: false })
   @ApiQuery({
     name: 'sortBy',
     required: false,
-    enum: ['phone_number', 'full_name', 'email'],
+    enum: ['phone_number', 'full_name'],
   })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
   findAll(@Query() query: Record<string, any>) {

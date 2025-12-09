@@ -4,7 +4,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { LoginUserDto } from './dto/login-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/core/entity/user.entity';
 import { ILike, Repository } from 'typeorm';
@@ -15,7 +14,6 @@ import { successRes } from 'src/infrostructure/utils/succesResponse';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
-import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 import { JWTPayload } from 'src/infrostructure/utils/user.type';
 import {
   AccessToken,
@@ -28,96 +26,77 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
-    private readonly bcrypt: BcryptEncryption,
   ) {}
 
 
-   async register(phone_number: string) {
+async register(phone_number: string) {
+  try {
     let user = await this.userRepo.findOne({ where: { phone_number } });
+    let isNewUser = false;
 
-    // Yangi user bo‘lsa, yaratiladi
     if (!user) {
       user = this.userRepo.create({
         phone_number,
-        code: '0000', // hozircha default code
+        code: '0000',
         role: UserRole.USER,
       });
       await this.userRepo.save(user);
+      isNewUser = true;
+    } else {
+      user.code = '0000';
+      await this.userRepo.save(user);
     }
 
-    // OTP yuborish (hozircha 0000)
     return {
-      message: 'Code sent to your phone (hozircha 0000)',
+      message: isNewUser
+        ? 'New user created and code sent (hozircha 0000)'
+        : 'Existing user code sent (hozircha 0000)',
       user_id: user.id,
+      code: user.code,
     };
+  } catch (error) {
+    return ErrorHender(error);
   }
+}
 
-  async verifyCode(phone_number: string, code: string) {
+async verifyCode(phone_number: string, code: string) {
+  try {
     const user = await this.userRepo.findOne({ where: { phone_number } });
     if (!user) throw new ForbiddenException('User not found');
 
     if (code !== user.code) throw new ForbiddenException('Wrong code');
 
-    const accessToken = this.jwtService.sign({
-      id: user.id,
-      role: user.role,
-    });
+    const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
+    const refreshToken = RefreshToken(this.jwtService, { id: user.id, role: user.role });
 
-    return { accessToken, user_id: user.id, message: 'Code verified' };
+    return { accessToken, refreshToken };
+  } catch (error) {
+    return ErrorHender(error);
   }
+}
 
-  async setFullName(user_id: string, full_name: string) {
+async setFullName(user_id: string, full_name: string) {
+  try {
     const user = await this.userRepo.findOne({ where: { id: user_id } });
     if (!user) throw new NotFoundException('User not found');
 
     user.full_name = full_name;
     await this.userRepo.save(user);
 
-    return { message: 'Full name set successfully', user_id: user.id };
+    return {
+      message: 'Full name set successfully',
+      user_id: user.id
+    };
+  } catch (error) {
+    return ErrorHender(error);
   }
-
-
-
-  async login(loginUserDto: LoginUserDto) {
-    try {
-      const user = await this.userRepo.findOne({
-        where: { phone_number: loginUserDto.phone_number },
-      });
-
-      if (!user) {
-        throw new ForbiddenException('Phone number not found');
-      }
-
-      if (loginUserDto.code !== user.code) {
-        throw new ForbiddenException('Wrong code');
-      }
-
-      if (user.role !== UserRole.USER && user.role !== UserRole.SUPPER_ADMIN) {
-        throw new ForbiddenException('Forbidden');
-      }
-
-      const accessToken = AccessToken(this.jwtService, {
-        id: user.id,
-        role: user.role,
-      });
-
-      const refreshToken = RefreshToken(this.jwtService, {
-        id: user.id,
-        role: user.role,
-      });
-
-      return { accessToken, refreshToken };
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
+}
 
   async findAll(query: Record<string, any>) {
     try {
       const {
         phone_number,
         full_name,
-        email,
         sortBy = 'full_name',
         order = 'DESC',
         page = 1,
@@ -134,7 +113,6 @@ export class UserService {
         where: {
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(email && { email: ILike(`%${email}%`) }),
           ...(role && { role: ILike(`%${role}%`) }),
         },
         relations: ['booking', 'notifikation', 'reyting'],
@@ -218,8 +196,6 @@ export class UserService {
       return ErrorHender(error);
     }
   }
-
-
 
   async delet(id: string) {
     try {
