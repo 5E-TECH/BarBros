@@ -115,7 +115,7 @@ export class BarberShopService {
   }
 
   // BarberShop malumotlarini yangilash
-  async update(id: string, updateDto: UpdateBarberShopDto, file?: Express.Multer.File, req?: Request) {
+  async update(id: number, updateDto: UpdateBarberShopDto, file?: Express.Multer.File, req?: Request) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
       if (!shop) throw new NotFoundException('BarberShop not found');
@@ -137,7 +137,7 @@ export class BarberShopService {
   }
 
   // BarberShop o'chirish
-  async remove(id: string) {
+  async remove(id: number) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
       if (!shop) throw new NotFoundException('BarberShop not found');
@@ -155,7 +155,7 @@ export class BarberShopService {
   }
 
   // BarberShop status yangilash
-  async statusUpdate(id: string, newData: UpdateBarberShopStatus) {
+  async statusUpdate(id: number, newData: UpdateBarberShopStatus) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
       if (!shop) throw new NotFoundException('BarberShop not found');
@@ -186,7 +186,7 @@ export class BarberShopService {
   }
 
   // Id orqali BarberShop olish
-  async findOne(id: string) {
+  async findOne(id: number) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id }, relations: ['barber', 'images'] });
       if (!shop) throw new NotFoundException('BarberShop not found');

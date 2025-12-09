@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { AdminEntity } from 'src/core/entity/admin-entity';
+// import { AdminEntity } from 'src/core/entity/admin.entity';
 import { UserRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -20,12 +20,13 @@ import { successRes } from 'src/infrostructure/utils/succesResponse';
 import { AccessToken, RefreshToken } from 'src/infrostructure/utils/Acses-Refresh-token';
 import { ErrorHender } from 'src/infrostructure/utils/catchError';
 import { Request } from 'express';
+import { UserEntity } from 'src/core/entity/user.entity';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
   constructor(
-    @InjectRepository(AdminEntity)
-    private readonly userRepo: Repository<AdminEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
     private readonly bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
   ) {}
@@ -100,9 +101,11 @@ async login(loginDto: AdminLoginDto) {
   try {
     const user = await this.userRepo.findOne({ where: { email: loginDto.email } });
     if (!user) throw new ForbiddenException('Wrong email or password');
-    if (![UserRole.ADMIN, UserRole.SUPPER_ADMIN].includes(user.role)) throw new ForbiddenException('Forbidden');
+    if (UserRole.USER === user.role) throw new ForbiddenException('Bu roldagi foydalanuvchiga parol bilan kirish mummkin emas...!!!');
 
-    const isMatch = await this.bcrypt.Verify(loginDto.password, user.password);
+
+    const userPass = user.password || "";
+    const isMatch = await this.bcrypt.Verify(loginDto.password, userPass);
     if (!isMatch) throw new ForbiddenException('Wrong email or password');
 
     const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
@@ -143,13 +146,13 @@ async login(loginDto: AdminLoginDto) {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const admin = await this.userRepo.findOne({ where: { id, role: In([UserRole.ADMIN, UserRole.SUPPER_ADMIN]) } });
     if (!admin) throw new NotFoundException('Admin not found');
     return successRes(admin);
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     const admin = await this.userRepo.findOne({ where: { id } });
     if (!admin) throw new NotFoundException('Admin not found');
     if (admin.role === UserRole.SUPPER_ADMIN) throw new ForbiddenException("Supper admin cannot delete itself");
@@ -157,7 +160,7 @@ async login(loginDto: AdminLoginDto) {
     return successRes(admin);
   }
 
-  async updateAdmin(id: string, data: UpdateAdminDto, req: Request) {
+  async updateAdmin(id: number, data: UpdateAdminDto, req: Request) {
     const admin = await this.userRepo.findOne({ where: { id } });
     if (!admin) throw new NotFoundException('Admin not found');
 

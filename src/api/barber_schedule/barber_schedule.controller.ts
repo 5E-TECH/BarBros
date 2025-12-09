@@ -45,14 +45,14 @@ export class BarberScheduleController {
   }
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.barberScheduleService.findOne(id);
   }
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateBarberScheduleDto: UpdateBarberScheduleDto, @Req() req: Request
   ) {
     return this.barberScheduleService.update(id, updateBarberScheduleDto, req);
@@ -60,7 +60,7 @@ export class BarberScheduleController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req:Request) {
+  remove(@Param('id') id: number, @Req() req:Request) {
     return this.barberScheduleService.remove(id, req);
   }
 }

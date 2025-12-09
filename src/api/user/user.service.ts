@@ -35,15 +35,17 @@ async register(phone_number: string) {
 
     const code = '0000'; // Hozircha test
 
+    
     if (!user) {
       user = this.userRepo.create({
         phone_number,
         code,
         role: UserRole.USER,
-        is_completed: false,
+        // is_completed: false,
       });
 
       await this.userRepo.save(user);
+
 
       return {
         is_new: true,
@@ -75,13 +77,15 @@ async verifyCode(phone_number: string, code: string) {
     if (code !== user.code) throw new ForbiddenException('Wrong code');
 
     // Yangi user hali full_name kiritmagan → token bermaymiz
-    if (!user.is_completed) {
-      return {
-        step: 'set_full_name',
-        message: 'Please set your full name',
-        user_id: user.id,
-      };
-    }
+    // if (!user.is_completed) {
+    //   return {
+    //     step: 'set_full_name',
+    //     message: 'Please set your full name',
+    //     user_id: user.id,
+    //   };
+    // }
+
+
 
     // Eski user → to‘liq ro‘yxatdan o‘tgan → token beramiz
     const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
@@ -94,13 +98,13 @@ async verifyCode(phone_number: string, code: string) {
 }
 
 
-async setFullName(user_id: string, full_name: string) {
+async setFullName(user_id: number, full_name: string) {
   try {
     const user = await this.userRepo.findOne({ where: { id: user_id } });
     if (!user) throw new NotFoundException('User not found');
 
     user.full_name = full_name;
-    user.is_completed = true; // Endi to‘liq ro‘yxatdan o‘tdi
+    // user.is_completed = true; // Endi to‘liq ro‘yxatdan o‘tdi
     await this.userRepo.save(user);
 
     const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
@@ -177,7 +181,7 @@ async setFullName(user_id: string, full_name: string) {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id:  number) {
     try {
       const data = await this.userRepo.findOne({
         where: { id, role: UserRole.USER },
@@ -192,7 +196,7 @@ async setFullName(user_id: string, full_name: string) {
       return ErrorHender(error);
     }
   }
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const data = await this.userRepo.findOne({ where: { id } });
       if (!data) {
@@ -222,7 +226,7 @@ async setFullName(user_id: string, full_name: string) {
     }
   }
 
-  async delet(id: string) {
+  async delet(id: number) {
     try {
       let data = await this.userRepo.findOneBy({ id });
       if (!data) {

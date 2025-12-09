@@ -40,6 +40,6 @@ export class RegisterBarberDto {
   @IsString()
   @IsNotEmpty()
   @IsUUID()
-  barberShop_id: string;
+  barberShop_id: number;
 
 }

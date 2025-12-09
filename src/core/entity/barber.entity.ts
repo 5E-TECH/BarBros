@@ -35,7 +35,7 @@ export class BarberEntity extends BaseEntity {
   img: string | null;
 
   @Column({ type: 'varchar' })
-  barberShop_id: string;
+  barberShop_id: number;
 
   @Column({ type: 'boolean', default: false })
   is_avaylbl: boolean;

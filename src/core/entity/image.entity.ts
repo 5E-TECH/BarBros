@@ -4,8 +4,8 @@ import { BarberShopEntity } from './barber-shop.entity';
 
 @Entity('images')
 export class ImageEntity extends BaseEntity {
-  @Column({ type: 'uuid' })
-  barberShop_id: string;
+  @Column({ type: 'bigint' })
+  barberShop_id: number;
 
   @Column({ type: 'varchar' })
   img: string;

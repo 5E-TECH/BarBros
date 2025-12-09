@@ -7,17 +7,20 @@ import { BookingEntity } from './booking.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
-  @Column({ type: 'varchar'})
+  @Column({ type: 'varchar', nullable:true })
   full_name?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  email?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  password?: string;
 
   @Column({ type: 'varchar', unique: true })
   phone_number: string;
 
   @Column({ type: 'varchar', nullable: true })
   code: string;
-
-  @Column({ type: 'boolean', default: false })
-  is_completed: boolean;
 
   @Column({ type: 'varchar', default: UserRole.USER })
   role: UserRole.ADMIN | UserRole.USER | UserRole.SUPPER_ADMIN;

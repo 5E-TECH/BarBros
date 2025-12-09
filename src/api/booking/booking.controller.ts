@@ -31,7 +31,7 @@ export class BookingController {
 
   @ApiOperation({summary: "cancellation"})
   @Delete("Update_schedule")
-  delet(@Param('id')id: string, @Body() data: UpdateBookingDto ){
+  delet(@Param('id')id: number, @Body() data: UpdateBookingDto ){
     return this.bookingService.delet(data, id)
   }
 
@@ -83,9 +83,9 @@ export class BookingController {
     description: 'ID of the service to be checked for availability' 
   })
   async getAvailability(
-    @Query('barberId') barberId: string,
+    @Query('barberId') barberId: number,
     @Query('date') date: string,
-    @Query("serviceId") serviceId: string
+    @Query("serviceId") serviceId: number
   ) {
     return await this.bookingService.getBarberAvailability(barberId, date, serviceId);
   }

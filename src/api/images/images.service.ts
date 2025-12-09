@@ -86,7 +86,7 @@ export class ImagesService {
     }
   }
 
-  async remove(id: string, req: Request) {
+  async remove(id: number, req: Request) {
     try {
       const image = await this.imageRepo.findOne({ where: { id } });
       if (!image) {

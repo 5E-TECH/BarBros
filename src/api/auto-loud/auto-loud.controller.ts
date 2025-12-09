@@ -21,7 +21,7 @@ export class AutoLoudController {
       let sum: number = 0;
       let sch: number = 0;
       let Avg: number = 0;
-      const SetReyting = new Set<string>();
+      const SetReyting = new Set<number>();
       const Reyting = await this.reyting.find();
       for (let R of Reyting) {
         SetReyting.add(R.barber_id);

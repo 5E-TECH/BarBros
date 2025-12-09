@@ -34,14 +34,14 @@ export class ServiceController {
   }
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.serviceService.findOne(id);
   }
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER)
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateServiceDto: UpdateServiceDto,
     @Req() req: Request,
   ) {
@@ -50,7 +50,7 @@ export class ServiceController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: Request) {
+  remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceService.remove(id, req);
   }
 }

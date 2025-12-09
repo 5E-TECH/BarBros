@@ -2,8 +2,9 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment', {type: 'bigint'
+  })
+  id: number;
 
   @Column({
     name: 'created_at',

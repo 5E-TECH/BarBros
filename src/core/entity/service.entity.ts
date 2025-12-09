@@ -28,7 +28,7 @@ export class ServiceEntity extends BaseEntity {
   duration_minutes: number;
 
   @Column()
-  barber_id: string;
+  barber_id: number;
 
   @OneToMany(() => BookingEntity, (booking) => booking.service)
   booking: BookingEntity[];

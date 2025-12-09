@@ -105,7 +105,7 @@ export class BarberShopController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.barberShopService.findOne(id);
   }
 
@@ -114,7 +114,7 @@ export class BarberShopController {
   @Roles(UserRole.SUPPER_ADMIN)
   @Patch('status/:id')
   updateStatus(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() status: UpdateBarberShopStatus,
   ) {
     return this.barberShopService.statusUpdate(id, status);
@@ -160,7 +160,7 @@ export class BarberShopController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('img'))
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateBarberShopDto: UpdateBarberShopDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request,
@@ -170,7 +170,7 @@ export class BarberShopController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.barberShopService.remove(id);
   }
 

@@ -65,7 +65,7 @@ export class ImagesController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER_SHOP)
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: Request) {
+  remove(@Param('id') id: number, @Req() req: Request) {
     return this.imagesService.remove(id, req);
   }
 }

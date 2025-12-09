@@ -10,8 +10,8 @@ export class NotificationEntity extends BaseEntity {
   @Column({ type: 'boolean' })
   is_read: boolean;
 
-  @Column({ type: 'uuid' })
-  user_id: string;
+  @Column({ type: 'bigint' })
+  user_id: number;
 
   // @ManyToOne(() => UserEntity, (user) => user.notifikation, {
   //   onDelete: 'CASCADE',

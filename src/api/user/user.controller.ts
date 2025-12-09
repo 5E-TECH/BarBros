@@ -96,18 +96,18 @@ export class UserController {
 
   @UseGuards(AuthGuard, SelfGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.userService.findOne(id);
   }
   @UseGuards(AuthGuard, SelfGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() data: UpdateUserDto) {
     return this.userService.update(id, data);
   }
 
   @UseGuards(AuthGuard, SelfGuard)
   @Delete(':id')
-  delet(@Param('id') id: string) {
+  delet(@Param('id') id: number) {
     return this.userService.delet(id);
   }
 
