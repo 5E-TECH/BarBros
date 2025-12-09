@@ -3,9 +3,19 @@ import { RefreshController } from './refresh.controller';
 import { UserModule } from '../user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BarberShopEntity } from 'src/core/entity/barber-shop.entity';
+<<<<<<< HEAD
 
 @Module({
   imports:[UserModule, TypeOrmModule.forFeature([BarberShopEntity])],
+=======
+import { UserEntity } from 'src/core/entity/user.entity';
+
+@Module({
+  imports: [
+    UserModule,
+    TypeOrmModule.forFeature([BarberShopEntity, UserEntity]), // UserEntity qo'shildi
+  ],
+>>>>>>> decbac9 (frony)
   controllers: [RefreshController],
 })
 export class RefreshModule {}

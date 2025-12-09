@@ -5,6 +5,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+<<<<<<< HEAD
+=======
+
+>>>>>>> decbac9 (frony)
 export class UpdateBarberShopDto {
   @IsString()
   @IsOptional()
@@ -26,4 +30,10 @@ export class UpdateBarberShopDto {
   @IsOptional()
   phoneNumber: string;
 
+<<<<<<< HEAD
+=======
+  @IsString()
+  @IsOptional()
+  img: string; // <-- bu qatorni qo‘shish kerak
+>>>>>>> decbac9 (frony)
 }

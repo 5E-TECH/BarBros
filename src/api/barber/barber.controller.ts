@@ -26,8 +26,12 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+<<<<<<< HEAD
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
 
+=======
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
+>>>>>>> decbac9 (frony)
 
 @Controller('barber')
 export class BarberController {
@@ -75,7 +79,11 @@ export class BarberController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
+<<<<<<< HEAD
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN,BarberRole.BARBER_SHOP)
+=======
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, BarberRole.BARBER_SHOP)
+>>>>>>> decbac9 (frony)
   @Post('Signup')
   @UseInterceptors(FileInterceptor('img'))
   register(
@@ -89,30 +97,52 @@ export class BarberController {
   login(@Body() loginBarberDto: LoginBarberDto) {
     return this.barberService.login(loginBarberDto);
   }
+<<<<<<< HEAD
   @Post('verify_otp')
   verify_otp(@Body() data: OtpBarberDto) {
     return this.barberService.VarifyOtp(data);
   }
+=======
+>>>>>>> decbac9 (frony)
 
   @UseGuards(AuthGuard)
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'full_name', required: false })
+<<<<<<< HEAD
   @ApiQuery({name: "phone_number", required: false})
   @ApiQuery({name: "bio", required: false})
   @ApiQuery({name: "email", required: false})
   @ApiQuery({ name: 'sortBy', required: false, enum: ['phone_number', 'full_name', "email"] })
   @ApiQuery({name: "order", required: false, enum:["asc","desc"]})
+=======
+  @ApiQuery({ name: 'phone_number', required: false })
+  @ApiQuery({ name: 'bio', required: false })
+  @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['phone_number', 'full_name', 'email'],
+  })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
+>>>>>>> decbac9 (frony)
   findAll(@Query() query: Record<string, any>) {
     return this.barberService.findAll(query);
   }
 
+<<<<<<< HEAD
 
   @UseGuards(AuthGuard)
   @Get("My_Accaunt")
   my_accaunt(@Req()req:Request){
     return this.barberService.My_accaunt(req)
+=======
+  @UseGuards(AuthGuard)
+  @Get('My_Accaunt')
+  my_accaunt(@Req() req: Request) {
+    return this.barberService.myAccount(req);
+>>>>>>> decbac9 (frony)
   }
 
   @UseGuards(AuthGuard, SelfGuard)
@@ -153,7 +183,11 @@ export class BarberController {
       },
     },
   })
+<<<<<<< HEAD
   @UseGuards(AuthGuard,SelfGuard)
+=======
+  @UseGuards(AuthGuard, SelfGuard)
+>>>>>>> decbac9 (frony)
   @Patch('update:id')
   @UseInterceptors(FileInterceptor('img'))
   update(
@@ -170,8 +204,14 @@ export class BarberController {
     return this.barberService.remove(id);
   }
 
+<<<<<<< HEAD
   @Post("Refresh_password")
   refresh_password(@Body() data: RefreshPasswortDto){
     return this.barberService.RefreshPassword(data)
+=======
+  @Post('refresh_password')
+  refresh_password(@Body() data: RefreshPasswordDto) {
+    return this.barberService.refreshPassword(data);
+>>>>>>> decbac9 (frony)
   }
 }

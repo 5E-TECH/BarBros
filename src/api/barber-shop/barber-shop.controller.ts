@@ -24,7 +24,11 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
+<<<<<<< HEAD
 import { RefreshPasswortDto } from '../admin/dto/RefreshPassword.dto';
+=======
+import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
+>>>>>>> decbac9 (frony)
 import { OtpBarberShopDto } from './dto/Otp-barber-shop.dto';
 
 @Controller('barber-shop')
@@ -83,10 +87,14 @@ export class BarberShopController {
   login(@Body() logimBarberShopDto: LogimBarberShopDto) {
     return this.barberShopService.login(logimBarberShopDto);
   }
+<<<<<<< HEAD
   @Post("verify_otp")
   verifyOtp(@Body() data: OtpBarberShopDto){
     return this.barberShopService.verifyOtp(data)
   }
+=======
+
+>>>>>>> decbac9 (frony)
 
   @UseGuards(AuthGuard)
   @Get()
@@ -103,7 +111,11 @@ export class BarberShopController {
   @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
+<<<<<<< HEAD
     return this.barberShopService.My_accaunt(req);
+=======
+    return this.barberShopService.myAccount(req);
+>>>>>>> decbac9 (frony)
   }
 
   @UseGuards(AuthGuard)
@@ -178,7 +190,12 @@ export class BarberShopController {
   }
 
   @Post('Refresh_password')
+<<<<<<< HEAD
   refresh_password(data: RefreshPasswortDto) {
     return this.barberShopService.RefreshPassword(data);
+=======
+  refresh_password(data: RefreshPasswordDto) {
+    return this.barberShopService.refreshPassword(data);
+>>>>>>> decbac9 (frony)
   }
 }

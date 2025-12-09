@@ -37,4 +37,11 @@ export class UpdateBarberDto {
     return value;
   })
   is_avaylbl: boolean;
+<<<<<<< HEAD
+=======
+
+  @IsString()
+  @IsOptional()
+  img: string; // <-- img maydoni qo‘shildi
+>>>>>>> decbac9 (frony)
 }
