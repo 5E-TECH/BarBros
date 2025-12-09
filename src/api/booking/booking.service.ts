@@ -47,7 +47,7 @@ export class BookingService {
       return ErrorHender(error)
     }
   }
-  async delet(updateBookingDto: UpdateBookingDto, id: string) {
+  async delet(updateBookingDto: UpdateBookingDto, id: number) {
     try {
       const booking = await this.Booking.findOne({
         where: {
@@ -110,9 +110,9 @@ export class BookingService {
   /////////////////////////////////////////////////////////////////////////////
   
   async getBarberAvailability(
-    barberId: string,
+    barberId: number,
     date: string,
-    serviceId: string,
+    serviceId: number,
   ) {
     const weekday = dayjs(date).format('dddd');
 

@@ -115,7 +115,7 @@ export class BarberController {
 
   @UseGuards(AuthGuard, SelfGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.barberService.findOne(id);
   }
 
@@ -155,7 +155,7 @@ export class BarberController {
   @Patch('update:id')
   @UseInterceptors(FileInterceptor('img'))
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateBarberDto: UpdateBarberDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -164,7 +164,7 @@ export class BarberController {
 
   @UseGuards(AuthGuard, SelfGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.barberService.remove(id);
   }
 

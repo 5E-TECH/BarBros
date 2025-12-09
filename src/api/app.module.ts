@@ -35,7 +35,7 @@ import { AutoLoudModule } from './auto-loud/auto-loud.module';
       port: Number(process.env.PG_PORT),
       password: String(process.env.PG_PASS),
       database: process.env.PG_DB,
-      // autoLoadEntities: true,
+      autoLoadEntities: true,
       synchronize: true,
       entities: [__dirname + `/**/*.entity{.ts,.js}`],
     }),

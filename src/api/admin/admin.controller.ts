@@ -59,7 +59,7 @@ export class AdminController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
   @Get('one/:id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.adminService.findOne(id);
   }
 
@@ -67,7 +67,7 @@ export class AdminController {
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch('update/:id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() data: UpdateAdminDto,
     @Req() req: Request,
   ) {
@@ -77,7 +77,7 @@ export class AdminController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
   @Delete('delete/:id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: number) {
     return this.adminService.delete(id);
   }
 

@@ -94,7 +94,7 @@ export class BarberImagesService {
       return ErrorHender(error);
     }
   }
-  async remove(id: string, req: Request) {
+  async remove(id: number, req: Request) {
     try {
       const data = await this.barberImg.findOneBy({ id });
       if (!data) {

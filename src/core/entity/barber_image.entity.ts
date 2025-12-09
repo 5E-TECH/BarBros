@@ -5,7 +5,7 @@ import { BarberEntity } from './barber.entity';
 @Entity('barber_image')
 export class BarberImageEntity extends BaseEntity {
   @Column({ type: 'varchar' })
-  barber_id: string;
+  barber_id: number;
 
   @Column({ type: 'varchar' })
   img: string;

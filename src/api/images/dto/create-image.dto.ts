@@ -7,6 +7,6 @@ export class CreateImageDto {
   })
   @IsString()
   @IsNotEmpty()
-  barberShop_id: string;
+  barberShop_id: number;
 
 }

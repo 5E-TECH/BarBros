@@ -6,7 +6,7 @@ export class UpdateBookingDto {
   @ApiProperty({ example: 'barber_id' })
   @IsString()
   @IsNotEmpty()
-  barber_id: string;
+  barber_id: number;
 
   @ApiProperty({ example: '2025-12-12' })
   @IsString()

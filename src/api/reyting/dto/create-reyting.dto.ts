@@ -19,5 +19,5 @@ export class CreateReytingDto {
 
   @ApiProperty({example: "barber_id"})
   @IsUUID()
-  barber_id: string
+  barber_id: number
 }

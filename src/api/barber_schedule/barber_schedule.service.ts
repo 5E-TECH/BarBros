@@ -41,7 +41,7 @@ export class BarberScheduleService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     try {
       const data = await this.scheduleRepo.findOne({
         where: { id },
@@ -53,7 +53,7 @@ export class BarberScheduleService {
     }
   }
 
-  async update(id: string, dto: UpdateBarberScheduleDto, req: Request) {
+  async update(id: number, dto: UpdateBarberScheduleDto, req: Request) {
     try {
       const schedule = await this.scheduleRepo.findOneBy({ id });
       if (!schedule) {
@@ -70,7 +70,7 @@ export class BarberScheduleService {
     }
   }
 
-  async remove(id: string, req: Request) {
+  async remove(id: number, req: Request) {
     try {
       const schedule = await this.scheduleRepo.findOneBy({ id });
       if (!schedule){

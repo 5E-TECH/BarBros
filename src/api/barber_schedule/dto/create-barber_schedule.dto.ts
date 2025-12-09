@@ -23,5 +23,5 @@ export class CreateBarberScheduleDto {
   @ApiProperty({ example: 'uuid-barber-id', description: 'Barber ID (UUID)' })
   @IsString()
   @IsNotEmpty()
-  barber_id: string;
+  barber_id: number;
 }

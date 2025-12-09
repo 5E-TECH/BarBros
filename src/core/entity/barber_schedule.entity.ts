@@ -21,7 +21,7 @@ export class BarberScheduleEntity extends BaseEntity {
     end_time: string;
 
     @Column()
-    barber_id: string;
+    barber_id: number;
 
     @ManyToOne(() => BarberEntity, (barber)=> barber.barberSchuld,{
         onDelete: 'CASCADE',

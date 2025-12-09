@@ -44,7 +44,7 @@ export class ServiceService {
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     try {
       const service = await this.serviceRepository.findOne({where:{id:id},relations:["booking","barber"] });
       if (!service) {
@@ -56,7 +56,7 @@ export class ServiceService {
     }
   }
 
-  async update(id: string, updateServiceDto: UpdateServiceDto, req: Request) {
+  async update(id: number, updateServiceDto: UpdateServiceDto, req: Request) {
     try {
       const data = await this.serviceRepository.findOneBy({ id });
       if(!data){
@@ -73,7 +73,7 @@ export class ServiceService {
     }
   }
 
-  async remove(id: string, req:Request) {
+  async remove(id: number, req:Request) {
     try {
       const service = await this.serviceRepository.findOneBy({id});
       if(!service){

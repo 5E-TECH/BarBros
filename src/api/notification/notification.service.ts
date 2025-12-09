@@ -31,7 +31,7 @@ export class NotificationService {
       return ErrorHender(error);
     }
   }
-  async delet(id: string){
+  async delet(id: number){
     try {
       const data = await this.notifRepo.findOne({where: {id:id}})
       if(!data){

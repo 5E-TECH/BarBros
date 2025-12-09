@@ -12,11 +12,11 @@ export class ReytingEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   comment: string;
 
-  @Column({ type: 'uuid' })
-  barber_id: string;
+  @Column({ type: 'bigint' })
+  barber_id: number;
 
-  @Column({ type: 'uuid' })
-  user_id: string;
+  @Column({ type: 'bigint' })
+  user_id: number;
 
   @ManyToOne(() => BarberEntity, (barber) => barber.reyting, {
     onDelete: 'CASCADE',

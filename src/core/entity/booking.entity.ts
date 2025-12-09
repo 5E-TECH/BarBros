@@ -15,13 +15,13 @@ import { BarberEntity } from './barber.entity';
 @Entity('booking')
 export class BookingEntity extends BaseEntity {
   @Column({ type: 'varchar' })
-  user_id: string;
+  user_id: number;
 
   @Column({ type: 'varchar' })
-  service_id: string;
+  service_id: number;
 
   @Column({ type: 'varchar' })
-  barber_id: string;
+  barber_id: number;
 
   @Column({ type: "varchar" })
   date: string;

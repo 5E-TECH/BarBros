@@ -127,7 +127,7 @@ export class BarberService {
   }
 
   // Barber malumotlarini yangilash
-  async update(id: string, updateBarberDto: UpdateBarberDto, file?: Express.Multer.File) {
+  async update(id: number, updateBarberDto: UpdateBarberDto, file?: Express.Multer.File) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
       if (!barber) throw new NotFoundException('Barber not found');
@@ -149,7 +149,7 @@ export class BarberService {
   }
 
   // Barberni o'chirish
-  async remove(id: string) {
+  async remove(id: number) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
       if (!barber) throw new NotFoundException('Barber not found');
@@ -179,7 +179,7 @@ export class BarberService {
   }
 
   // Id orqali barber olish
-  async findOne(id: string) {
+  async findOne(id: number) {
     try {
       const barber = await this.BarberRepo.findOne({
         where: { id },

@@ -30,7 +30,7 @@ export class NotificationController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete()
-  delete(@Param("id")id: string){
+  delete(@Param("id")id: number){
     return this.notificationService.delet(id)
   }
 
