@@ -1,3 +1,3 @@
-import Application from "./api/app.service";
+import Application from "./app.service";
 
 void Application.main()

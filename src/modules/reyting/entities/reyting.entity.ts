@@ -1,0 +1,34 @@
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { StarRating } from 'src/common/enum';
+import { BaseEntity } from 'src/common/database/baseEntity';
+import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
+import { UserEntity } from 'src/modules/user/entities/user.admin,entity';
+
+@Entity('reyting')
+export class ReytingEntity extends BaseEntity {
+  @Column({ type: 'enum', enum: StarRating })
+  star: number;
+
+  @Column({ type: 'varchar' })
+  comment: string;
+
+  @Column({ type: 'bigint' })
+  barber_id: number;
+
+  @Column({ type: 'bigint' })
+  user_id: number;
+
+  @ManyToOne(() => BarberEntity, (barber) => barber.reyting, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'barber_id' })
+  barber: BarberEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.reyting, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
+}
