@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-// import { AdminEntity } from 'src/core/entity/admin.entity';
 import { UserRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -40,7 +39,7 @@ async onModuleInit() {
   if (!email || !password) return console.log("Supper admin credentials not defined");
 
   try {
-    let user = await this.userRepo.findOne({ where: { email } }); // email bo‘yicha qidiring
+    let user = await this.userRepo.findOne({ where: { email } });
     if (!user) {
       const hashPass = await this.bcrypt.Generate(password);
       const supperAdmin = this.userRepo.create({

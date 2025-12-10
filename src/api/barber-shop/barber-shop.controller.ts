@@ -25,7 +25,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
 import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
-import { OtpBarberShopDto } from './dto/Otp-barber-shop.dto';
 
 @Controller('barber-shop')
 export class BarberShopController {

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -11,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ErrorHender } from 'src/infrostructure/utils/catchError';
 import { successRes } from 'src/infrostructure/utils/succesResponse';
-import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 import { JWTPayload } from 'src/infrostructure/utils/user.type';
@@ -33,7 +31,7 @@ async register(phone_number: string) {
   try {
     let user = await this.userRepo.findOne({ where: { phone_number } });
 
-    const code = '0000'; // Hozircha test
+    const code = '0000'; 
 
     
     if (!user) {
@@ -41,7 +39,6 @@ async register(phone_number: string) {
         phone_number,
         code,
         role: UserRole.USER,
-        // is_completed: false,
       });
 
       await this.userRepo.save(user);
@@ -54,7 +51,6 @@ async register(phone_number: string) {
       };
     }
 
-    // Eski user bo‘lsa — code yangilanadi
     user.code = code;
     await this.userRepo.save(user);
 
@@ -87,7 +83,6 @@ async verifyCode(phone_number: string, code: string) {
 
 
 
-    // Eski user → to‘liq ro‘yxatdan o‘tgan → token beramiz
     const accessToken = AccessToken(this.jwtService, { id: user.id, role: user.role });
     const refreshToken = RefreshToken(this.jwtService, { id: user.id, role: user.role });
 

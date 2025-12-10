@@ -33,7 +33,6 @@ export class BarberShopService {
     private readonly Bcrypt: BcryptEncryption,
   ) {}
 
-  // BarberShop yaratish
   async create(createDto: CreateBarberShopDto, file?: Express.Multer.File) {
     try {
       const exists = await this.barberRepo.findOne({ where: { name: createDto.name } });
@@ -52,7 +51,6 @@ export class BarberShopService {
     }
   }
 
-  // BarberShop login
   async login(dto: LogimBarberShopDto) {
     try {
       const shop = await this.barberRepo.findOne({ where: { email: dto.email } });
@@ -69,7 +67,6 @@ export class BarberShopService {
     }
   }
 
-  // BarberShop malumotlarini olish
   async myAccount(req: Request) {
     try {
       const user = req['user'];
@@ -82,7 +79,6 @@ export class BarberShopService {
     }
   }
 
-  // Barcha BarberShoplar
   async findAll(query: Record<string, any>) {
     try {
       const { name, descripton, location, sortBy = 'name', order = 'DESC', page = 1, limit = 10 } = query;
@@ -100,8 +96,6 @@ export class BarberShopService {
         take: Number(limit),
       });
 
-      if (!data.length) throw new NotFoundException('No BarberShops found');
-
       return successRes({
         data,
         total,
@@ -114,7 +108,6 @@ export class BarberShopService {
     }
   }
 
-  // BarberShop malumotlarini yangilash
   async update(id: number, updateDto: UpdateBarberShopDto, file?: Express.Multer.File, req?: Request) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
@@ -136,7 +129,6 @@ export class BarberShopService {
     }
   }
 
-  // BarberShop o'chirish
   async remove(id: number) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
@@ -154,7 +146,6 @@ export class BarberShopService {
     }
   }
 
-  // BarberShop status yangilash
   async statusUpdate(id: number, newData: UpdateBarberShopStatus) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
@@ -168,7 +159,6 @@ export class BarberShopService {
     }
   }
 
-  // Parolni yangilash
   async refreshPassword(data: RefreshPasswordDto) {
     try {
       const shop = await this.barberRepo.findOne({ where: { email: data.email } });
@@ -185,7 +175,6 @@ export class BarberShopService {
     }
   }
 
-  // Id orqali BarberShop olish
   async findOne(id: number) {
     try {
       const shop = await this.barberRepo.findOne({ where: { id }, relations: ['barber', 'images'] });
