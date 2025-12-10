@@ -20,7 +20,7 @@ export default class Application {
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       }),
     );
-    const api = 'api';
+    const api = 'api/v1';
     app.setGlobalPrefix(api);
     const config = new DocumentBuilder()
       .setTitle('Barber Shop')
@@ -31,7 +31,7 @@ export default class Application {
       .build();
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, documentFactory);
+    SwaggerModule.setup('api/v1', app, documentFactory);
 
     await app.listen(Port, () => {
       console.log(`server running on port ${Port}`);
