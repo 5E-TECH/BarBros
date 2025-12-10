@@ -25,12 +25,12 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', default: UserRole.USER })
   role: UserRole.ADMIN | UserRole.USER | UserRole.SUPPER_ADMIN;
 
-  // @OneToMany(() => ReytingEntity, (reyting) => reyting.user)
-  // reyting: ReytingEntity[];
+  @OneToMany(() => ReytingEntity, (reyting) => reyting.user)
+  reyting: ReytingEntity[];
 
-  // @OneToMany(() => NotificationEntity, (notifikation) => notifikation.user)
-  // notifikation: NotificationEntity[];
+  @OneToMany(() => NotificationEntity, (notifikation) => notifikation.user)
+  notifikation: NotificationEntity[];
 
-  // @OneToMany(() => BookingEntity, (booking) => booking.user)
-  // booking: BookingEntity[];
+  @OneToMany(() => BookingEntity, (booking) => booking.user)
+  booking: BookingEntity[];
 }

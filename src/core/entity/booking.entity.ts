@@ -29,12 +29,12 @@ export class BookingEntity extends BaseEntity {
   @Column({ type: "varchar" })
   time: string;
 
-  // @ManyToOne(() => UserEntity, (user) => user.booking, {
-  //   onDelete: 'CASCADE',
-  //   onUpdate: 'CASCADE',
-  // })
-  // @JoinColumn({ name: 'user_id' })
-  // user: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.booking, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
 
   @ManyToOne(() => ServiceEntity, (service) => service.booking, {
     onDelete: 'CASCADE',
