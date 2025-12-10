@@ -1,6 +1,6 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import { extname } from 'path';
-import { ErrorHender } from 'src/infrostructure/utils/catchError';
+import { ErrorHender } from 'src/utils/catchError';
 
 @Injectable()
 export class ImageValidationPipe implements PipeTransform<any> {
