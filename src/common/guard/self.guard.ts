@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UserRole } from '../enum';
-import { ErrorHender } from 'src/infrostructure/utils/catchError';
+import { ErrorHender } from 'src/utils/catchError';
 
 @Injectable()
 export class SelfGuard implements CanActivate {
