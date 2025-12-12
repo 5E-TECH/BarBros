@@ -15,10 +15,11 @@ import { ImagesModule } from './modules/images/images.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { JwtModule } from '@nestjs/jwt';
 import { BarberImagesModule } from './modules/barber_images/barber_images.module';
-import { ReytingModule } from './modules/reyting/reyting.module';
+import { ReytingModule } from './modules/rayting/reyting.module';
 import { BarberScheduleModule } from './modules/barber_schedule/barber_schedule.module';
 import { RefreshModule } from './modules/refresh/refresh.module';
 import { AutoLoudModule } from './modules/auto-loud/auto-loud.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { AutoLoudModule } from './modules/auto-loud/auto-loud.module';
     ReytingModule,
     BarberScheduleModule,
     RefreshModule,
-    AutoLoudModule
+    AutoLoudModule,
+    CategoryModule
   ],
 })
 export class AppModule {}

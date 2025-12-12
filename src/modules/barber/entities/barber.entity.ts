@@ -1,7 +1,7 @@
 import { BaseEntity } from 'src/common/database/baseEntity';
 import { BarberRole } from 'src/common/enum';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { ReytingEntity } from 'src/modules/reyting/entities/reyting.entity';
+import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 import { BarberImageEntity } from 'src/modules/barber_images/entities/barber_image.entity';
 import { BarberScheduleEntity } from 'src/modules/barber_schedule/entities/barber_schedule.entity';
