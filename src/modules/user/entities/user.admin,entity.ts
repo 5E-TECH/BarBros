@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { UserRole } from 'src/common/enum';
 import { BaseEntity } from 'src/common/database/baseEntity';
-import { ReytingEntity } from 'src/modules/reyting/entities/reyting.entity';
+import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { NotificationEntity } from 'src/modules/notification/entities/notification.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 

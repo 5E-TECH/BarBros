@@ -10,7 +10,7 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar' })  // alohida entity bo'lsin
   location: string;
 
   @Column({ type: 'varchar',default: null })

@@ -22,7 +22,7 @@ import { Request } from 'express';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER, UserRole.SUPPER_ADMIN)
+  @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @Req() req: Request) {
     return this.serviceService.creates(createServiceDto, req);
@@ -38,7 +38,7 @@ export class ServiceController {
     return this.serviceService.findOne(id);
   }
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @Roles(BarberRole.BARBER_SHOP)
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -48,7 +48,7 @@ export class ServiceController {
     return this.serviceService.update(id, updateServiceDto, req);
   }
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @Roles(BarberRole.BARBER_SHOP)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceService.remove(id, req);

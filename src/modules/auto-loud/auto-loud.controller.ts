@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
-import { ReytingEntity } from '../reyting/entities/reyting.entity';
+import { ReytingEntity } from '../rayting/entities/reyting.entity';
 import { Repository } from 'typeorm';
 
 @Controller('auto-loud')
