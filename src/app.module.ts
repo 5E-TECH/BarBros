@@ -55,7 +55,7 @@ import { CategoryModule } from './modules/category/category.module';
     BarberScheduleModule,
     RefreshModule,
     AutoLoudModule,
-    CategoryModule
+    CategoryModule,
   ],
 })
 export class AppModule {}
