@@ -14,39 +14,38 @@ import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 
 @Entity('booking')
 export class BookingEntity extends BaseEntity {
-  @Column({ type: 'varchar' })
+
+  @Column({ type: 'int' })
   user_id: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'int' })
   service_id: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'int' })
   barber_id: number;
 
-  @Column({ type: "varchar" })
+  @Column({ type: 'varchar' })
   date: string;
 
-  @Column({ type: "varchar" })
+  @Column({ type: 'varchar' })
   time: string;
 
   @ManyToOne(() => UserEntity, (user) => user.booking, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
   @ManyToOne(() => ServiceEntity, (service) => service.booking, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'service_id' })
   service: ServiceEntity;
 
   @ManyToOne(() => BarberEntity, (barber) => barber.booking, {
     onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'barber_id' })
   barber: BarberEntity;
 }
+

@@ -1,35 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDecimal,
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsString,
+  ArrayNotEmpty,
 } from 'class-validator';
 
 export class CreateServiceDto {
   @ApiProperty({ example: 35000 })
   @IsNumber()
-  @IsNotEmpty()
   price: number;
 
-  @ApiProperty({ example: 'kelorasilar' })
+  @ApiProperty({ example: 'Oddiy erkaklar soch turmagi' })
   @IsString()
-  @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ example: 'JOXA' })
+  @ApiProperty({ example: 'Haircut' })
   @IsString()
-  @IsNotEmpty()
   name: string;
-
-  @ApiProperty({ example: 'JOXA' })
-  @IsString()
-  @IsNotEmpty()
-  barber_id: string;
 
   @ApiProperty({ example: 30 })
   @IsNumber()
-  @IsNotEmpty()
   duration_minutes: number;
 
+  @ApiProperty({
+    example: [1, 2, 5],
+    description: 'service qila oladigan barberlar idlari',
+  })
+  @IsArray()
+  @ArrayNotEmpty()
+  barber_ids: number[];
+
+  @ApiProperty({ example: 3 })
+  @IsNumber()
+  category_id: number;
 }

@@ -47,6 +47,7 @@ export class BarberService {
         ...registerBarberDto,
         password: hashPass,
         role: BarberRole.BARBER,
+        barberShop: { id: registerBarberDto.barberShop_id },
       });
 
       if (file && new ImageValidationPipe().transform(file)) {

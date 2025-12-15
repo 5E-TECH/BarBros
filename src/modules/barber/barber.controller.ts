@@ -33,12 +33,20 @@ export class BarberController {
   constructor(private readonly barberService: BarberService) {}
 
   @ApiOperation({
-    summary: 'Created barber BarberShop yoki Admin tomonidan',
+    summary: 'Barber yaratish (BarberShop yoki Admin tomonidan)',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
+      required: [
+        'full_name',
+        'phone_number',
+        'password',
+        'username',
+        'bio',
+        'barberShop_id',
+      ],
       properties: {
         full_name: {
           type: 'string',
@@ -65,10 +73,10 @@ export class BarberController {
           type: 'string',
           format: 'binary',
         },
-
         barberShop_id: {
-          type: 'string',
-          example: 'barberShop_id',
+          type: 'number',
+          example: 2,
+          description: 'Barber qaysi barber shop ga tegishli',
         },
       },
     },
