@@ -2,10 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
 
 export class RefreshPasswordDto {
-  @ApiProperty({ example: "shop@example.com" })
+  @ApiProperty({ example: "bar bro " })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  username: string;
 
   @ApiProperty({ example: "newPassword123" })
   @IsString()

@@ -13,5 +13,5 @@ export class LoginBarberDto {
   @ApiProperty({ description: 'Email', example: 'karalevstvabitva@gmail.com' })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  username: string;
 }

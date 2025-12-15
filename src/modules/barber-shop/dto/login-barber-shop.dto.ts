@@ -2,18 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class LogimBarberShopDto {
-
-  @ApiProperty({example: "+998930451852"})
-  @IsString()
+  @ApiProperty({ example: 'bar bro' })
   @IsNotEmpty()
-  phoneNumber: string;
+  username: string;
 
-  @ApiProperty({example: "email@gmail.com"})
-  @IsEmail()
-  @IsNotEmpty()
-  email:string
-
-  @ApiProperty({example: "12345678"})
+  @ApiProperty({ example: '12345678' })
   @IsString()
   @IsNotEmpty()
   password: string;

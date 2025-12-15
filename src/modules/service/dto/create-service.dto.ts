@@ -22,6 +22,11 @@ export class CreateServiceDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ example: 'JOXA' })
+  @IsString()
+  @IsNotEmpty()
+  barber_id: string;
+
   @ApiProperty({ example: 30 })
   @IsNumber()
   @IsNotEmpty()

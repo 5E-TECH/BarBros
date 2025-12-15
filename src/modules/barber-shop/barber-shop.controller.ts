@@ -24,7 +24,7 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
-import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
+import { RefreshPasswordDto } from './dto/refreshPassword.dto';
 
 @Controller('barber-shop')
 export class BarberShopController {
@@ -50,9 +50,9 @@ export class BarberShopController {
           type: 'string',
           example: '12345678',
         },
-        email: {
+        username: {
           type: 'string',
-          example: 'karalevstvabitva@gmail.com',
+          example: 'bar bro',
         },
         img: { type: 'string', format: 'binary' },
 
@@ -67,15 +67,15 @@ export class BarberShopController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN)
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(UserRole.SUPPER_ADMIN)
   @Post('Signup')
   @UseInterceptors(FileInterceptor('img'))
   register(
     @Body() createBarberShopDto: CreateBarberShopDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.barberShopService.create(createBarberShopDto, file);
+    return this.barberShopService.signup(createBarberShopDto, file);
   }
 
   @Post('Singin')
