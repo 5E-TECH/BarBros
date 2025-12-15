@@ -6,7 +6,7 @@ export class RefreshPasswordDto {
   @ApiProperty({ example: "barber@example.com" })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  username: string;
 
   @ApiProperty({ example: "newPassword123" })
   @IsString()

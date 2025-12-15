@@ -27,9 +27,8 @@ export class RegisterBarberDto {
   })
   password: string;
 
-  @IsEmail()
   @IsNotEmpty()
-  email: string;
+  username: string;
 
   @IsString()
   @Length(8, 300, { message: "bio uzunligi 8 dan 300 gacha bo'lishi kerak" })
@@ -39,7 +38,6 @@ export class RegisterBarberDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsUUID()
   barberShop_id: number;
 
 }

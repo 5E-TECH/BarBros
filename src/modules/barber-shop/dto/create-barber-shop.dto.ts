@@ -16,10 +16,6 @@ export class CreateBarberShopDto {
   @IsNotEmpty()
   location: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
   @IsString()
   @IsNotEmpty()
   descripton: string;
@@ -27,6 +23,10 @@ export class CreateBarberShopDto {
   @IsString()
   @IsNotEmpty()
   phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
   @IsString()
   @MaxLength(15)

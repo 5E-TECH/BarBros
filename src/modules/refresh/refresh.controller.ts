@@ -9,7 +9,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenDro } from './refreshToken.Dto';
 import { ApiTags } from '@nestjs/swagger';
-import { BarberRole } from 'src/common/enum';
+import { BarberRole, Status } from 'src/common/enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BarberShopEntity } from '../barber-shop/entities/barber-shop.entity';
 import { Repository } from 'typeorm';
@@ -51,7 +51,7 @@ export class RefreshController {
           throw new UnauthorizedException('User not found');
         }
 
-        if (barberShop.status === false) {
+        if (barberShop.status === Status.INACTIVE) {
           throw new ForbiddenException('Siz Admin tomonidan bloklangansiz');
         }
 

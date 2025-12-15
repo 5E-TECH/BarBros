@@ -19,11 +19,11 @@ import { ImageValidationPipe } from 'src/common/pipe/img-validation';
 import { RegisterBarberDto } from './dto/register-barber.dto';
 import { LoginBarberDto } from './dto/login-barber.dto';
 import { UpdateBarberDto } from './dto/update-barber.dto';
-import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 
 import { AccessToken, RefreshToken } from 'src/utils/Acses-Refresh-token';
 import { successRes } from 'src/utils/succesResponse';
 import { ErrorHender } from 'src/utils/catchError';
+import { RefreshPasswordDto } from './dto/refreshPassword.doo';
 
 @Injectable()
 export class BarberService {
@@ -38,7 +38,7 @@ export class BarberService {
   // Barber ro'yxatdan o'tkazish
   async register(registerBarberDto: RegisterBarberDto, file?: Express.Multer.File) {
     try {
-      const existing = await this.BarberRepo.findOne({ where: { email: registerBarberDto.email } });
+      const existing = await this.BarberRepo.findOne({ where: { username: registerBarberDto.username } });
       if (existing) throw new ConflictException('Barber email already exists');
 
       const hashPass = await this.Bcrypt.Generate(registerBarberDto.password);
@@ -64,7 +64,7 @@ export class BarberService {
   // Barber login
   async login(loginBarberDto: LoginBarberDto) {
     try {
-      const barber = await this.BarberRepo.findOne({ where: { email: loginBarberDto.email } });
+      const barber = await this.BarberRepo.findOne({ where: { username: loginBarberDto.username } });
       if (!barber) throw new ForbiddenException('Wrong email');
 
       if (barber.role !== BarberRole.BARBER) throw new ForbiddenException('Forbidden');
@@ -164,7 +164,7 @@ export class BarberService {
   // Parolni yangilash
   async refreshPassword(data: RefreshPasswordDto) {
     try {
-      const barber = await this.BarberRepo.findOne({ where: { email: data.email } });
+      const barber = await this.BarberRepo.findOne({ where: { username: data.username } });
       if (!barber) throw new NotFoundException('Barber not found');
 
       if (!data.new_password) throw new BadRequestException('New password is required');

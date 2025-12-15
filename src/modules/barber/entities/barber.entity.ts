@@ -13,14 +13,14 @@ export class BarberEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   full_name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   phone_number: string;
 
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({ type: 'varchar' })
-  email: string;
+  @Column({ type: 'varchar', unique: true })
+  username: string;
 
   @Column({ type: 'text' })
   bio: string;
@@ -40,25 +40,26 @@ export class BarberEntity extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   is_avaylbl: boolean;
 
-  @OneToMany(()=> ReytingEntity, (reyting)=> reyting.barber)
-  reyting: ReytingEntity[]
+  @OneToMany(() => ReytingEntity, (reyting) => reyting.barber)
+  reyting: ReytingEntity[];
 
-  @OneToMany(()=> BookingEntity, (booking)=> booking.barber)
-  booking: BookingEntity[]
+  @OneToMany(() => BookingEntity, (booking) => booking.barber)
+  booking: BookingEntity[];
 
-  @OneToMany(()=> BarberImageEntity, (barberImage)=> barberImage.barber)
-  barberImage: BarberImageEntity[]
+  @OneToMany(() => BarberImageEntity, (barberImage) => barberImage.barber)
+  barberImage: BarberImageEntity[];
 
-  @OneToMany(()=> BarberScheduleEntity, (barberSchuld)=> barberSchuld.barber)
-  barberSchuld: BarberScheduleEntity[]
+  @OneToMany(() => BarberScheduleEntity, (barberSchuld) => barberSchuld.barber)
+  barberSchuld: BarberScheduleEntity[];
 
-  @ManyToOne(()=> BarberShopEntity, (barberShop)=> barberShop.barber,{
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE"
+  @ManyToOne(() => BarberShopEntity, (barberShop) => barberShop.barber, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
-  @JoinColumn({name: "barberShop_id"})
-  barberShop: BarberShopEntity
+  @ManyToOne(() => BarberShopEntity, (shop) => shop.barber)
+  @JoinColumn({ name: 'barberShop_id' })
+  barberShop: BarberShopEntity;
 
-  @OneToMany(()=> ServiceEntity, (service)=>service.barber)
-  service: ServiceEntity[]
+  @OneToMany(() => ServiceEntity, (service) => service.barber)
+  service: ServiceEntity[];
 }

@@ -26,7 +26,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
+import { RefreshPasswordDto } from './dto/refreshPassword.doo';
 
 @Controller('barber')
 export class BarberController {
@@ -52,9 +52,9 @@ export class BarberController {
           type: 'string',
           example: '12345678',
         },
-        email: {
+        username: {
           type: 'string',
-          example: 'karalevstvabitba@gmail.com',
+          example: 'faxame',
         },
         bio: {
           type: 'string',

@@ -16,3 +16,8 @@ export enum StarRating {
   FOUR = 4,
   FIVE = 5,
 }
+
+export enum Status {
+  ACTIVE = "active",
+  INACTIVE = "inactive"
+}
