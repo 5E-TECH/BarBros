@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/common/database/baseEntity';
 import { BarberRole } from 'src/common/enum';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 import { BarberImageEntity } from 'src/modules/barber_images/entities/barber_image.entity';
@@ -34,8 +34,6 @@ export class BarberEntity extends BaseEntity {
   @Column({ type: 'text', default: null })
   img: string | null;
 
-  @Column({ type: 'varchar' })
-  barberShop_id: number;
 
   @Column({ type: 'boolean', default: false })
   is_avaylbl: boolean;
@@ -56,10 +54,9 @@ export class BarberEntity extends BaseEntity {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @ManyToOne(() => BarberShopEntity, (shop) => shop.barber)
   @JoinColumn({ name: 'barberShop_id' })
   barberShop: BarberShopEntity;
 
-  @OneToMany(() => ServiceEntity, (service) => service.barber)
+  @ManyToMany(() => ServiceEntity, (service) => service.barbers)
   service: ServiceEntity[];
 }

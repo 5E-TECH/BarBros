@@ -10,11 +10,11 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })  // alohida entity bo'lsin
+  @Column({ type: 'varchar' }) // alohida entity bo'lsin
   location: string;
 
-  @Column({ type: 'varchar',default: null })
-  img: string | null
+  @Column({ type: 'varchar', default: null })
+  img: string | null;
 
   @Column({ type: 'varchar' })
   descripton: string;
@@ -25,19 +25,21 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   password: string;
 
-  @Column({type: "varchar", unique:true})
-  username: string
+  @Column({ type: 'varchar', unique: true })
+  username: string;
 
-  @Column({type:"varchar", default: BarberRole.BARBER_SHOP})
-  role: BarberRole.BARBER_SHOP
+  @Column({ type: 'varchar', default: BarberRole.BARBER_SHOP })
+  role: BarberRole.BARBER_SHOP;
 
-  @Column({ type: "enum", enum:Status, default: Status.INACTIVE })
+  @Column({ type: 'enum', enum: Status, default: Status.INACTIVE })
   status: Status;
 
-  @OneToMany(()=> BarberEntity, (barber)=> barber.barberShop)
-  barber: BarberEntity[]
+  @OneToMany(() => BarberEntity, (barber) => barber.barberShop)
+  barber: BarberEntity[];
 
-  @OneToMany(()=> ImageEntity, (image)=> image.barberShop)
-  images: ImageEntity[]
-  
+  @OneToMany(() => ImageEntity, (image) => image.barberShop)
+  images: ImageEntity[];
+
+  @OneToMany(() => ServiceEntity, (service) => service.barberShop)
+  services: ServiceEntity[];
 }

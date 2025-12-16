@@ -33,12 +33,19 @@ export class BarberController {
   constructor(private readonly barberService: BarberService) {}
 
   @ApiOperation({
-    summary: 'Created barber BarberShop yoki Admin tomonidan',
+    summary: 'Barber yaratish (BarberShop tomonidan)',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
+      required: [
+        'full_name',
+        'phone_number',
+        'password',
+        'username',
+        'bio',
+      ],
       properties: {
         full_name: {
           type: 'string',
@@ -65,23 +72,20 @@ export class BarberController {
           type: 'string',
           format: 'binary',
         },
-
-        barberShop_id: {
-          type: 'string',
-          example: 'barberShop_id',
-        },
       },
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, BarberRole.BARBER_SHOP)
+  @Roles(BarberRole.BARBER_SHOP)
   @Post('Signup')
   @UseInterceptors(FileInterceptor('img'))
   register(
+    @Req() req,
     @Body() registerBarberDto: RegisterBarberDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.barberService.register(registerBarberDto, file);
+    console.log('CONTROLLER USER 👉', req.user);
+    return this.barberService.register(registerBarberDto, req.user.id, file);
   }
 
   @Post('Signin')

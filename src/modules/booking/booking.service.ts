@@ -51,7 +51,7 @@ export class BookingService {
     try {
       const booking = await this.Booking.findOne({
         where: {
-          barber_id: updateBookingDto.barber_id,
+          // barber_id: updateBookingDto.barber_id,
           date: updateBookingDto.date,
           id: id,
         },
@@ -69,7 +69,7 @@ export class BookingService {
   async findAllBarber(req: Request) {
     try {
       const data = await this.Booking.find({
-        where: { barber_id: req['user'].id },relations:["service", "user","barber"]
+        // where: { barber_id: req['user'].id },relations:["service", "user","barber"]
       });
       if (!data.length) {
         throw new NotFoundException('Not fount data');
@@ -151,7 +151,7 @@ export class BookingService {
 
     const bookings = await this.Booking.find({
       where: {
-        barber_id: barberId,
+        // barber_id: barberId,
         date: dayjs(date).toDate(),
       },
     });
@@ -161,7 +161,7 @@ export class BookingService {
 
     for (const booking of bookings) {
       const bookedService = await this.servicerepo.findOne({
-        where: { id: booking.service_id },
+        // where: { id: booking.service_id },
       })
       const bookDuration = bookedService?.duration_minutes || 30
 

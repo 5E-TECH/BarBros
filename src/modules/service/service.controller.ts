@@ -17,6 +17,8 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { BarberRole, UserRole } from 'src/common/enum';
 import { Request } from 'express';
+import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
 
 @Controller('service')
 export class ServiceController {
@@ -24,19 +26,31 @@ export class ServiceController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
   @Post()
-  create(@Body() createServiceDto: CreateServiceDto, @Req() req: Request) {
-    return this.serviceService.creates(createServiceDto, req);
+  create(@Body() createServiceDto: CreateServiceDto, @Req() req) {
+    return this.serviceService.creates(createServiceDto, req.user.id);
   }
-  @UseGuards(AuthGuard)
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
   @Get()
   findAll() {
     return this.serviceService.findAll();
   }
+
   @UseGuards(AuthGuard)
+  @Roles(BarberRole.BARBER_SHOP)
+  @Get('my-service')
+  findAllMyservices(@Req() req ) {
+    return this.serviceService.findAllMyServices(req.user.id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.serviceService.findOne(id);
   }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER_SHOP)
   @Patch(':id')
@@ -47,10 +61,28 @@ export class ServiceController {
   ) {
     return this.serviceService.update(id, updateServiceDto, req);
   }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER_SHOP)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceService.remove(id, req);
+  }
+
+  @ApiOperation({
+    summary: 'Mavjud service ga barber qo‘shish (BarberShop faqat)',
+  })
+  @ApiBody({
+    type: AddBarbersToServiceDto,
+    description: 'Service id va barberlar id listi',
+  })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(BarberRole.BARBER_SHOP)
+  @Post('add-barbers')
+  async addBarbersToService(@Body() dto: AddBarbersToServiceDto, @Req() req) {
+    // Token orqali olingan barber_shop id
+
+    // Service logikasini chaqiramiz
+    return this.serviceService.addBarbersToService(dto, req.user.id);
   }
 }
