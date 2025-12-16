@@ -38,8 +38,8 @@ export class RegisterBarberDto {
   })
   bio: string;
 
-  @ApiProperty({ example: 2 })
-  @Type(() => Number)  // 👈 shu qo‘shildi
-  @IsNumber()
-  barberShop_id: number;
+  // @ApiProperty({ example: 2 })
+  // @Type(() => Number)  // 👈 shu qo‘shildi
+  // @IsNumber()
+  // barberShop_id: number;
 }

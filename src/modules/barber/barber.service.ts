@@ -36,8 +36,10 @@ export class BarberService {
   ) {}
 
   // Barber ro'yxatdan o'tkazish
-  async register(registerBarberDto: RegisterBarberDto, file?: Express.Multer.File) {
+  async register(registerBarberDto: RegisterBarberDto, barbershop_id:number, file?: Express.Multer.File) {
     try {
+      console.log(barbershop_id);
+      
       const existing = await this.BarberRepo.findOne({ where: { username: registerBarberDto.username } });
       if (existing) throw new ConflictException('Barber email already exists');
 
@@ -47,7 +49,7 @@ export class BarberService {
         ...registerBarberDto,
         password: hashPass,
         role: BarberRole.BARBER,
-        barberShop: { id: registerBarberDto.barberShop_id },
+        barberShop: { id: barbershop_id },
       });
 
       if (file && new ImageValidationPipe().transform(file)) {
