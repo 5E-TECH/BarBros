@@ -37,11 +37,11 @@ export class ServiceController {
     return this.serviceService.findAll();
   }
 
-  @UseGuards(AuthGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(BarberRole.BARBER_SHOP, BarberRole.BARBER)
   @Get('my-service')
   findAllMyservices(@Req() req ) {
-    return this.serviceService.findAllMyServices(req.user.id);
+    return this.serviceService.findAllMyServices(req.user);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   ForbiddenException,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -15,6 +16,7 @@ import { successRes } from 'src/utils/succesResponse';
 import { Request } from 'express';
 import { BarberEntity } from '../barber/entities/barber.entity';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
+import { BarberRole } from 'src/common/enum';
 
 @Injectable()
 export class ServiceService {
@@ -126,15 +128,36 @@ export class ServiceService {
     }
   }
 
-  async findAllMyServices(id:number) {
+  async findAllMyServices(user: any) {
     try {
-      const data = await this.serviceRepository.find({
-        where:{barberShop:{id}},
-        relations: ['barbers'],
-      });
-      if (!data.length) {
-        throw new NotFoundException('Not Fount service');
+      let data;
+
+      // 🏪 BARBER_SHOP → o‘ziga tegishli barcha servicelar
+      if (user.role === BarberRole.BARBER_SHOP) {
+        data = await this.serviceRepository.find({
+          where: {
+            barberShop: { id: user.id },
+          },
+          relations: ['barbers'],
+        });
       }
+
+      // ✂️ BARBER → o‘ziga biriktirilgan servicelar
+      else if (user.role === BarberRole.BARBER) {
+        data = await this.serviceRepository
+          .createQueryBuilder('service')
+          .leftJoin('service.barbers', 'barber')
+          .where('barber.id = :barberId', { barberId: user.id })
+          // .leftJoinAndSelect('service.barbers', 'barbers')
+          .getMany();
+      } else {
+        throw new ForbiddenException('Access denied');
+      }
+
+      if (!data || !data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
       return successRes(data);
     } catch (error) {
       return ErrorHender(error);
