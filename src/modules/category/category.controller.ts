@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -12,7 +13,8 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { CreateCategoryDto } from './dto/category.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('category')
 export class CategoryController {
@@ -21,11 +23,28 @@ export class CategoryController {
   @ApiOperation({
     summary: 'Created category by SuperAdmin and or Admin',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Hair',
+        },
+        img: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @UseInterceptors(FileInterceptor('img'))
   @Post('create')
-  register(@Body() createCategory: CreateCategoryDto) {
-    return this.categoryService.createCategory(createCategory);
+  register(@Body() createCategory: CreateCategoryDto,  @UploadedFile() img: Express.Multer.File,) {
+    return this.categoryService.createCategory(createCategory, img);
   }
 
   @ApiOperation({
