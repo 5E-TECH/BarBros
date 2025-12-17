@@ -4,8 +4,8 @@ import { existsSync, mkdirSync, unlink, writeFile } from 'fs';
 import { extname, join, resolve } from 'path';
 import { ErrorHender } from 'src/utils/catchError';
 import { v4 } from 'uuid';
-import * as dotenv from "dotenv"
-dotenv.config()
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class FileService {
@@ -13,8 +13,16 @@ export class FileService {
   async createFile(file: Express.Multer.File | any): Promise<string> {
     try {
       const ext = extname(file.originalname);
-      const file_name = `${file.originalname.split('.')[0]}__${v4()}${ext.toLowerCase()}`;
-      const file_path = resolve(__dirname, '..', '..', '..', '..', 'uplout');
+
+      // 🔥 SHU YERDA BO‘SHLIQ VA BELGILARNI TOZALAYMIZ
+      const safeName = file.originalname
+        .split('.')[0]
+        .replace(/\s+/g, '-') // bo‘shliqlar → -
+        .replace(/[^a-zA-Z0-9-_]/g, ''); // faqat xavfsiz belgilar
+
+      const file_name = `${safeName}__${v4()}${ext.toLowerCase()}`;
+
+      const file_path = resolve(__dirname, '..', '..', '..', '..', 'uploud');
       if (!existsSync(file_path)) {
         mkdirSync(file_path, { recursive: true });
       }
@@ -32,7 +40,7 @@ export class FileService {
 
   async deleteFile(files: string): Promise<void> {
     try {
-      const prefix = this.Base_url + "/"!;
+      const prefix = this.Base_url + '/'!;
       const file = files.replace(prefix, '');
       const file_path = resolve(
         __dirname,
@@ -58,9 +66,8 @@ export class FileService {
   }
 
   async existFile(file_name: any) {
-    const file = file_name.replace(this.Base_url + "/", '');
+    const file = file_name.replace(this.Base_url + '/', '');
 
-    
     const file_path = resolve(
       __dirname,
       '..',
