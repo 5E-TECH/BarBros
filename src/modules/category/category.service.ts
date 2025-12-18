@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntitiy } from './entitiy/category.entitiy';
 import { ILike, Repository } from 'typeorm';
@@ -57,4 +57,34 @@ export class CategoryService {
       return ErrorHender(error);
     }
   }
+
+
+
+  async updateCategory(){
+    try {
+      
+    } catch (error) {
+     return ErrorHender(error)
+      
+    }
+  }
+
+
+  async deletCategory(id:number){
+    try {
+      const category = await this.categoryRepo.findOne({where:{id}})
+      if(!category) throw new NotFoundException("Not found category")
+
+        const categorys = await this.categoryRepo.remove(category)
+        return successRes(categorys)
+
+    } catch (error) {
+      ErrorHender(error)
+      
+    }
+  }
+
+
+
+  
 }

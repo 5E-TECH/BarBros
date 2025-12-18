@@ -35,10 +35,8 @@ export class BarberService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // Barber ro'yxatdan o'tkazish
   async register(registerBarberDto: RegisterBarberDto, barbershop_id:number, file?: Express.Multer.File) {
     try {
-      console.log(barbershop_id);
       
       const existing = await this.BarberRepo.findOne({ where: { username: registerBarberDto.username } });
       if (existing) throw new ConflictException('Barber email already exists');
@@ -64,7 +62,6 @@ export class BarberService {
     }
   }
 
-  // Barber login
   async login(loginBarberDto: LoginBarberDto) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { username: loginBarberDto.username } });
@@ -84,7 +81,6 @@ export class BarberService {
     }
   }
 
-  // Barber account malumotlarini olish
   async myAccount(req: Request) {
     try {
       const user = req['user'];
@@ -151,7 +147,6 @@ export class BarberService {
     }
   }
 
-  // Barberni o'chirish
   async remove(id: number) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
@@ -164,7 +159,6 @@ export class BarberService {
     }
   }
 
-  // Parolni yangilash
   async refreshPassword(data: RefreshPasswordDto) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { username: data.username } });
