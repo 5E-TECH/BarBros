@@ -32,7 +32,7 @@ export class FileService {
           resolve();
         });
       });
-      return `${this.Base_url}/${file_name}`;
+      return `/uploud/${file_name}`;  
     } catch (error) {
       return ErrorHender(error);
     }
