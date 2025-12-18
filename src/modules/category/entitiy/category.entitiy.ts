@@ -10,7 +10,6 @@ export class CategoryEntitiy extends BaseEntity {
   @Column({type:'varchar'})
   img:string
 
-  // CategoryEntity
   @OneToMany(() => ServiceEntity, (service) => service.category)
   services: ServiceEntity[];
 }

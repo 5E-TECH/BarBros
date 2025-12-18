@@ -29,6 +29,7 @@ export class BarberScheduleController {
   create(@Body() createBarberScheduleDto: CreateBarberScheduleDto, @Req() req:Request) {
     return this.barberScheduleService.create(createBarberScheduleDto, req);
   }
+  
   @UseGuards(AuthGuard)
   @Get()
   findAll() {

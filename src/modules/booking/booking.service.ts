@@ -51,7 +51,6 @@ export class BookingService {
     try {
       const booking = await this.Booking.findOne({
         where: {
-          // barber_id: updateBookingDto.barber_id,
           date: updateBookingDto.date,
           id: id,
         },
