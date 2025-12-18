@@ -77,7 +77,7 @@ export class BarberController {
   })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(BarberRole.BARBER_SHOP)
-  @Post('Signup')
+  @Post('create')
   @UseInterceptors(FileInterceptor('img'))
   register(
     @Req() req,
