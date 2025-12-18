@@ -11,7 +11,7 @@ import { CategoryService } from './category.service';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { UserRole } from 'src/common/enum';
+import { Category, UserRole } from 'src/common/enum';
 import { CreateCategoryDto } from './dto/category.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -32,6 +32,11 @@ export class CategoryController {
           type: 'string',
           example: 'Hair',
         },
+        categoryType: {
+        type: 'string',
+        enum: Object.values(Category), // 🔥 SELECT BO‘LADI
+        example: Category.MAN,
+      },
         img: {
           type: 'string',
           format: 'binary',
