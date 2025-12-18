@@ -21,14 +21,20 @@ export class CategoryService {
     file?: Express.Multer.File,
   ) {
     try {
-      const { name } = createCategoryDto;
+      const { name, categoryType } = createCategoryDto;
 
-      const existName = await this.categoryRepo.findOne({
-        where: { name: ILike(name) },
+      const existCategory = await this.categoryRepo.findOne({
+        where: {
+          name: ILike(name),
+          categoryType: categoryType,
+        },
       });
-      if (existName)
-        throw new ConflictException('category name already exists!');
 
+      if (existCategory) {
+        throw new ConflictException(
+          'Category with this name and type already exists!',
+        );
+      }
       const category = this.categoryRepo.create(createCategoryDto);
 
       if (file && new ImageValidationPipe().transform(file)) {
