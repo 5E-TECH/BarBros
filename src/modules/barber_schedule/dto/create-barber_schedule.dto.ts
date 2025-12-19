@@ -1,14 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
 
 export class CreateBarberScheduleDto {
   @ApiProperty({
     example: 'monday',
-    description: 'Ish kuni (monday, tuesday...)',
+    description: 'Ish boshlanish  kuni (monday, tuesday...)',
   })
   @IsString()
   @IsNotEmpty()
-  working_day: string;
+  start_day: string;
+
+  @ApiProperty({
+    example: 'monday',
+    description: 'Ish tugash  kuni (monday, tuesday...)',
+  })
+  @IsString()
+  @IsNotEmpty()
+  end_day: string;
 
   @ApiProperty({ example: '09:00:00', description: 'Boshlanish vaqti' })
   @IsString()
@@ -20,8 +28,16 @@ export class CreateBarberScheduleDto {
   @IsNotEmpty()
   end_time: string;
 
-  @ApiProperty({ example: 'uuid-barber-id', description: 'Barber ID (UUID)' })
-  @IsString()
+  @ApiProperty({
+    example: '10 minutda',
+    description: "har bir ish oralig'ida dam olish vaqti",
+  })
+  @IsInt()
+  @Min(0)
+  @IsNotEmpty()
+  break_time: number;
+
+  @ApiProperty({ example: '1,2,3,....', description: 'Barber ID (int)' })
   @IsNotEmpty()
   barber_id: number;
 }
