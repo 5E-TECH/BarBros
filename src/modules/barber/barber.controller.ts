@@ -110,6 +110,25 @@ export class BarberController {
     return this.barberService.findAll(query);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(BarberRole.BARBER_SHOP)
+  @Get('all-myBarbers')
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiQuery({ name: 'full_name', required: false })
+  @ApiQuery({ name: 'phone_number', required: false })
+  @ApiQuery({ name: 'bio', required: false })
+  @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['phone_number', 'full_name', 'email'],
+  })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
+  findAllMyBarbers(@Query() query: Record<string, any>, @Req() req) {
+    return this.barberService.findAllMyBarbers(req, query);
+  }
+
   @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {

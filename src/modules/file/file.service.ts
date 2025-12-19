@@ -1,61 +1,71 @@
 import { Injectable } from '@nestjs/common';
-import { error } from 'console';
 import { existsSync, mkdirSync, unlink, writeFile } from 'fs';
 import { extname, join, resolve } from 'path';
-import { ErrorHender } from 'src/utils/catchError';
-import { v4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import * as dotenv from 'dotenv';
+import { ErrorHender } from 'src/utils/catchError';
+
 dotenv.config();
 
 @Injectable()
 export class FileService {
-  private readonly Base_url = process.env.BASE_API;
-  async createFile(file: Express.Multer.File | any): Promise<string> {
-    try {
-      const ext = extname(file.originalname);
+  private readonly BASE_URL = process.env.BASE_API;
 
-      // 🔥 SHU YERDA BO‘SHLIQ VA BELGILARNI TOZALAYMIZ
+  private readonly UPLOAD_PATH = resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    'uploud',
+  );
+
+  async createFile(file: Express.Multer.File): Promise<string> {
+    try {
+      const ext = extname(file.originalname).toLowerCase();
+
       const safeName = file.originalname
         .split('.')[0]
-        .replace(/\s+/g, '-') // bo‘shliqlar → -
-        .replace(/[^a-zA-Z0-9-_]/g, ''); // faqat xavfsiz belgilar
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9-_]/g, '');
 
-      const file_name = `${safeName}__${v4()}${ext.toLowerCase()}`;
+      const fileName = `${safeName}__${uuidv4()}${ext}`;
 
-      const file_path = resolve(__dirname, '..', '..', '..', '..', 'uploud');
-      if (!existsSync(file_path)) {
-        mkdirSync(file_path, { recursive: true });
+      if (!existsSync(this.UPLOAD_PATH)) {
+        mkdirSync(this.UPLOAD_PATH, { recursive: true });
       }
+
       await new Promise<void>((resolve, reject) => {
-        writeFile(join(file_path, file_name), file.buffer, (err) => {
+        writeFile(join(this.UPLOAD_PATH, fileName), file.buffer, (err) => {
           if (err) reject(err);
           resolve();
         });
       });
-      return `/uploud/${file_name}`;  
+
+      return `/uploud/${fileName}`;
     } catch (error) {
       return ErrorHender(error);
     }
   }
 
-  async deleteFile(files: string): Promise<void> {
+  async deleteFile(fileUrl: string | null): Promise<void> {
     try {
-      const prefix = this.Base_url + '/'!;
-      const file = files.replace(prefix, '');
-      const file_path = resolve(
+      if (!fileUrl) return;
+
+      // 👉 faqat /uploud/xxx.png qismi qoladi
+      const filePath = resolve(
         __dirname,
         '..',
         '..',
         '..',
         '..',
-        'uplout',
-        file,
+        fileUrl.startsWith('/') ? fileUrl.slice(1) : fileUrl,
       );
-      if (!existsSync(file_path)) {
-        ErrorHender(error);
-      }
+
+      if (!existsSync(filePath)) return;
+
       await new Promise<void>((resolve, reject) => {
-        unlink(file_path, (err) => {
+        unlink(filePath, (err) => {
           if (err) reject(err);
           resolve();
         });
@@ -65,22 +75,31 @@ export class FileService {
     }
   }
 
-  async existFile(file_name: any) {
-    const file = file_name.replace(this.Base_url + '/', '');
+  async replaceFile(
+    oldFile: string | null,
+    newFile: Express.Multer.File,
+  ): Promise<string> {
+    try {
+      if (oldFile) {
+        await this.deleteFile(oldFile); // 🔥 eski rasm o‘chadi
+      }
 
-    const file_path = resolve(
+      return await this.createFile(newFile); // 🔥 yangi rasm yoziladi
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  async existFile(fileUrl: string): Promise<boolean> {
+    const filePath = resolve(
       __dirname,
       '..',
       '..',
       '..',
       '..',
-      'uplout',
-      file,
+      fileUrl.startsWith('/') ? fileUrl.slice(1) : fileUrl,
     );
-    if (existsSync(file_path)) {
-      return true;
-    } else {
-      return false;
-    }
+
+    return existsSync(filePath);
   }
 }

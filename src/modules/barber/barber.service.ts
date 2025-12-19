@@ -35,11 +35,23 @@ export class BarberService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerBarberDto: RegisterBarberDto, barbershop_id:number, file?: Express.Multer.File) {
+  async register(
+    registerBarberDto: RegisterBarberDto,
+    barbershop_id: number,
+    file?: Express.Multer.File,
+  ) {
     try {
-      
-      const existing = await this.BarberRepo.findOne({ where: { username: registerBarberDto.username } });
-      if (existing) throw new ConflictException('Barber email already exists');
+      const existing = await this.BarberRepo.findOne({
+        where: { username: registerBarberDto.username },
+      });
+      if (existing)
+        throw new ConflictException('Barber username already exists');
+
+      const existingPhone_Number = await this.BarberRepo.findOne({
+        where: { phone_number: registerBarberDto.phone_number },
+      });
+      if (existingPhone_Number)
+        throw new ConflictException('Barber Phone number already exists');
 
       const hashPass = await this.Bcrypt.Generate(registerBarberDto.password);
 
@@ -64,16 +76,28 @@ export class BarberService {
 
   async login(loginBarberDto: LoginBarberDto) {
     try {
-      const barber = await this.BarberRepo.findOne({ where: { username: loginBarberDto.username } });
+      const barber = await this.BarberRepo.findOne({
+        where: { username: loginBarberDto.username },
+      });
       if (!barber) throw new ForbiddenException('Wrong email');
 
-      if (barber.role !== BarberRole.BARBER) throw new ForbiddenException('Forbidden');
+      if (barber.role !== BarberRole.BARBER)
+        throw new ForbiddenException('Forbidden');
 
-      const isMatch = await this.Bcrypt.Verify(loginBarberDto.password, barber.password);
+      const isMatch = await this.Bcrypt.Verify(
+        loginBarberDto.password,
+        barber.password,
+      );
       if (!isMatch) throw new ForbiddenException('Wrong password');
 
-      const accessToken = AccessToken(this.jwtService, { id: barber.id, role: barber.role });
-      const refreshToken = RefreshToken(this.jwtService, { id: barber.id, role: barber.role });
+      const accessToken = AccessToken(this.jwtService, {
+        id: barber.id,
+        role: barber.role,
+      });
+      const refreshToken = RefreshToken(this.jwtService, {
+        id: barber.id,
+        role: barber.role,
+      });
 
       return { accessToken, refreshToken };
     } catch (error) {
@@ -84,7 +108,8 @@ export class BarberService {
   async myAccount(req: Request) {
     try {
       const user = req['user'];
-      if (user.role !== BarberRole.BARBER) throw new ForbiddenException('Forbidden');
+      if (user.role !== BarberRole.BARBER)
+        throw new ForbiddenException('Forbidden');
 
       const barber = await this.BarberRepo.findOne({ where: { id: user.id } });
       return successRes(barber);
@@ -96,7 +121,16 @@ export class BarberService {
   // Barcha barberlarni olish
   async findAll(query: Record<string, any>) {
     try {
-      const { full_name, phone_number, email, bio, sortBy = 'full_name', order = 'DESC', page = 1, limit = 10 } = query;
+      const {
+        full_name,
+        phone_number,
+        email,
+        bio,
+        sortBy = 'full_name',
+        order = 'DESC',
+        page = 1,
+        limit = 10,
+      } = query;
       const skip = (Number(page) - 1) * Number(limit);
 
       const [data, total] = await this.BarberRepo.findAndCount({
@@ -107,7 +141,14 @@ export class BarberService {
           ...(email && { email: ILike(`%${email}%`) }),
           ...(bio && { bio: ILike(`%${bio}%`) }),
         },
-        relations: ['reyting', 'service', 'barberShop', 'barberSchuld', 'barberImage', 'booking'],
+        relations: [
+          'reyting',
+          'service',
+          'barberShop',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
         order: { [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC' },
         skip,
         take: Number(limit),
@@ -125,14 +166,68 @@ export class BarberService {
     }
   }
 
+  async findAllMyBarbers(user: any, query: Record<string, any>) {
+    try {
+      const {
+        full_name,
+        phone_number,
+        email,
+        bio,
+        sortBy = 'full_name',
+        order = 'DESC',
+        page = 1,
+        limit = 10,
+      } = query;
+
+      const skip = (Number(page) - 1) * Number(limit);
+
+      const [data, total] = await this.BarberRepo.findAndCount({
+        where: {
+          role: BarberRole.BARBER,
+          barberShop: { id: user.id }, // 🔥 faqat o‘zining barberlari
+          ...(full_name && { full_name: ILike(`%${full_name}%`) }),
+          ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
+          ...(email && { email: ILike(`%${email}%`) }),
+          ...(bio && { bio: ILike(`%${bio}%`) }),
+        },
+        relations: [
+          'reyting',
+          'service',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
+        order: {
+          [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+        },
+        skip,
+        take: Number(limit),
+      });
+
+      return successRes({
+        data,
+        total,
+        currentPage: Number(page),
+        pageSize: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      });
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   // Barber malumotlarini yangilash
-  async update(id: number, updateBarberDto: UpdateBarberDto, file?: Express.Multer.File) {
+  async update(
+    id: number,
+    updateBarberDto: UpdateBarberDto,
+    file?: Express.Multer.File,
+  ) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
       if (!barber) throw new NotFoundException('Barber not found');
 
       if (file) {
-        if (barber.img && await this.fileServis.existFile(barber.img)) {
+        if (barber.img && (await this.fileServis.existFile(barber.img))) {
           await this.fileServis.deleteFile(barber.img);
         }
         const img = await this.fileServis.createFile(file);
@@ -161,15 +256,18 @@ export class BarberService {
 
   async refreshPassword(data: RefreshPasswordDto) {
     try {
-      const barber = await this.BarberRepo.findOne({ where: { username: data.username } });
+      const barber = await this.BarberRepo.findOne({
+        where: { username: data.username },
+      });
       if (!barber) throw new NotFoundException('Barber not found');
 
-      if (!data.new_password) throw new BadRequestException('New password is required');
+      if (!data.new_password)
+        throw new BadRequestException('New password is required');
 
       const hashPass = await this.Bcrypt.Generate(data.new_password);
       await this.BarberRepo.update({ id: barber.id }, { password: hashPass });
 
-      return { message: "Password updated successfully", statusCode: 201 };
+      return { message: 'Password updated successfully', statusCode: 201 };
     } catch (error) {
       return ErrorHender(error);
     }
@@ -180,7 +278,14 @@ export class BarberService {
     try {
       const barber = await this.BarberRepo.findOne({
         where: { id },
-        relations: ['reyting', 'service', 'barberShop', 'barberSchuld', 'barberImage', 'booking'],
+        relations: [
+          'reyting',
+          'service',
+          'barberShop',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
       });
       if (!barber) throw new NotFoundException('Barber not found');
       return successRes(barber);
