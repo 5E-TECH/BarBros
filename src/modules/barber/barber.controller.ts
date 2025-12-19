@@ -84,7 +84,6 @@ export class BarberController {
     @Body() registerBarberDto: RegisterBarberDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log('CONTROLLER USER 👉', req.user);
     return this.barberService.register(registerBarberDto, req.user.id, file);
   }
 
