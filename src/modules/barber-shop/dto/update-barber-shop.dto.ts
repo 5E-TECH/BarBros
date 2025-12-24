@@ -1,33 +1,27 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateBarberShopDto {
+  @ApiProperty({
+    example:'faxa mee'
+  })
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  location: string;
+  location?: string;
 
   @IsString()
   @IsOptional()
-  descripton: string;
-
-  @IsEmail()
-  @IsOptional()
-  email: string;
+  descripton?: string;
 
   @IsString()
   @IsOptional()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsString()
   @IsOptional()
-  img: string; // <-- bu qatorni qo‘shish kerak
+  img?: string;
 }

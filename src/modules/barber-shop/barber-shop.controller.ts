@@ -139,10 +139,6 @@ export class BarberShopController {
           type: 'string',
           format: 'binary',
         },
-        email: {
-          type: 'string',
-          example: 'karalevstvabitva@gmail.com',
-        },
         descripton: {
           type: 'string',
           example: 'Berber shop haqida',
