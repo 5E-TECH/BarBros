@@ -42,7 +42,8 @@ export default class Application {
     });
 
     await app.listen(Port, () => {
-      console.log(`server running on port ${Port}`);
+      console.log(`server running on port`,Port);
+      console.log("Swagger >>",`http://localhost:${Port}/api/v1`);
     });
   }
 }

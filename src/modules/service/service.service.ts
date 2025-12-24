@@ -30,10 +30,7 @@ export class ServiceService {
     try {
       const { barber_ids, category_id, ...serviceData } = createServiceDto;
 
-      // 🔹 0️⃣ JWT orqali currentShopId olish
-      // const currentShopId = req.user.shopId; // JWT dan olinadi
-
-      // 🔹 1️⃣ barberlarni topish (faqat current shop barbersi)
+ 
       const barbers = await this.barberRepository.find({
         where: { id: In(barber_ids), barberShop: { id: barbershop_id } },
       });
@@ -44,15 +41,13 @@ export class ServiceService {
         );
       }
 
-      // 🔹 2️⃣ service yaratish va barberShop relation qo‘shish
       const service = this.serviceRepository.create({
         ...serviceData,
         category: { id: category_id },
-        barberShop: { id: barbershop_id }, // faqat o‘z shopiga tegishli
+        barberShop: { id: barbershop_id },
         barbers,
       });
 
-      // 🔹 3️⃣ saqlash
       await this.serviceRepository.save(service);
 
       return successRes(service, 201);
@@ -67,7 +62,6 @@ export class ServiceService {
   ) {
     const { service_id, barber_ids } = dto;
 
-    // 1️⃣ Service topish (faqat service_id bilan)
     const service = await this.serviceRepository.findOne({
       where: { id: service_id },
       relations: ['barbers'],
@@ -75,7 +69,6 @@ export class ServiceService {
 
     if (!service) throw new NotFoundException('Service not found');
 
-    // 2️⃣ Barberlarni topish (faqat current shop barbersi)
     const newBarbers = await this.barberRepository.find({
       where: { id: In(barber_ids), barberShop: { id: currentShopId } },
     });
@@ -86,14 +79,11 @@ export class ServiceService {
       );
     }
 
-    // 3️⃣ Qaytadan tekshirish (duplicate bo‘lishini oldini olish)
     const existingIds = service.barbers.map((b) => b.id);
     const barbersToAdd = newBarbers.filter((b) => !existingIds.includes(b.id));
 
-    // 4️⃣ Qo‘shish
     service.barbers.push(...barbersToAdd);
 
-    // 5️⃣ Saqlash
     await this.serviceRepository.save(service);
 
     return successRes(service, 200);
@@ -132,7 +122,6 @@ export class ServiceService {
     try {
       let data;
 
-      // 🏪 BARBER_SHOP → o‘ziga tegishli barcha servicelar
       if (user.role === BarberRole.BARBER_SHOP) {
         data = await this.serviceRepository.find({
           where: {
@@ -142,7 +131,6 @@ export class ServiceService {
         });
       }
 
-      // ✂️ BARBER → o‘ziga biriktirilgan servicelar
       else if (user.role === BarberRole.BARBER) {
         data = await this.serviceRepository
           .createQueryBuilder('service')

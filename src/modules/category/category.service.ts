@@ -135,8 +135,9 @@ export class CategoryService {
       const category = await this.categoryRepo.findOne({ where: { id } });
       if (!category) throw new NotFoundException('Not found category');
 
-      const categorys = await this.categoryRepo.remove(category);
-      return successRes(categorys);
+      category.is_deleted = true;
+      await this.categoryRepo.save(category);
+      return successRes(category);
     } catch (error) {
       ErrorHender(error);
     }
