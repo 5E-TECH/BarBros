@@ -29,7 +29,7 @@ export default class Application {
       .setTitle('Barber Shop')
       .setDescription('The cats API description')
       .setVersion('1.0')
-      // .addServer('/barber')
+      .addServer('/barber')
       .addSecurityRequirements('bearer', ['bearer'])
       .addBearerAuth()
       .build();
@@ -42,7 +42,8 @@ export default class Application {
     });
 
     await app.listen(Port, () => {
-      console.log(`server running on port ${Port}`);
+      console.log(`server running on port`,Port);
+      console.log("Swagger >>",`http://localhost:${Port}/api/v1`);
     });
   }
 }

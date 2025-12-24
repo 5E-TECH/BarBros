@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -125,5 +127,13 @@ export class CategoryController {
       updateCategoryDto,
       img,
     );
+  }
+
+  
+@UseGuards(AuthGuard,RolesGuard)
+@Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+@Delete(':id')
+  remove(@Param('id') id:number, @Req() req:Request){
+    return this.categoryService.deletCategory(id)
   }
 }

@@ -25,7 +25,6 @@ private generateTimeSlots(
   breakTime: number = 0,
 ): string[] {
   const slots: string[] = [];
-
   const SLOT = 30;
 
   let [sh, sm] = startTime.split(':').map(Number);
@@ -47,10 +46,10 @@ private generateTimeSlots(
     slots.push(`${hour}:${minute}`);
 
     if (isFirstSlot && breakTime > 0) {
-      current += SLOT + breakTime; // faqat birinchi marta
+      current += SLOT + breakTime;
       isFirstSlot = false;
     } else {
-      current += SLOT; // keyingilari oddiy 30 minut
+      current += SLOT;
     }
   }
 
@@ -58,34 +57,93 @@ private generateTimeSlots(
 }
 
 
+private getDaysBetween(startDay: string, endDay: string): string[] {
+  const daysOfWeek = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
 
+  const startIndex = daysOfWeek.indexOf(startDay.toLowerCase());
+  const endIndex = daysOfWeek.indexOf(endDay.toLowerCase());
 
+  if (startIndex === -1 || endIndex === -1) {
+    throw new Error('Invalid day name');
+  }
 
-  async create(dto: CreateBarberScheduleDto, req: Request) {
-    try {
-      const slots = this.generateTimeSlots(
-        dto.start_time,
-        dto.end_time,
-        dto.break_time,
-      );
-
-      const schedule = this.scheduleRepo.create({
-        ...dto,
-      });
-
-      await this.scheduleRepo.save(schedule);
-
-      return successRes(
-        {
-          schedule,
-          slots,
-        },
-        201,
-      );
-    } catch (error) {
-      return ErrorHender(error);
+  const days: string[] = [];
+  
+  if (startIndex <= endIndex) {
+    // Normal case: monday to friday
+    for (let i = startIndex; i <= endIndex; i++) {
+      days.push(daysOfWeek[i]);
+    }
+  } else {
+    // Wrap around case: friday to monday
+    for (let i = startIndex; i < daysOfWeek.length; i++) {
+      days.push(daysOfWeek[i]);
+    }
+    for (let i = 0; i <= endIndex; i++) {
+      days.push(daysOfWeek[i]);
     }
   }
+
+  return days;
+}
+
+
+
+
+async create(dto: CreateBarberScheduleDto, req: Request) {
+  try {
+    const slots = this.generateTimeSlots(
+      dto.start_time,
+      dto.end_time,
+      dto.break_time,
+    );
+
+    const days = this.getDaysBetween(dto.start_day, dto.end_day);
+
+    const schedules: Array<{
+      day: string;
+      schedule: BarberScheduleEntity;
+      slots: string[];
+    }> = [];
+
+    for (const day of days) {
+      const schedule = this.scheduleRepo.create({
+        start_day: day,
+        end_day: day,
+        start_time: dto.start_time,
+        end_time: dto.end_time,
+        break_time: dto.break_time,
+        barber_id: dto.barber_id,
+      });
+
+      const savedSchedule = await this.scheduleRepo.save(schedule);
+      
+      schedules.push({
+        day: day,
+        schedule: savedSchedule,
+        slots: slots,
+      });
+    }
+
+    return successRes(
+      {
+        schedules,
+        totalDays: days.length,
+      },
+      201,
+    );
+  } catch (error) {
+    return ErrorHender(error);
+  }
+}
 
 
   async findAll() {

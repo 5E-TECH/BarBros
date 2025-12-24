@@ -35,13 +35,11 @@ export class RefreshController {
     if (bearer !== 'Bearer' || !token) {
       throw new UnauthorizedException('Invalid authorization format');
     }
-
     try {
       const data = this.jwtService.verify(token, {
         secret: String(process.env.REFRESH_SECRET),
       });
 
-      // BarberShop uchun
       if (data.role === BarberRole.BARBER_SHOP) {
         const barberShop = await this.barberShop.findOne({
           where: { id: data.id },
@@ -58,12 +56,12 @@ export class RefreshController {
         const accessToken = AccessToken(this.jwtService, {
           id: barberShop.id,
           role: barberShop.role,
+          UserService,
         });
 
         return { accessToken };
       }
 
-      // Oddiy user uchun
       const accessToken = AccessToken(this.jwtService, {
         id: data.id,
         role: data.role,

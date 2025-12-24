@@ -8,7 +8,7 @@ import { UserEntity } from 'src/modules/user/entities/user.admin,entity';
 @Module({
   imports: [
     UserModule,
-    TypeOrmModule.forFeature([BarberShopEntity, UserEntity]), // UserEntity qo'shildi
+    TypeOrmModule.forFeature([BarberShopEntity, UserEntity]), 
   ],
   controllers: [RefreshController],
 })
