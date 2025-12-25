@@ -182,7 +182,7 @@ async login(loginDto: AdminLoginDto) {
   }
 
 async refreshPassword(data: RefreshPasswordDto) {
-  const admin = await this.userRepo.findOne({ where: { email: data.email } }); // email bo‘yicha
+  const admin = await this.userRepo.findOne({ where: { email: data.email } });
   if (!admin) throw new NotFoundException('Admin not found');
   if (![UserRole.ADMIN, UserRole.SUPPER_ADMIN].includes(admin.role)) throw new ForbiddenException('Forbidden');
 
