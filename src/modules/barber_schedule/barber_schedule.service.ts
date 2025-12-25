@@ -19,42 +19,42 @@ export class BarberScheduleService {
     private readonly scheduleRepo: Repository<BarberScheduleEntity>,
   ) {}
 
-private generateTimeSlots(
-  startTime: string,
-  endTime: string,
-  breakTime: number = 0,
-): string[] {
-  const slots: string[] = [];
-  const SLOT = 30;
+// private generateTimeSlots(
+//   startTime: string,
+//   endTime: string,
+//   breakTime: number = 0,
+// ): string[] {
+//   const slots: string[] = [];
+//   const SLOT = 30;
 
-  let [sh, sm] = startTime.split(':').map(Number);
-  let [eh, em] = endTime.split(':').map(Number);
+//   let [sh, sm] = startTime.split(':').map(Number);
+//   let [eh, em] = endTime.split(':').map(Number);
 
-  let current = sh * 60 + sm;
-  const end = eh * 60 + em;
+//   let current = sh * 60 + sm;
+//   const end = eh * 60 + em;
 
-  let isFirstSlot = true;
+//   let isFirstSlot = true;
 
-  while (current <= end) {
-    const hour = Math.floor(current / 60)
-      .toString()
-      .padStart(2, '0');
-    const minute = (current % 60)
-      .toString()
-      .padStart(2, '0');
+//   while (current <= end) {
+//     const hour = Math.floor(current / 60)
+//       .toString()
+//       .padStart(2, '0');
+//     const minute = (current % 60)
+//       .toString()
+//       .padStart(2, '0');
 
-    slots.push(`${hour}:${minute}`);
+//     slots.push(`${hour}:${minute}`);
 
-    if (isFirstSlot && breakTime > 0) {
-      current += SLOT + breakTime;
-      isFirstSlot = false;
-    } else {
-      current += SLOT;
-    }
-  }
+//     if (isFirstSlot && breakTime > 0) {
+//       current += SLOT + breakTime;
+//       isFirstSlot = false;
+//     } else {
+//       current += SLOT;
+//     }
+//   }
 
-  return slots;
-}
+//   return slots;
+// }
 
 
 private getDaysBetween(startDay: string, endDay: string): string[] {
@@ -100,27 +100,19 @@ private getDaysBetween(startDay: string, endDay: string): string[] {
 
 async create(dto: CreateBarberScheduleDto, req: Request) {
   try {
-    const slots = this.generateTimeSlots(
-      dto.start_time,
-      dto.end_time,
-      dto.break_time,
-    );
+
 
     const days = this.getDaysBetween(dto.start_day, dto.end_day);
 
     const schedules: Array<{
       day: string;
       schedule: BarberScheduleEntity;
-      slots: string[];
     }> = [];
 
     for (const day of days) {
       const schedule = this.scheduleRepo.create({
         start_day: day,
         end_day: day,
-        start_time: dto.start_time,
-        end_time: dto.end_time,
-        break_time: dto.break_time,
         barber_id: dto.barber_id,
       });
 
@@ -129,7 +121,6 @@ async create(dto: CreateBarberScheduleDto, req: Request) {
       schedules.push({
         day: day,
         schedule: savedSchedule,
-        slots: slots,
       });
     }
 
