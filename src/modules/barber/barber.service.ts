@@ -118,7 +118,6 @@ export class BarberService {
     }
   }
 
-  // Barcha barberlarni olish
   async findAll(query: Record<string, any>) {
     try {
       const {
@@ -216,7 +215,6 @@ export class BarberService {
     }
   }
 
-  // Barber malumotlarini yangilash
   async update(
     id: number,
     updateBarberDto: UpdateBarberDto,
@@ -273,7 +271,6 @@ export class BarberService {
     }
   }
 
-  // Id orqali barber olish
   async findOne(id: number) {
     try {
       const barber = await this.BarberRepo.findOne({
