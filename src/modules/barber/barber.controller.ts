@@ -141,6 +141,12 @@ export class BarberController {
     return this.barberService.findOne(id);
   }
 
+   @UseGuards(AuthGuard, SelfGuard)
+  @Get('barbershop/:id')
+  findBarbershopId(@Param('id') id: number) {
+    return this.barberService.findBarbershopId(id);
+  }
+
   @ApiOperation({
     summary: 'Update barber',
   })
