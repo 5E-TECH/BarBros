@@ -1,15 +1,17 @@
 import {
-  ForbiddenException,
+  BadRequestException,
+  ConflictException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { BarberScheduleEntity } from './entities/barber_schedule.entity';
+import { Repository, In } from 'typeorm';
+import {
+  BarberScheduleEntity,
+  DayOfWeek,
+} from './entities/barber_schedule.entity';
 import { CreateBarberScheduleDto } from './dto/create-barber_schedule.dto';
 import { UpdateBarberScheduleDto } from './dto/update-barber_schedule.dto';
 import { successRes } from 'src/utils/succesResponse';
-import { ErrorHender } from 'src/utils/catchError';
 import { Request } from 'express';
 
 @Injectable()
@@ -19,193 +21,315 @@ export class BarberScheduleService {
     private readonly scheduleRepo: Repository<BarberScheduleEntity>,
   ) {}
 
-// private generateTimeSlots(
-//   startTime: string,
-//   endTime: string,
-//   breakTime: number = 0,
-// ): string[] {
-//   const slots: string[] = [];
-//   const SLOT = 30;
+  private getDaysBetween(startDay: DayOfWeek, endDay: DayOfWeek): DayOfWeek[] {
+    const daysOfWeek = [
+      DayOfWeek.MONDAY,
+      DayOfWeek.TUESDAY,
+      DayOfWeek.WEDNESDAY,
+      DayOfWeek.THURSDAY,
+      DayOfWeek.FRIDAY,
+      DayOfWeek.SATURDAY,
+      DayOfWeek.SUNDAY,
+    ];
 
-//   let [sh, sm] = startTime.split(':').map(Number);
-//   let [eh, em] = endTime.split(':').map(Number);
+    const startIndex = daysOfWeek.indexOf(startDay);
+    const endIndex = daysOfWeek.indexOf(endDay);
 
-//   let current = sh * 60 + sm;
-//   const end = eh * 60 + em;
-
-//   let isFirstSlot = true;
-
-//   while (current <= end) {
-//     const hour = Math.floor(current / 60)
-//       .toString()
-//       .padStart(2, '0');
-//     const minute = (current % 60)
-//       .toString()
-//       .padStart(2, '0');
-
-//     slots.push(`${hour}:${minute}`);
-
-//     if (isFirstSlot && breakTime > 0) {
-//       current += SLOT + breakTime;
-//       isFirstSlot = false;
-//     } else {
-//       current += SLOT;
-//     }
-//   }
-
-//   return slots;
-// }
-
-
-private getDaysBetween(startDay: string, endDay: string): string[] {
-  const daysOfWeek = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
-
-  const startIndex = daysOfWeek.indexOf(startDay.toLowerCase());
-  const endIndex = daysOfWeek.indexOf(endDay.toLowerCase());
-
-  if (startIndex === -1 || endIndex === -1) {
-    throw new Error('Invalid day name');
-  }
-
-  const days: string[] = [];
-  
-  if (startIndex <= endIndex) {
-    // Normal case: monday to friday
-    for (let i = startIndex; i <= endIndex; i++) {
-      days.push(daysOfWeek[i]);
-    }
-  } else {
-    // Wrap around case: friday to monday
-    for (let i = startIndex; i < daysOfWeek.length; i++) {
-      days.push(daysOfWeek[i]);
-    }
-    for (let i = 0; i <= endIndex; i++) {
-      days.push(daysOfWeek[i]);
+    if (startIndex <= endIndex) {
+      return daysOfWeek.slice(startIndex, endIndex + 1);
+    } else {
+      return [
+        ...daysOfWeek.slice(startIndex),
+        ...daysOfWeek.slice(0, endIndex + 1),
+      ];
     }
   }
 
-  return days;
-}
+  private validateTimeRange(startTime: string, endTime: string): void {
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
 
+    if (start >= end) {
+      throw new BadRequestException(
+        "start_time end_time dan oldin bo'lishi kerak",
+      );
+    }
+  }
 
+  async create(dto: CreateBarberScheduleDto, req: Request) {
+    try {
+      // 1. Vaqt validatsiyasi
+      this.validateTimeRange(dto.start_time, dto.end_time);
 
+      // 2. Kunlarni olish
+      const days = this.getDaysBetween(dto.start_day, dto.end_day);
 
-async create(dto: CreateBarberScheduleDto, req: Request) {
-  try {
-
-
-    const days = this.getDaysBetween(dto.start_day, dto.end_day);
-
-    const schedules: Array<{
-      day: string;
-      schedule: BarberScheduleEntity;
-    }> = [];
-
-    for (const day of days) {
-      const schedule = this.scheduleRepo.create({
-        start_day: day,
-        end_day: day,
-        barber_id: dto.barber_id,
+      // 3. Mavjud jadvallarni tekshirish
+      const existingSchedules = await this.scheduleRepo.find({
+        where: {
+          barber_id: dto.barber_id,
+          day_of_week: In(days),
+        },
       });
 
-      const savedSchedule = await this.scheduleRepo.save(schedule);
-      
-      schedules.push({
-        day: day,
-        schedule: savedSchedule,
-      });
+      if (existingSchedules.length > 0) {
+        const existingDays = existingSchedules
+          .map((s) => s.day_of_week)
+          .join(', ');
+        throw new ConflictException(
+          `Bu kunlar uchun jadval allaqachon mavjud: ${existingDays}`,
+        );
+      }
+
+      // 4. Bulk insert - bir marta DB ga murojaat
+      const schedules = days.map((day) =>
+        this.scheduleRepo.create({
+          day_of_week: day,
+          start_time: dto.start_time,
+          end_time: dto.end_time,
+          break_time: dto.break_time,
+          barber_id: dto.barber_id,
+        }),
+      );
+
+      const savedSchedules = await this.scheduleRepo.save(schedules);
+
+      return successRes(
+        {
+          schedules: savedSchedules,
+          totalDays: savedSchedules.length,
+          message: `${savedSchedules.length} kun uchun jadval muvaffaqiyatli yaratildi`,
+        },
+        201,
+      );
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+
+      // Database unique constraint error
+      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('Bu barber uchun jadval allaqachon mavjud');
+      }
+
+      throw new BadRequestException(
+        `Jadval yaratishda xatolik: ${error.message}`,
+      );
     }
-
-    return successRes(
-      {
-        schedules,
-        totalDays: days.length,
-      },
-      201,
-    );
-  } catch (error) {
-    return ErrorHender(error);
   }
-}
-
 
   async findAll() {
     try {
-      const data = await this.scheduleRepo.find();
-      return successRes(data);
+      const schedules = await this.scheduleRepo.find({
+        relations: ['barber'],
+        order: { day_of_week: 'ASC' },
+      });
+
+      return successRes(
+        {
+          schedules,
+          total: schedules.length,
+        },
+        200,
+      );
     } catch (error) {
-      return ErrorHender(error);
+      throw new BadRequestException(
+        `Jadvallarni olishda xatolik: ${error.message}`,
+      );
     }
   }
 
   async findOne(id: number) {
     try {
-      const data = await this.scheduleRepo.findOne({
+      const schedule = await this.scheduleRepo.findOne({
         where: { id },
+        relations: ['barber'],
       });
-      if (!data) throw new NotFoundException('Schedule not found');
-      return successRes(data);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
 
-  async update(id: number, dto: UpdateBarberScheduleDto, req: Request) {
-    try {
-      const schedule = await this.scheduleRepo.findOneBy({ id });
       if (!schedule) {
-        throw new NotFoundException('Schedule not found');
+        throw new BadRequestException('Jadval topilmadi');
       }
-      if (schedule.barber_id !== req['user'].id) {
-        throw new ForbiddenException(
-          "Siz boshqa barber ish rejasini o'zgartira olmaysiz",
-        );
-      }
-      await this.scheduleRepo.update(id, dto);
-      const updated = await this.scheduleRepo.findOne({ where: { id } });
-      return successRes(updated);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
 
-  async remove(id: number, req: Request) {
-    try {
-      const schedule = await this.scheduleRepo.findOneBy({ id });
-      if (!schedule) {
-        throw new NotFoundException('Schedule not found');
-      }
-      if (schedule.barber_id !== req['user'].id) {
-        throw new ForbiddenException(
-          "Siz Boshqa barbenning ish rejasini o'zgartira olmaysiz",
-        );
-      }
-      await this.scheduleRepo.remove(schedule);
-      return successRes({ message: 'Deleted successfully' });
+      return successRes({ schedule }, 200);
     } catch (error) {
-      return ErrorHender(error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(`Jadval olishda xatolik: ${error.message}`);
     }
   }
 
   async getSchedulesByBarber(req: Request) {
     try {
-      const schedules = await this.scheduleRepo.find({
-        where: { barber_id: req['user'].id },
-      });
-      if (!schedules.length) {
-        throw new NotFoundException('Not Fount barber schedule');
+      const barberId = req['user']?.id;
+
+      if (!barberId) {
+        throw new BadRequestException('Barber ID topilmadi');
       }
-      return successRes(schedules);
+
+      const schedules = await this.scheduleRepo.find({
+        where: { barber_id: barberId },
+        relations: ['barber'],
+        order: { day_of_week: 'ASC' },
+      });
+
+      return successRes(
+        {
+          schedules,
+          total: schedules.length,
+        },
+        200,
+      );
     } catch (error) {
-      return ErrorHender(error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Jadvallarni olishda xatolik: ${error.message}`,
+      );
+    }
+  }
+
+  async findByBarber(barberId: number) {
+    try {
+      const schedules = await this.scheduleRepo.find({
+        where: { barber_id: barberId },
+        relations: ['barber'],
+        order: { day_of_week: 'ASC' },
+      });
+
+      return successRes(
+        {
+          schedules,
+          total: schedules.length,
+        },
+        200,
+      );
+    } catch (error) {
+      throw new BadRequestException(
+        `Jadvallarni olishda xatolik: ${error.message}`,
+      );
+    }
+  }
+
+  async findByBarberAndDay(barberId: number, dayOfWeek: DayOfWeek) {
+    try {
+      const schedule = await this.scheduleRepo.findOne({
+        where: { barber_id: barberId, day_of_week: dayOfWeek },
+        relations: ['barber'],
+      });
+
+      if (!schedule) {
+        throw new BadRequestException(
+          `${dayOfWeek} kuni uchun jadval topilmadi`,
+        );
+      }
+
+      return successRes({ schedule }, 200);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(`Jadval olishda xatolik: ${error.message}`);
+    }
+  }
+
+  async update(id: number, dto: UpdateBarberScheduleDto, req: Request) {
+    try {
+      const schedule = await this.scheduleRepo.findOne({ where: { id } });
+
+      if (!schedule) {
+        throw new BadRequestException('Jadval topilmadi');
+      }
+
+      // Agar vaqt yangilanayotgan bo'lsa, validatsiya qilish
+      const newStartTime = dto.start_time || schedule.start_time;
+      const newEndTime = dto.end_time || schedule.end_time;
+      this.validateTimeRange(newStartTime, newEndTime);
+
+      Object.assign(schedule, dto);
+      const updatedSchedule = await this.scheduleRepo.save(schedule);
+
+      return successRes(
+        {
+          schedule: updatedSchedule,
+          message: 'Jadval muvaffaqiyatli yangilandi',
+        },
+        200,
+      );
+    } catch (error) {
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+
+      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('Bu kun uchun jadval allaqachon mavjud');
+      }
+
+      throw new BadRequestException(
+        `Jadval yangilashda xatolik: ${error.message}`,
+      );
+    }
+  }
+
+  async remove(id: number, req: Request) {
+    try {
+      const schedule = await this.scheduleRepo.findOne({ where: { id } });
+
+      if (!schedule) {
+        throw new BadRequestException('Jadval topilmadi');
+      }
+
+      await this.scheduleRepo.remove(schedule);
+
+      return successRes(
+        {
+          message: "Jadval muvaffaqiyatli o'chirildi",
+        },
+        200,
+      );
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Jadval o'chirishda xatolik: ${error.message}`,
+      );
+    }
+  }
+
+  async removeByBarber(barberId: number) {
+    try {
+      const schedules = await this.scheduleRepo.find({
+        where: { barber_id: barberId },
+      });
+
+      if (schedules.length === 0) {
+        throw new BadRequestException('Bu barber uchun jadvallar topilmadi');
+      }
+
+      await this.scheduleRepo.remove(schedules);
+
+      return successRes(
+        {
+          deletedCount: schedules.length,
+          message: `${schedules.length} ta jadval o'chirildi`,
+        },
+        200,
+      );
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Jadvallarni o'chirishda xatolik: ${error.message}`,
+      );
     }
   }
 }

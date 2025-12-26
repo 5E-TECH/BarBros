@@ -114,7 +114,7 @@ export class BookingService {
     const weekday = dayjs(date).format('dddd');
 
     const schedule = await this.barberscherepo.findOne({
-      where: { barber_id: barberId, start_day: weekday },
+      where: { barber_id: barberId, day_of_week: weekday },
     });
 
     if (!schedule) {

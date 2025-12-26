@@ -35,7 +35,7 @@ export class BarberService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(
+  async create(
     registerBarberDto: RegisterBarberDto,
     barbershop_id: number,
     file?: Express.Multer.File,
