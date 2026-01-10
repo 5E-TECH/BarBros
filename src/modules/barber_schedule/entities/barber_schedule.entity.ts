@@ -13,8 +13,8 @@ export enum DayOfWeek {
 }
 
 @Entity('barber_schedules')
-@Unique(['barber_id', 'day_of_week']) // ❗ Bir barber bir kunda faqat bitta jadval
-@Index(['barber_id', 'day_of_week']) // ❗ Tezkor qidiruv uchun
+@Unique(['barber_id', 'day_of_week'])
+@Index(['barber_id', 'day_of_week'])
 export class BarberScheduleEntity extends BaseEntity {
   @Column({ type: 'enum', enum: DayOfWeek })
   day_of_week: DayOfWeek;
@@ -26,7 +26,7 @@ export class BarberScheduleEntity extends BaseEntity {
   end_time: string;
 
   @Column({ type: 'int', default: 0 })
-  break_time: number; // Daqiqalarda
+  break_time: number;
 
   @Column({ type: 'int' })
   barber_id: number;

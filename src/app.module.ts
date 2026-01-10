@@ -7,7 +7,6 @@ import { BookingModule } from './modules/booking/booking.module';
 import { BarberShopModule } from './modules/barber-shop/barber-shop.module';
 import { ServiceModule } from './modules/service/service.module';
 import { AdminModule } from './modules/admin/admin.module';
-import { MailModule } from './common/mail/mail.module';
 import { FileModule } from './modules/file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
@@ -45,7 +44,6 @@ import { CategoryModule } from './modules/category/category.module';
     BookingModule,
     BarberShopModule,
     AdminModule,
-    MailModule,
     ServiceModule,
     FileModule,
     ImagesModule,
