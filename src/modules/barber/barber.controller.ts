@@ -19,7 +19,7 @@ import { RegisterBarberDto } from './dto/register-barber.dto';
 import { LoginBarberDto } from './dto/login-barber.dto';
 import { OtpBarberDto } from './dto/Otp-barber.dto';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { SelfGuard } from 'src/common/guard/self.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
@@ -76,7 +76,7 @@ export class BarberController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SP_ADMIN)
   @Post('create')
   @UseInterceptors(FileInterceptor('img'))
   register(
@@ -111,7 +111,7 @@ export class BarberController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SP_ADMIN)
   @Get('all-myBarbers')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })

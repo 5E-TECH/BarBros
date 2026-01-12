@@ -19,7 +19,7 @@ import { UpdateBarberShopStatus } from './dto/update-status';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
@@ -151,7 +151,7 @@ export class BarberShopController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('img'))
   update(

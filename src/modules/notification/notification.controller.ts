@@ -4,7 +4,7 @@ import { CreateNotificationDto } from './dto/create-notification.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('notification')
@@ -13,14 +13,14 @@ export class NotificationController {
   
   @ApiOperation({summary: "Admin uchun"})
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, UserRole.SP_ADMIN)
   @Post()
   create(@Body() createNotificationDto: CreateNotificationDto) {
     return this.notificationService.create(createNotificationDto);
   }
   @ApiOperation({summary: "Admin uchun"})
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN, UserRole.SP_ADMIN)
   @Get()
   findAll() {
     return this.notificationService.findAll();

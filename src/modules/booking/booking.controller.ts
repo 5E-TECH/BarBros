@@ -16,7 +16,7 @@ import { AuthGuard } from 'src/common/guard/auth.guard';
 import { Request } from 'express';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
@@ -37,7 +37,7 @@ export class BookingController {
 
   @ApiOperation({ summary: 'Barberlar uchun' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @Roles(UserRole.BARBER)
   @Get('Barber_bookig')
   findAll(@Req() req: Request) {
     return this.bookingService.findAllBarber(req);

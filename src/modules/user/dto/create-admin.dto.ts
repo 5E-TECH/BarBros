@@ -10,11 +10,11 @@ export class CreateAdminDto {
   full_name: string;
 
   @ApiProperty({
-    example: "admin@example.com",
+    example: "ko'cheniskiy",
     description: "Adminning email manzili"
   })
-  @IsEmail()
-  email: string;
+  @IsString()
+  username: string;
 
   @ApiProperty({
     example: "+998901234567",

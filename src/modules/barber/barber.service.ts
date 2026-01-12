@@ -10,7 +10,7 @@ import { Repository, ILike } from 'typeorm';
 import { Request } from 'express';
 
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { FileService } from '../file/file.service';
@@ -58,7 +58,7 @@ export class BarberService {
       const newBarber = this.BarberRepo.create({
         ...registerBarberDto,
         password: hashPass,
-        role: BarberRole.BARBER,
+        role: UserRole.BARBER,
         barberShop: { id: barbershop_id },
       });
 
@@ -81,7 +81,7 @@ export class BarberService {
       });
       if (!barber) throw new ForbiddenException('Wrong email');
 
-      if (barber.role !== BarberRole.BARBER)
+      if (barber.role !== UserRole.BARBER)
         throw new ForbiddenException('Forbidden');
 
       const isMatch = await this.Bcrypt.Verify(
@@ -108,7 +108,7 @@ export class BarberService {
   async myAccount(req: Request) {
     try {
       const user = req['user'];
-      if (user.role !== BarberRole.BARBER)
+      if (user.role !== UserRole.BARBER)
         throw new ForbiddenException('Forbidden');
 
       const barber = await this.BarberRepo.findOne({ where: { id: user.id } });
@@ -134,7 +134,7 @@ export class BarberService {
 
       const [data, total] = await this.BarberRepo.findAndCount({
         where: {
-          role: BarberRole.BARBER,
+          role: UserRole.BARBER,
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
           ...(email && { email: ILike(`%${email}%`) }),
@@ -182,7 +182,7 @@ export class BarberService {
 
       const [data, total] = await this.BarberRepo.findAndCount({
         where: {
-          role: BarberRole.BARBER,
+          role: UserRole.BARBER,
           barberShop: { id: user.id }, // 🔥 faqat o‘zining barberlari
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),

@@ -16,7 +16,7 @@ import { successRes } from 'src/utils/succesResponse';
 import { Request } from 'express';
 import { BarberEntity } from '../barber/entities/barber.entity';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 
 @Injectable()
 export class ServiceService {
@@ -122,7 +122,7 @@ export class ServiceService {
     try {
       let data;
 
-      if (user.role === BarberRole.BARBER_SHOP) {
+      if (user.role === UserRole.SP_ADMIN) {
         data = await this.serviceRepository.find({
           where: {
             barberShop: { id: user.id },
@@ -131,7 +131,7 @@ export class ServiceService {
         });
       }
 
-      else if (user.role === BarberRole.BARBER) {
+      else if (user.role === UserRole.BARBER) {
         data = await this.serviceRepository
           .createQueryBuilder('service')
           .leftJoin('service.barbers', 'barber')

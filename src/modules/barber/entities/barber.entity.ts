@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/common/database/baseEntity';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
@@ -25,8 +25,8 @@ export class BarberEntity extends BaseEntity {
   @Column({ type: 'text' })
   bio: string;
 
-  @Column({ type: 'varchar', default: BarberRole.BARBER })
-  role: BarberRole.BARBER;
+  @Column({ type: 'varchar', default: UserRole.BARBER })
+  role: UserRole.BARBER;
 
   @Column({ type: 'decimal', default: 0 })
   avg_reyting: number;

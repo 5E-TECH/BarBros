@@ -2,12 +2,9 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   Req,
@@ -19,7 +16,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 
 @Controller('images')
@@ -39,7 +36,7 @@ export class ImagesController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SP_ADMIN)
   @Post()
   @UseInterceptors(FilesInterceptor('img'))
   create(
@@ -57,13 +54,13 @@ export class ImagesController {
 
   @ApiOperation({summary:"BarberShoplar uchun"})
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SP_ADMIN)
   @Get('BarberShop_all')
   findAllBarber(@Req() req: Request) {
     return this.imagesService.findAllBarber(req);
   }
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @Roles(UserRole.SP_ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.imagesService.remove(id, req);

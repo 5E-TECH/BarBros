@@ -3,7 +3,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
-import { BarberRole, Status } from 'src/common/enum';
+import { UserRole, Status } from 'src/common/enum';
 
 @Entity()
 export class BarberShopEntity extends BaseEntity {
@@ -28,8 +28,8 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   username: string;
 
-  @Column({ type: 'varchar', default: BarberRole.BARBER_SHOP })
-  role: BarberRole.BARBER_SHOP;
+  @Column({ type: 'varchar', default: UserRole.SP_ADMIN })
+  role: UserRole.SP_ADMIN;
 
   @Column({ type: 'enum', enum: Status, default: Status.INACTIVE })
   status: Status;

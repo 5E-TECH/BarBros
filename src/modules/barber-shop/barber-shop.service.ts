@@ -10,7 +10,7 @@ import { Repository, ILike } from 'typeorm';
 import { Request } from 'express';
 
 import { BarberShopEntity } from './entities/barber-shop.entity';
-import { BarberRole, Status } from 'src/common/enum';
+import { UserRole, Status } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
@@ -94,7 +94,7 @@ export class BarberShopService {
   async myAccount(req: Request) {
   try {
     const user = req['user'];
-    if (user.role !== BarberRole.BARBER_SHOP)
+    if (user.role !== UserRole.SP_ADMIN)
       throw new ForbiddenException('Forbidden');
 
     const shop = await this.barberRepo.findOne({

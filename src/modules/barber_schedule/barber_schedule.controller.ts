@@ -13,7 +13,7 @@ import { BarberScheduleService } from './barber_schedule.service';
 import { CreateBarberScheduleDto } from './dto/create-barber_schedule.dto';
 import { UpdateBarberScheduleDto } from './dto/update-barber_schedule.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Request } from 'express';
@@ -25,7 +25,7 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, UserRole.ADMIN, UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SP_ADMIN, UserRole.ADMIN, UserRole.SUPPER_ADMIN)
   @Post()
   create(
     @Body() createBarberScheduleDto: CreateBarberScheduleDto,
@@ -63,7 +63,7 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP,UserRole.SUPPER_ADMIN,)
+  @Roles(UserRole.SP_ADMIN,UserRole.SUPPER_ADMIN,)
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -76,7 +76,7 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @Roles(UserRole.BARBER)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.barberScheduleService.remove(id, req);

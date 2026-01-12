@@ -2,11 +2,9 @@ export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
   SUPPER_ADMIN = 'supperadmin',
-}
-
-export enum BarberRole {
-  BARBER_SHOP = 'barber_shop',
+  SP_ADMIN = 'sp_admin',
   BARBER = 'barber',
+
 }
 
 export enum StarRating {

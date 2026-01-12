@@ -1,7 +1,7 @@
 import { BaseEntity } from 'src/common/database/baseEntity';
 import { Category } from 'src/common/enum';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('category')
 export class CategoryEntitiy extends BaseEntity {
@@ -14,7 +14,6 @@ export class CategoryEntitiy extends BaseEntity {
   @Column({type:"enum", enum:Category})
   categoryType:Category
 
-  // CategoryEntity
   @OneToMany(() => ServiceEntity, (service) => service.category)
   services: ServiceEntity[];
 }
