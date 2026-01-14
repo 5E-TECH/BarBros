@@ -38,7 +38,7 @@ export class CategoryController {
         },
         categoryType: {
         type: 'string',
-        enum: Object.values(Category), // 🔥 SELECT BO‘LADI
+        enum: Object.values(Category),
         example: Category.MAN,
       },
         img: {
