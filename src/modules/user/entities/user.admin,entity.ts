@@ -4,6 +4,7 @@ import { BaseEntity } from 'src/common/database/baseEntity';
 import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { NotificationEntity } from 'src/modules/notification/entities/notification.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
+import { ChatEntity } from 'src/modules/chat/entities/chat.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -52,4 +53,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => BookingEntity, (booking) => booking.user)
   booking: BookingEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.user)
+  chat: ChatEntity[];
 }

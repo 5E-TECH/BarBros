@@ -2,7 +2,8 @@ import { BaseEntity } from 'src/common/database/baseEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
-import { ServiceEntity } from 'src/modules/service/entities/service.entity';
+import { BarberShopServicesEntity } from 'src/modules/barber-shop-services/entities/barber-shop-services.entity';
+import { ServiceImageEntity } from 'src/modules/service-image/entities/service-image.entity';
 import { UserRole, Status } from 'src/common/enum';
 
 @Entity()
@@ -12,6 +13,12 @@ export class BarberShopEntity extends BaseEntity {
 
   @Column({ type: 'varchar' })
   location: string;
+
+  @Column({ type: 'double precision', nullable: true })
+  latitude: number | null;
+
+  @Column({ type: 'double precision', nullable: true })
+  longitude: number | null;
 
   @Column({ type: 'varchar', default: null })
   img: string | null;
@@ -34,12 +41,21 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'enum', enum: Status, default: Status.INACTIVE })
   status: Status;
 
+  @Column({ type: 'decimal', default: 0 })
+  avg_rating: number;
+
   @OneToMany(() => BarberEntity, (barber) => barber.barberShop)
   barber: BarberEntity[];
 
   @OneToMany(() => ImageEntity, (image) => image.barberShop)
   images: ImageEntity[];
 
-  @OneToMany(() => ServiceEntity, (service) => service.barberShop)
-  services: ServiceEntity[];
+  @OneToMany(
+    () => BarberShopServicesEntity,
+    (barberShopService) => barberShopService.barberShop,
+  )
+  barberShopServices: BarberShopServicesEntity[];
+
+  @OneToMany(() => ServiceImageEntity, (image) => image.barberShop)
+  serviceImages: ServiceImageEntity[];
 }

@@ -24,3 +24,27 @@ export enum Category {
   MAN = "man",
   WOMAN = "woman"
 }
+
+export enum BookingStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  PAID = 'paid',
+  FAILED = 'failed',
+}
+
+export enum PaymentModel {
+  CASH = 'cash',
+  CARD = 'card',
+  ONLINE = 'online',
+}
+
+export enum OrderType {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+}

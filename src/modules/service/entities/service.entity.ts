@@ -11,13 +11,11 @@ import { BaseEntity } from 'src/common/database/baseEntity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 import { BarberEntity } from '../../barber/entities/barber.entity';
 import { CategoryEntitiy } from 'src/modules/category/entitiy/category.entitiy';
-import { BarberShopEntity } from 'src/modules/barber-shop/entities/barber-shop.entity';
+import { BarberShopServicesEntity } from 'src/modules/barber-shop-services/entities/barber-shop-services.entity';
+import { ServiceImageEntity } from 'src/modules/service-image/entities/service-image.entity';
 
 @Entity('services')
 export class ServiceEntity extends BaseEntity {
-  @Column({ type: 'int' })
-  price: number;
-
   @Column({ type: 'varchar' })
   description: string;
 
@@ -47,11 +45,14 @@ export class ServiceEntity extends BaseEntity {
   @JoinColumn({ name: 'category_id' })
   category: CategoryEntitiy;
 
-  @ManyToOne(() => BarberShopEntity, (shop) => shop.services, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'barber_shop_id' })
-  barberShop: BarberShopEntity;
+  @OneToMany(
+    () => BarberShopServicesEntity,
+    (barberShopService) => barberShopService.service,
+  )
+  barberShopServices: BarberShopServicesEntity[];
+
+  @OneToMany(() => ServiceImageEntity, (image) => image.service)
+  serviceImages: ServiceImageEntity[];
 
   // @Column({ type: 'int', nullable: true })
   // category_id: number;

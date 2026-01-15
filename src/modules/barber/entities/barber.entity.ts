@@ -7,6 +7,8 @@ import { BarberImageEntity } from 'src/modules/barber_images/entities/barber_ima
 import { BarberScheduleEntity } from 'src/modules/barber_schedule/entities/barber_schedule.entity';
 import { BarberShopEntity } from 'src/modules/barber-shop/entities/barber-shop.entity';
 import { ServiceEntity } from '../../service/entities/service.entity';
+import { ChatEntity } from 'src/modules/chat/entities/chat.entity';
+import { NotificationEntity } from 'src/modules/notification/entities/notification.entity';
 
 @Entity('barber')
 export class BarberEntity extends BaseEntity {
@@ -49,6 +51,12 @@ export class BarberEntity extends BaseEntity {
 
   @OneToMany(() => BarberScheduleEntity, (barberSchuld) => barberSchuld.barber)
   barberSchuld: BarberScheduleEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.barber)
+  chat: ChatEntity[];
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.barber)
+  notification: NotificationEntity[];
 
   @ManyToOne(() => BarberShopEntity, (barberShop) => barberShop.barber, {
     onDelete: 'CASCADE',

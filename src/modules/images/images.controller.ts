@@ -10,7 +10,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { CreateImageDto } from './dto/create-image.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/common/guard/auth.guard';
@@ -45,8 +44,7 @@ export class ImagesController {
   ) {
     return this.imagesService.create(files, req);
   }
-  @ApiOperation({summary:"Barcha uchun"})
-  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Barcha uchun' })
   @Get('all')
   findAllUser() {
     return this.imagesService.findAll();

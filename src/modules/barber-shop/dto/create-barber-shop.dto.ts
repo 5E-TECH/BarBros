@@ -1,5 +1,7 @@
 import {
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -13,6 +15,14 @@ export class CreateBarberShopDto {
   @IsString()
   @IsNotEmpty()
   location: string;
+
+  @IsNumber()
+  @IsOptional()
+  latitude?: number;
+
+  @IsNumber()
+  @IsOptional()
+  longitude?: number;
 
   @IsString()
   @IsNotEmpty()

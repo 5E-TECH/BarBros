@@ -3,9 +3,10 @@ import { BarberScheduleService } from './barber_schedule.service';
 import { BarberScheduleController } from './barber_schedule.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BarberScheduleEntity } from './entities/barber_schedule.entity';
+import { BarberEntity } from '../barber/entities/barber.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([BarberScheduleEntity])],
+  imports: [TypeOrmModule.forFeature([BarberScheduleEntity, BarberEntity])],
   controllers: [BarberScheduleController],
   providers: [BarberScheduleService],
 })

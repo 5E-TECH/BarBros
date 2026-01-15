@@ -8,8 +8,8 @@ export class CategoryEntitiy extends BaseEntity {
   @Column({ nullable: true})
   name: string;
 
-  @Column({type:'varchar'})
-  img:string
+  @Column({ type: 'varchar', nullable: true })
+  img: string | null;
 
   @Column({type:"enum", enum:Category})
   categoryType:Category

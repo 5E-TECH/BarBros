@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Delete,
+  Req,
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
@@ -6,6 +15,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { ApiOperation } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @Controller('notification')
 export class NotificationController {
@@ -26,10 +36,18 @@ export class NotificationController {
     return this.notificationService.findAll();
   }
 
+  @ApiOperation({ summary: 'User yoki Barber uchun' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.USER, UserRole.BARBER)
+  @Get('my')
+  findMy(@Req() req: Request) {
+    return this.notificationService.findMy(req);
+  }
+
   @ApiOperation({summary: "Admin uchun"})
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
-  @Delete()
+  @Delete(':id')
   delete(@Param("id")id: number){
     return this.notificationService.delet(id)
   }

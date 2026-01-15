@@ -26,7 +26,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
-import { RefreshPasswordDto } from './dto/refreshPassword.doo';
+import { BarberRefreshPasswordDto } from './dto/refreshPassword.doo';
 
 @Controller('barber')
 export class BarberController {
@@ -92,7 +92,14 @@ export class BarberController {
     return this.barberService.login(loginBarberDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.USER,
+  )
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
@@ -173,25 +180,30 @@ export class BarberController {
       },
     },
   })
-  @UseGuards(AuthGuard, SelfGuard)
-  @Patch('update:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER, UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Patch('update/:id')
   @UseInterceptors(FileInterceptor('img'))
   update(
     @Param('id') id: number,
     @Body() updateBarberDto: UpdateBarberDto,
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: Request,
   ) {
-    return this.barberService.update(id, updateBarberDto, file);
+    return this.barberService.update(id, updateBarberDto, req, file);
   }
 
-  @UseGuards(AuthGuard, SelfGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER, UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.barberService.remove(id);
+  remove(@Param('id') id: number, @Req() req: Request) {
+    return this.barberService.remove(id, req);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER)
   @Post('refresh_password')
-  refresh_password(@Body() data: RefreshPasswordDto) {
-    return this.barberService.refreshPassword(data);
+  refresh_password(@Body() data: BarberRefreshPasswordDto, @Req() req: Request) {
+    return this.barberService.refreshPassword(data, req);
   }
 }

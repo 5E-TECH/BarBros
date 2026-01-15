@@ -1,7 +1,9 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
@@ -13,12 +15,16 @@ import { CreateBarberScheduleDto } from './dto/create-barber_schedule.dto';
 import { UpdateBarberScheduleDto } from './dto/update-barber_schedule.dto';
 import { successRes } from 'src/utils/succesResponse';
 import { Request } from 'express';
+import { BarberEntity } from '../barber/entities/barber.entity';
+import { UserRole } from 'src/common/enum';
 
 @Injectable()
 export class BarberScheduleService {
   constructor(
     @InjectRepository(BarberScheduleEntity)
     private readonly scheduleRepo: Repository<BarberScheduleEntity>,
+    @InjectRepository(BarberEntity)
+    private readonly barberRepo: Repository<BarberEntity>,
   ) {}
 
   private getDaysBetween(startDay: DayOfWeek, endDay: DayOfWeek): DayOfWeek[] {
@@ -58,6 +64,8 @@ export class BarberScheduleService {
 
   async create(dto: CreateBarberScheduleDto, req: Request) {
     try {
+      await this.assertScheduleOwner(dto.barber_id, req);
+
       // 1. Vaqt validatsiyasi
       this.validateTimeRange(dto.start_time, dto.end_time);
 
@@ -245,6 +253,8 @@ export class BarberScheduleService {
         throw new BadRequestException('Jadval topilmadi');
       }
 
+      await this.assertScheduleOwner(schedule.barber_id, req);
+
       // Agar vaqt yangilanayotgan bo'lsa, validatsiya qilish
       const newStartTime = dto.start_time || schedule.start_time;
       const newEndTime = dto.end_time || schedule.end_time;
@@ -285,6 +295,8 @@ export class BarberScheduleService {
       if (!schedule) {
         throw new BadRequestException('Jadval topilmadi');
       }
+
+      await this.assertScheduleOwner(schedule.barber_id, req);
 
       await this.scheduleRepo.remove(schedule);
 
@@ -331,5 +343,35 @@ export class BarberScheduleService {
         `Jadvallarni o'chirishda xatolik: ${error.message}`,
       );
     }
+  }
+
+  private async assertScheduleOwner(barberId: number, req: Request) {
+    const user = req['user'];
+    if (!user) throw new ForbiddenException('Forbidden');
+
+    if (user.role === UserRole.BARBER) {
+      if (user.id !== barberId) {
+        throw new ForbiddenException('Access denied');
+      }
+      return;
+    }
+
+    if (user.role === UserRole.SP_ADMIN) {
+      const barber = await this.barberRepo.findOne({
+        where: { id: barberId },
+        relations: ['barberShop'],
+      });
+      if (!barber) throw new NotFoundException('Barber not found');
+      if (!barber.barberShop || barber.barberShop.id !== user.id) {
+        throw new ForbiddenException('Access denied');
+      }
+      return;
+    }
+
+    if (user.role === UserRole.SUPPER_ADMIN || user.role === UserRole.ADMIN) {
+      return;
+    }
+
+    throw new ForbiddenException('Access denied');
   }
 }

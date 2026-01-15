@@ -15,7 +15,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import {UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
@@ -27,11 +27,17 @@ export class ServiceController {
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @Req() req) {
-    return this.serviceService.creates(createServiceDto, req.user.id);
+    return this.serviceService.creates(createServiceDto, req.user);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @Roles(
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.USER,
+  )
   @Get()
   findAll() {
     return this.serviceService.findAll();
@@ -45,14 +51,20 @@ export class ServiceController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @Roles(
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.USER,
+  )
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.serviceService.findOne(id);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -63,7 +75,7 @@ export class ServiceController {
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceService.remove(id, req);

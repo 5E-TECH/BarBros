@@ -25,7 +25,12 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN, UserRole.ADMIN, UserRole.SUPPER_ADMIN)
+  @Roles(
+    UserRole.SP_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SUPPER_ADMIN,
+    UserRole.BARBER,
+  )
   @Post()
   create(
     @Body() createBarberScheduleDto: CreateBarberScheduleDto,
@@ -36,7 +41,8 @@ export class BarberScheduleController {
 
 
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN)
   @Get()
   findAll() {
     return this.barberScheduleService.findAll();
@@ -47,14 +53,16 @@ export class BarberScheduleController {
 
 
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER)
   @Get('getSchedulesByBarber')
   getSchedulesByBarber(@Req() req: Request) {
     return this.barberScheduleService.getSchedulesByBarber(req);
   }
 
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.barberScheduleService.findOne(id);
@@ -63,7 +71,12 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN,UserRole.SUPPER_ADMIN,)
+  @Roles(
+    UserRole.SP_ADMIN,
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.BARBER,
+  )
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -76,7 +89,12 @@ export class BarberScheduleController {
 
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.BARBER)
+  @Roles(
+    UserRole.BARBER,
+    UserRole.SP_ADMIN,
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+  )
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.barberScheduleService.remove(id, req);
