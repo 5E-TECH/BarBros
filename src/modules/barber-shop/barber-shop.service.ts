@@ -6,11 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, FindOptionsOrder } from 'typeorm';
 import { Request } from 'express';
 
 import { BarberShopEntity } from './entities/barber-shop.entity';
-import { BarberRole, Status } from 'src/common/enum';
+import { UserRole, Status } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
@@ -22,7 +22,7 @@ import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 
 import { successRes } from 'src/utils/succesResponse';
 import { ErrorHender } from 'src/utils/catchError';
-import { RefreshPasswordDto } from './dto/refreshPassword.dto';
+import { BarberShopRefreshPasswordDto } from './dto/refreshPassword.dto';
 import { AccessToken, RefreshToken } from 'src/utils/Acses-Refresh-token';
 import { JwtService } from '@nestjs/jwt';
 
@@ -94,7 +94,7 @@ export class BarberShopService {
   async myAccount(req: Request) {
   try {
     const user = req['user'];
-    if (user.role !== BarberRole.BARBER_SHOP)
+    if (user.role !== UserRole.SP_ADMIN)
       throw new ForbiddenException('Forbidden');
 
     const shop = await this.barberRepo.findOne({
@@ -122,20 +122,81 @@ export class BarberShopService {
         order = 'DESC',
         page = 1,
         limit = 10,
+        lat,
+        lng,
+        radiusKm,
       } = query;
       const skip = (Number(page) - 1) * Number(limit);
 
+      const where = {
+        ...(name && { name: ILike(`%${name}%`) }),
+        ...(descripton && { descripton: ILike(`%${descripton}%`) }),
+        ...(location && { location: ILike(`%${location}%`) }),
+      };
+
+      const baseOrder: FindOptionsOrder<BarberShopEntity> =
+        sortBy === 'distance' || sortBy === 'avg_rating'
+          ? { name: 'ASC' }
+          : {
+              [sortBy]:
+                order.toUpperCase() === 'ASC'
+                  ? ('ASC' as const)
+                  : ('DESC' as const),
+            };
+
+      const useGeo = lat !== undefined && lng !== undefined;
       const [data, total] = await this.barberRepo.findAndCount({
-        where: {
-          ...(name && { name: ILike(`%${name}%`) }),
-          ...(descripton && { descripton: ILike(`%${descripton}%`) }),
-          ...(location && { location: ILike(`%${location}%`) }),
-        },
+        where,
         relations: ['barber', 'images'],
-        order: { [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC' },
-        skip,
-        take: Number(limit),
+        order: baseOrder,
+        ...(useGeo ? {} : { skip, take: Number(limit) }),
       });
+
+      const latNum = lat !== undefined ? Number(lat) : null;
+      const lngNum = lng !== undefined ? Number(lng) : null;
+      const radiusNum = radiusKm !== undefined ? Number(radiusKm) : null;
+
+      if (latNum !== null && lngNum !== null) {
+        const withDistance = data
+          .map((shop) => {
+            if (shop.latitude === null || shop.longitude === null) {
+              return { ...shop, distance_km: null };
+            }
+            const distance = this.calcDistanceKm(
+              latNum,
+              lngNum,
+              shop.latitude,
+              shop.longitude,
+            );
+            return { ...shop, distance_km: distance };
+          })
+          .filter((shop) => {
+            if (radiusNum === null) return true;
+            if (shop.distance_km === null) return false;
+            return shop.distance_km <= radiusNum;
+          });
+
+        const sorted =
+          sortBy === 'distance'
+            ? withDistance.sort((a, b) => {
+                if (a.distance_km === null) return 1;
+                if (b.distance_km === null) return -1;
+                return a.distance_km - b.distance_km;
+              })
+            : sortBy === 'avg_rating'
+              ? withDistance.sort((a, b) => b.avg_rating - a.avg_rating)
+              : withDistance;
+
+        const paged = sorted.slice(skip, skip + Number(limit));
+
+        return successRes({
+          data: paged,
+          total: sorted.length,
+          currentPage: Number(page),
+          pageSize: Number(limit),
+          totalPages: Math.ceil(sorted.length / Number(limit)),
+        });
+      }
 
       return successRes({
         data,
@@ -147,6 +208,26 @@ export class BarberShopService {
     } catch (error) {
       return ErrorHender(error);
     }
+  }
+
+  private calcDistanceKm(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ) {
+    const toRad = (val: number) => (val * Math.PI) / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return Math.round(R * c * 100) / 100;
   }
 
   async update(
@@ -206,12 +287,15 @@ export class BarberShopService {
     }
   }
 
-  async refreshPassword(data: RefreshPasswordDto) {
+  async refreshPassword(data: BarberShopRefreshPasswordDto) {
     try {
       const shop = await this.barberRepo.findOne({
         where: { username: data.username },
       });
       if (!shop) throw new NotFoundException('BarberShop not found');
+      if (shop.status !== Status.ACTIVE) {
+        throw new ForbiddenException('BarberShop is blocked by admin');
+      }
 
       if (!data.new_password)
         throw new BadRequestException('New password is required');
@@ -232,7 +316,7 @@ export class BarberShopService {
         relations: ['barber', 'images'],
       });
       if (!shop) throw new NotFoundException('BarberShop not found');
-      if (!shop.status)
+      if (shop.status !== Status.ACTIVE)
         throw new NotFoundException('BarberShop is blocked by admin');
       return successRes(shop);
     } catch (error) {

@@ -3,14 +3,16 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ArrayNotEmpty,
 } from 'class-validator';
 
 export class CreateServiceDto {
-  @ApiProperty({ example: 35000 })
+  @ApiProperty({ example: 35000, required: false })
+  @IsOptional()
   @IsNumber()
-  price: number;
+  price?: number;
 
   @ApiProperty({ example: 'Oddiy erkaklar soch turmagi' })
   @IsString()
@@ -27,10 +29,12 @@ export class CreateServiceDto {
   @ApiProperty({
     example: [1, 2, 5],
     description: 'service qila oladigan barberlar idlari',
+    required: false,
   })
+  @IsOptional()
   @IsArray()
   @ArrayNotEmpty()
-  barber_ids: number[];
+  barber_ids?: number[];
 
   @ApiProperty({ example: 3 })
   @IsNumber()

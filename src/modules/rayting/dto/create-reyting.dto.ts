@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { StarRating } from 'src/common/enum';
 
@@ -17,7 +17,7 @@ export class CreateReytingDto {
   @IsNotEmpty()
   comment: string;
 
-  @ApiProperty({example: "barber_id"})
-  @IsUUID()
-  barber_id: number
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  barber_id: number;
 }

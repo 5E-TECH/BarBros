@@ -1,0 +1,449 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 4 0 R 5 0 R 6 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 8 0 R >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 9 0 R >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 10 0 R >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 7 0 R >> >> /Contents 11 0 R >>
+endobj
+7 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+8 0 obj
+<< /Length 1979 >>
+stream
+BT
+/F1 10 Tf
+72 800 Td
+(STYLE UP BACKEND - FULL TZ \(ROLE + API\)) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(1\) QISQACHA MAQSAD) Tj
+0 -13 Td
+(Platforma: barber shop booking. Flow: Category -> Service -> BarberShop_Services\(price\) ->) Tj
+0 -13 Td
+(BarberShop -> Barber -> Barber_Schedule -> Booking. Notification, Rating, Chat, Transactions) Tj
+0 -13 Td
+(mavjud.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(2\) ROLLAR) Tj
+0 -13 Td
+(- superadmin: tizimni boshqaradi, barbershoplarni aktiv/deaktiv qiladi.) Tj
+0 -13 Td
+(- admin: umumiy monitoring va boshqaruv.) Tj
+0 -13 Td
+(- sp_admin: barbershop egasi.) Tj
+0 -13 Td
+(- barber: usta.) Tj
+0 -13 Td
+(- user: mijoz.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(3\) TABLITSALAR \(AMALDAGI KOD BO‘YICHA\)) Tj
+0 -13 Td
+(- user) Tj
+0 -13 Td
+(- barber) Tj
+0 -13 Td
+(- barber_shop) Tj
+0 -13 Td
+(- category) Tj
+0 -13 Td
+(- services) Tj
+0 -13 Td
+(- barber_services \(barber-service many-to-many join\)) Tj
+0 -13 Td
+(- barber_shop_services) Tj
+0 -13 Td
+(- barber_schedules) Tj
+0 -13 Td
+(- booking) Tj
+0 -13 Td
+(- notifications) Tj
+0 -13 Td
+(- reyting) Tj
+0 -13 Td
+(- images) Tj
+0 -13 Td
+(- barber_images) Tj
+0 -13 Td
+(- chat) Tj
+0 -13 Td
+(- transactions) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(Eslatma: diagrammadagi `service_image` jadvali hozirgi kodda yo‘q.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(4\) API RO'YXATI \(MODUL BO'YICHA\)) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(USER \(AUTH + ADMIN\)) Tj
+0 -13 Td
+(Base: /api/v1/user) Tj
+0 -13 Td
+(- POST /register - User ro'yxatdan o'tish \(telefon\).) Tj
+0 -13 Td
+(- POST /verify - OTP tekshirish, token olish.) Tj
+0 -13 Td
+(- PATCH /set-fullname - User full_name set.) Tj
+0 -13 Td
+(- GET /my_accaunt - User o'z profilini olish.) Tj
+0 -13 Td
+(- GET /:id - User profilini olish \(self\).) Tj
+0 -13 Td
+(- PATCH /:id - User update \(self\).) Tj
+0 -13 Td
+(- DELETE /:id - User delete \(self\).) Tj
+0 -13 Td
+(- GET /profile - User profile \(token orqali\).) Tj
+0 -13 Td
+(- GET /all - Superadmin userlar ro'yxati.) Tj
+0 -13 Td
+(- POST /signin-admin - Admin login.) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Length 2436 >>
+stream
+BT
+/F1 10 Tf
+72 800 Td
+(- POST /create-admin - Superadmin admin yaratadi.) Tj
+0 -13 Td
+(- GET /all-admin - Superadmin adminlar ro'yxati.) Tj
+0 -13 Td
+(- GET /my-account - Admin/superadmin o'z account.) Tj
+0 -13 Td
+(- GET /one/:id - Superadmin adminni olish.) Tj
+0 -13 Td
+(- PATCH /update/:id - Admin/superadmin admin update.) Tj
+0 -13 Td
+(- DELETE /delete/:id - Superadmin admin delete.) Tj
+0 -13 Td
+(- POST /refresh-password - Admin/superadmin parol yangilash.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BARBER) Tj
+0 -13 Td
+(Base: /api/v1/barber) Tj
+0 -13 Td
+(- POST /Signin - Barber login.) Tj
+0 -13 Td
+(- POST /create - SP_ADMIN barber yaratadi.) Tj
+0 -13 Td
+(- GET /all - Barberlar ro'yxati.) Tj
+0 -13 Td
+(- GET /all-myBarbers - SP_ADMIN o'z barberlari.) Tj
+0 -13 Td
+(- GET /My_Accaunt - Barber o'z account.) Tj
+0 -13 Td
+(- GET /:id - Barber detail \(self guard\).) Tj
+0 -13 Td
+(- PATCH /update/:id - Barber/SP_ADMIN/Admin update.) Tj
+0 -13 Td
+(- DELETE /:id - Barber/SP_ADMIN/Admin delete.) Tj
+0 -13 Td
+(- POST /refresh_password - Barber parol yangilash.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BARBER SHOP) Tj
+0 -13 Td
+(Base: /api/v1/barber-shop) Tj
+0 -13 Td
+(- POST /Signup - Barbershop sign up \(INACTIVE default\).) Tj
+0 -13 Td
+(- POST /Singin - Barbershop login \(ACTIVE bo'lsa\).) Tj
+0 -13 Td
+(- GET / - Barbershop list \(filter + geo + rating\).) Tj
+0 -13 Td
+(- GET /My_Accaunt - SP_ADMIN own shop.) Tj
+0 -13 Td
+(- GET /:id - Shop detail \(ACTIVE bo'lsa\).) Tj
+0 -13 Td
+(- PATCH /status/:id - Superadmin status update.) Tj
+0 -13 Td
+(- PATCH /:id - SP_ADMIN/superadmin update.) Tj
+0 -13 Td
+(- DELETE /:id - Superadmin delete.) Tj
+0 -13 Td
+(- POST /Refresh_password - SP_ADMIN parol yangilash.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(CATEGORY) Tj
+0 -13 Td
+(Base: /api/v1/category) Tj
+0 -13 Td
+(- POST /create - Admin/superadmin create.) Tj
+0 -13 Td
+(- GET /getAll?categoryType=man|woman - Category list.) Tj
+0 -13 Td
+(- PATCH /update/:id - Admin/superadmin update.) Tj
+0 -13 Td
+(- DELETE /:id - Admin/superadmin soft delete.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(SERVICE) Tj
+0 -13 Td
+(Base: /api/v1/service) Tj
+0 -13 Td
+(- POST / - SP_ADMIN/superadmin service create \(SP_ADMIN price bilan\).) Tj
+0 -13 Td
+(- GET / - Service list.) Tj
+0 -13 Td
+(- GET /:id - Service detail.) Tj
+0 -13 Td
+(- GET /my-service - SP_ADMIN/Barber service list.) Tj
+0 -13 Td
+(- PATCH /:id - SP_ADMIN/superadmin/admin update.) Tj
+0 -13 Td
+(- DELETE /:id - SP_ADMIN/superadmin/admin delete.) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Length 2233 >>
+stream
+BT
+/F1 10 Tf
+72 800 Td
+(- POST /add-barbers - SP_ADMIN barberlarni servicega biriktiradi.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BARBER SHOP SERVICES \(PRICE\)) Tj
+0 -13 Td
+(Base: /api/v1/barber-shop-services) Tj
+0 -13 Td
+(- POST / - SP_ADMIN/superadmin/admin shopga service biriktirish \(price\).) Tj
+0 -13 Td
+(- GET / - Shop service list.) Tj
+0 -13 Td
+(- GET /:id - Shop service detail.) Tj
+0 -13 Td
+(- PATCH /:id - Update price.) Tj
+0 -13 Td
+(- DELETE /:id - Remove.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BARBER SCHEDULE) Tj
+0 -13 Td
+(Base: /api/v1/barber-schedule) Tj
+0 -13 Td
+(- POST / - SP_ADMIN/ADMIN/Barber jadval yaratish.) Tj
+0 -13 Td
+(- GET / - Admin/superadmin hamma jadval.) Tj
+0 -13 Td
+(- GET /getSchedulesByBarber - Barber o'z jadvali.) Tj
+0 -13 Td
+(- GET /:id - Admin/superadmin detail.) Tj
+0 -13 Td
+(- PATCH /:id - Update \(ownership check\).) Tj
+0 -13 Td
+(- DELETE /:id - Remove \(ownership check\).) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BOOKING) Tj
+0 -13 Td
+(Base: /api/v1/booking) Tj
+0 -13 Td
+(- POST / - User booking yaratadi \(pending\).) Tj
+0 -13 Td
+(- DELETE /:id - Booking cancel \(role check\).) Tj
+0 -13 Td
+(- PATCH /:id/status - Status update \(barber/sp_admin/admin\).) Tj
+0 -13 Td
+(- GET /Barber_bookig - Barber booking list.) Tj
+0 -13 Td
+(- GET /User_booking - User booking list.) Tj
+0 -13 Td
+(- GET /All - Admin/superadmin booking list.) Tj
+0 -13 Td
+(- GET /availability?barberId&date&serviceId - 1 kun availability.) Tj
+0 -13 Td
+(- GET /availability-range?barberId&from&to&serviceId - ko'p kun availability.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(IMAGES \(BARBERSHOP\)) Tj
+0 -13 Td
+(Base: /api/v1/images) Tj
+0 -13 Td
+(- POST / - SP_ADMIN shop rasmlari upload.) Tj
+0 -13 Td
+(- GET /all - Public image list.) Tj
+0 -13 Td
+(- GET /BarberShop_all - SP_ADMIN o'z rasmlari.) Tj
+0 -13 Td
+(- DELETE /:id - SP_ADMIN delete.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(BARBER IMAGES) Tj
+0 -13 Td
+(Base: /api/v1/barber_images) Tj
+0 -13 Td
+(- POST / - Barber rasm upload.) Tj
+0 -13 Td
+(- GET / - All images.) Tj
+0 -13 Td
+(- GET /findAllBarberImg - Barber o'z rasmlari.) Tj
+0 -13 Td
+(- DELETE /:id - Barber delete.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(NOTIFICATION) Tj
+0 -13 Td
+(Base: /api/v1/notification) Tj
+0 -13 Td
+(- POST / - Admin/SP_ADMIN notification yaratadi.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Length 2154 >>
+stream
+BT
+/F1 10 Tf
+72 800 Td
+(- GET / - Admin/SP_ADMIN list.) Tj
+0 -13 Td
+(- GET /my - User o'z notification.) Tj
+0 -13 Td
+(- DELETE /:id - Admin delete.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(RATING) Tj
+0 -13 Td
+(Base: /api/v1/reyting) Tj
+0 -13 Td
+(- POST / - User barberga reyting yozadi.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(CHAT \(REST + REALTIME\)) Tj
+0 -13 Td
+(Base: /api/v1/chat) Tj
+0 -13 Td
+(- POST / - Message yuborish \(user/barber/admin\).) Tj
+0 -13 Td
+(- GET /conversation?user_id&barber_id - Chat tarixi.) Tj
+0 -13 Td
+(- GET /my - User/Barber o'z chatlari.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(Realtime: WebSocket event) Tj
+0 -13 Td
+(- event: chat:new \(server yangi message yuboradi\)) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(TRANSACTIONS \(HISOB-KITOB\)) Tj
+0 -13 Td
+(Base: /api/v1/transactions) Tj
+0 -13 Td
+(- GET / - Admin/superadmin barcha tranzaksiyalar.) Tj
+0 -13 Td
+(- GET /my-shop - SP_ADMIN o'z shop tranzaksiyalari.) Tj
+0 -13 Td
+(- GET /my-barber - Barber o'z tranzaksiyalari.) Tj
+0 -13 Td
+(- GET /summary?range=daily|weekly|monthly) Tj
+0 -13 Td
+(- GET /summary?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(REFRESH TOKEN) Tj
+0 -13 Td
+(Base: /api/v1/refresh) Tj
+0 -13 Td
+(- POST /refreshToken - Refresh token orqali access token olish.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(AUTOLOUD \(CRON\)) Tj
+0 -13 Td
+(Base: /api/v1/auto-loud) Tj
+0 -13 Td
+(- Cron: avg_rating hisoblash \(har kuni\)) Tj
+0 -13 Td
+(- Cron: reyting tozalash \(har yili\)) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(5\) ROLLAR BO'YICHA QISQA SUMMARY) Tj
+0 -13 Td
+(- Superadmin: barcha boshqaruv, status, adminlar, transactions, bookings.) Tj
+0 -13 Td
+(- Admin: monitoring va boshqaruv.) Tj
+0 -13 Td
+(- SP_ADMIN: shop, barber, schedule, service, price, images, booking status.) Tj
+0 -13 Td
+(- Barber: schedule, booking status, o'z profili, chat.) Tj
+0 -13 Td
+(- User: category/service/availability, booking, rating, chat.) Tj
+0 -13 Td
+() Tj
+0 -13 Td
+(SERVICE IMAGE) Tj
+0 -13 Td
+(Base: /api/v1/service-image) Tj
+0 -13 Td
+(- POST / - SP_ADMIN/ADMIN/SUPER service rasm upload.) Tj
+0 -13 Td
+(- GET /service/:id - Service rasmlari \(public\).) Tj
+0 -13 Td
+(- DELETE /:id - Service rasm delete.) Tj
+0 -13 Td
+() Tj
+ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000133 00000 n 
+0000000259 00000 n 
+0000000385 00000 n 
+0000000512 00000 n 
+0000000639 00000 n 
+0000000709 00000 n 
+0000002740 00000 n 
+0000005228 00000 n 
+0000007514 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R >>
+startxref
+9721
+%%EOF

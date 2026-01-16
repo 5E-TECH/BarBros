@@ -54,30 +54,13 @@ export class CategoryService {
     }
   }
 
-  async getAllCategory() {
-    try {
-      const category = await this.categoryRepo.find();
-      return successRes(category);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
-
-  async getAllManCategory() {
+  async getAllCategory(categoryType?: Category) {
     try {
       const category = await this.categoryRepo.find({
-        where: { categoryType: Category.MAN },
-      });
-      return successRes(category);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
-
-  async getAllWomanCategory() {
-    try {
-      const category = await this.categoryRepo.find({
-        where: { categoryType: Category.WOMAN },
+        where: {
+          is_deleted: false,
+          ...(categoryType ? { categoryType } : {}),
+        },
       });
       return successRes(category);
     } catch (error) {
@@ -91,8 +74,6 @@ export class CategoryService {
     file?: Express.Multer.File,
   ) {
     try {
-      const { name, categoryType } = updateCategoryDto;
-
       const category = await this.categoryRepo.findOne({
         where: { id },
       });
@@ -100,6 +81,10 @@ export class CategoryService {
       if (!category) {
         throw new NotFoundException('Category not found');
       }
+
+      const name = updateCategoryDto.name ?? category.name;
+      const categoryType =
+        updateCategoryDto.categoryType ?? category.categoryType;
 
       const existCategory = await this.categoryRepo.findOne({
         where: {
@@ -139,7 +124,7 @@ export class CategoryService {
       await this.categoryRepo.save(category);
       return successRes(category);
     } catch (error) {
-      ErrorHender(error);
+      return ErrorHender(error);
     }
   }
 }

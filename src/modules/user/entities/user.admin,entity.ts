@@ -4,14 +4,15 @@ import { BaseEntity } from 'src/common/database/baseEntity';
 import { ReytingEntity } from 'src/modules/rayting/entities/reyting.entity';
 import { NotificationEntity } from 'src/modules/notification/entities/notification.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
+import { ChatEntity } from 'src/modules/chat/entities/chat.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
-  @Column({ type: 'varchar', nullable:true })
+  @Column({ type: 'varchar', nullable: true })
   full_name?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  email?: string;
+  username?: string;
 
   @Column({ type: 'varchar', nullable: true })
   password?: string;
@@ -20,10 +21,29 @@ export class UserEntity extends BaseEntity {
   phone_number: string;
 
   @Column({ type: 'varchar', nullable: true })
-  code: string;
+  otp: string;
 
   @Column({ type: 'varchar', default: UserRole.USER })
-  role: UserRole.ADMIN | UserRole.USER | UserRole.SUPPER_ADMIN;
+  role:
+    | UserRole.ADMIN
+    | UserRole.USER
+    | UserRole.SUPPER_ADMIN
+    | UserRole.SP_ADMIN
+    | UserRole.BARBER
+    | UserRole.SP_ADMIN
+    
+
+  @Column({ type: 'varchar', nullable:true })
+  bio: string;
+
+  @Column({ type: 'varchar',nullable:true })
+  avg_rayting: string;
+
+  @Column({ type: 'varchar',nullable:true })
+  avatar_image: string;
+
+  @Column({ type: 'boolean',nullable:true })
+  is_available: boolean;
 
   @OneToMany(() => ReytingEntity, (reyting) => reyting.user)
   reyting: ReytingEntity[];
@@ -33,4 +53,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToMany(() => BookingEntity, (booking) => booking.user)
   booking: BookingEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.user)
+  chat: ChatEntity[];
 }

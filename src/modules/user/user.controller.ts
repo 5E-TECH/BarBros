@@ -18,7 +18,6 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
-import { RefreshPasswordDto } from '../admin/dto/RefreshPassword.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -28,10 +27,76 @@ import {
 import { CurrentUser } from 'src/common/Decorator/user.decarator';
 import { JWTPayload } from 'src/utils/user.type';
 import { FullNameDto, RegisterDto, VerifyDto } from './dto/auth-dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { AdminLoginDto } from './dto/login -admin.dto';
+import { UpdateAdminDto } from './dto/updateAdmin.dto';
+import { RefreshAdminPasswordDto } from './dto/Refresh-Admin-Password.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN)
+  @Post('create-admin')
+  createAdmin(@Body() data: CreateAdminDto, @Req() req: Request) {
+    return this.userService.createAdmin(data, req);
+  }
+
+  @Post('signin-admin')
+  login(@Body() loginDto: AdminLoginDto) {
+    return this.userService.loginAdmin(loginDto);
+  }
+
+  @ApiOperation({ summary: 'Supper admin uchun' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN)
+  @Get('all-admin')
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 10 })
+  findAllAdmin(@Query() query: Record<string, any>) {
+    return this.userService.findAllAdmin(query);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Get('my-account')
+  myAccount(@Req() req: Request) {
+    return this.userService.MyAcauntAdmin(req);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN)
+  @Get('one/:id')
+  findOneAdmin(@Param('id') id: number) {
+    return this.userService.findOneAdmin(id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Patch('update/:id')
+  updateAdmin(
+    @Param('id') id: number,
+    @Body() data: UpdateAdminDto,
+    @Req() req: Request,
+  ) {
+    return this.userService.updateAdmin(id, data, req);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN)
+  @Delete('delete/:id')
+  delete(@Param('id') id: number) {
+    return this.userService.deleteAdmin(id);
+  }
+
+    @ApiOperation({ summary: 'Supper admin va admin uchun' })
+  @Post('refresh-password')
+  refreshPassword(@Body() data: RefreshAdminPasswordDto) {
+    return this.userService.refreshPasswordAdmin(data);
+  }
+
+  ///////////////////////////////  USER--------------///////////////////////////
 
   @ApiOperation({ summary: 'Register user (send phone number)' })
   @ApiResponse({
@@ -67,8 +132,6 @@ export class UserController {
   setFullName(@CurrentUser() user: JWTPayload, @Body() data: FullNameDto) {
     return this.userService.setFullName(user.id, data.full_name);
   }
-
-
 
   @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)

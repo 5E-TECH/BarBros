@@ -6,7 +6,6 @@ import { BarberModule } from './modules/barber/barber.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { BarberShopModule } from './modules/barber-shop/barber-shop.module';
 import { ServiceModule } from './modules/service/service.module';
-import { AdminModule } from './modules/admin/admin.module';
 import { FileModule } from './modules/file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
@@ -19,6 +18,10 @@ import { BarberScheduleModule } from './modules/barber_schedule/barber_schedule.
 import { RefreshModule } from './modules/refresh/refresh.module';
 import { AutoLoudModule } from './modules/auto-loud/auto-loud.module';
 import { CategoryModule } from './modules/category/category.module';
+import { BarberShopServicesModule } from './modules/barber-shop-services/barber-shop-services.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ServiceImageModule } from './modules/service-image/service-image.module';
 
 @Module({
   imports: [
@@ -43,7 +46,6 @@ import { CategoryModule } from './modules/category/category.module';
     BarberModule,
     BookingModule,
     BarberShopModule,
-    AdminModule,
     ServiceModule,
     FileModule,
     ImagesModule,
@@ -54,6 +56,10 @@ import { CategoryModule } from './modules/category/category.module';
     RefreshModule,
     AutoLoudModule,
     CategoryModule,
+    BarberShopServicesModule,
+    ChatModule,
+    TransactionsModule,
+    ServiceImageModule,
   ],
 })
 export class AppModule {}

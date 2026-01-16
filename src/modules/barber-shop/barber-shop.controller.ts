@@ -19,12 +19,12 @@ import { UpdateBarberShopStatus } from './dto/update-status';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
-import { RefreshPasswordDto } from './dto/refreshPassword.dto';
+import { BarberShopRefreshPasswordDto } from './dto/refreshPassword.dto';
 
 @Controller('barber-shop')
 export class BarberShopController {
@@ -45,6 +45,14 @@ export class BarberShopController {
         location: {
           type: 'string',
           example: 'lince',
+        },
+        latitude: {
+          type: 'number',
+          example: 41.2995,
+        },
+        longitude: {
+          type: 'number',
+          example: 69.2401,
         },
         password: {
           type: 'string',
@@ -91,7 +99,14 @@ export class BarberShopController {
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'descripton', required: false })
   @ApiQuery({name: "location", required: false})
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'descripton'] })
+  @ApiQuery({ name: 'lat', required: false })
+  @ApiQuery({ name: 'lng', required: false })
+  @ApiQuery({ name: 'radiusKm', required: false })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['name', 'descripton', 'distance', 'avg_rating'],
+  })
   @ApiQuery({name: "order", required: false, enum:["asc","desc"]})
   findAll(@Query() query: Record<string, any>) {
     return this.barberShopService.findAll(query);
@@ -135,6 +150,14 @@ export class BarberShopController {
           type: 'string',
           example: 'lince',
         },
+        latitude: {
+          type: 'number',
+          example: 41.2995,
+        },
+        longitude: {
+          type: 'number',
+          example: 69.2401,
+        },
         img: {
           type: 'string',
           format: 'binary',
@@ -151,7 +174,7 @@ export class BarberShopController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('img'))
   update(
@@ -169,8 +192,10 @@ export class BarberShopController {
     return this.barberShopService.remove(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Post('Refresh_password')
-  refresh_password(data: RefreshPasswordDto) {
+  refresh_password(@Body() data: BarberShopRefreshPasswordDto) {
     return this.barberShopService.refreshPassword(data);
   }
 }
