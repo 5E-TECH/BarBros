@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateBarberShopDto {
   @IsString()
@@ -16,10 +17,12 @@ export class CreateBarberShopDto {
   @IsNotEmpty()
   location: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   latitude?: number;
 
+  @Type(() => Number)
   @IsNumber()
   @IsOptional()
   longitude?: number;
