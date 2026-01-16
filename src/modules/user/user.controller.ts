@@ -58,12 +58,6 @@ export class UserController {
     return this.userService.findAllAdmin(query);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
-  @Get('my-account')
-  myAccount(@Req() req: Request) {
-    return this.userService.MyAcauntAdmin(req);
-  }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
@@ -151,10 +145,19 @@ export class UserController {
     return this.userService.findAll(query);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('my_accaunt')
-  my_accaunt(@Req() req: Request) {
-    return this.userService.My_accaunt(req);
+
+  @ApiOperation({
+    summary: 'Get user profile',
+    description: 'Get current user profile information',
+  })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @Get('profile')
+  profile(@CurrentUser() user: JWTPayload) {
+    return this.userService.profile(user);
   }
 
   @UseGuards(AuthGuard, SelfGuard)
@@ -172,19 +175,5 @@ export class UserController {
   @Delete(':id')
   delet(@Param('id') id: number) {
     return this.userService.delet(id);
-  }
-
-  @ApiOperation({
-    summary: 'Get user profile',
-    description: 'Get current user profile information',
-  })
-  @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard, SelfGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
-  @Get('profile')
-  profile(@CurrentUser() user: JWTPayload) {
-    return this.userService.profile(user);
   }
 }

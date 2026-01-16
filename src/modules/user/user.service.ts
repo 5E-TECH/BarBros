@@ -252,6 +252,10 @@ export class UserService implements OnModuleInit {
         };
       }
 
+      if (user.role !== UserRole.USER) {
+        throw new ForbiddenException('Bu telefon raqam user uchun ishlatilmaydi');
+      }
+
       user.otp = code;
       await this.userRepo.save(user);
 
@@ -269,6 +273,9 @@ export class UserService implements OnModuleInit {
     try {
       const user = await this.userRepo.findOne({ where: { phone_number } });
       if (!user) throw new ForbiddenException('User not found');
+      if (user.role !== UserRole.USER) {
+        throw new ForbiddenException('Bu telefon raqam user uchun ishlatilmaydi');
+      }
       if (code !== user.otp) throw new ForbiddenException('Wrong code');
 
 
