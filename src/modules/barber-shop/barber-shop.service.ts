@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike, FindOptionsOrder } from 'typeorm';
+import { BarberShopServicesEntity } from '../barber-shop-services/entities/barber-shop-services.entity';
 import { Request } from 'express';
 
 import { BarberShopEntity } from './entities/barber-shop.entity';
@@ -31,6 +32,8 @@ export class BarberShopService {
   constructor(
     @InjectRepository(BarberShopEntity)
     private barberRepo: Repository<BarberShopEntity>,
+    @InjectRepository(BarberShopServicesEntity)
+    private readonly barberShopServicesRepo: Repository<BarberShopServicesEntity>,
     private readonly fileServis: FileService,
     private readonly Bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
@@ -228,6 +231,67 @@ export class BarberShopService {
         Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c * 100) / 100;
+  }
+
+  async findByService(query: Record<string, any>) {
+    try {
+      const { serviceId, lat, lng, radiusKm, sortBy = 'distance' } = query;
+      const serviceIdNum = Number(serviceId);
+      if (!serviceIdNum) {
+        throw new BadRequestException('serviceId is required');
+      }
+
+      const latNum = lat !== undefined ? Number(lat) : null;
+      const lngNum = lng !== undefined ? Number(lng) : null;
+      const radiusNum = radiusKm !== undefined ? Number(radiusKm) : null;
+
+      const links = await this.barberShopServicesRepo.find({
+        where: { service_id: serviceIdNum },
+        relations: ['barberShop'],
+      });
+
+      const mapped = links.map((link) => {
+        const shop = link.barberShop;
+        const distance =
+          latNum !== null &&
+          lngNum !== null &&
+          shop.latitude !== null &&
+          shop.longitude !== null
+            ? this.calcDistanceKm(latNum, lngNum, shop.latitude, shop.longitude)
+            : null;
+
+        return {
+          barber_shop_id: shop.id,
+          shop_name: shop.name,
+          shop_location: shop.location,
+          shop_image: shop.img,
+          avg_rating: shop.avg_rating,
+          price: link.price,
+          distance_km: distance,
+        };
+      });
+
+      const filtered = mapped.filter((item) => {
+        if (radiusNum === null) return true;
+        if (item.distance_km === null) return false;
+        return item.distance_km <= radiusNum;
+      });
+
+      const sorted =
+        sortBy === 'avg_rating'
+          ? filtered.sort((a, b) => b.avg_rating - a.avg_rating)
+          : sortBy === 'distance'
+            ? filtered.sort((a, b) => {
+                if (a.distance_km === null) return 1;
+                if (b.distance_km === null) return -1;
+                return a.distance_km - b.distance_km;
+              })
+            : filtered;
+
+      return successRes(sorted);
+    } catch (error) {
+      return ErrorHender(error);
+    }
   }
 
   async update(
