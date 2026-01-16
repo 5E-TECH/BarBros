@@ -151,6 +151,15 @@ export class BarberController {
   @ApiOperation({
     summary: 'Update barber',
   })
+   @UseGuards(AuthGuard, SelfGuard)
+  @Get('barbershop/:id')
+  findBarbershopId(@Param('id') id: number) {
+    return this.barberService.findBarbershopId(id);
+  }
+
+  @ApiOperation({
+    summary: 'Update barber',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
