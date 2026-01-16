@@ -326,8 +326,7 @@ export class UserService implements OnModuleInit {
   async findAll(query: Record<string, any>) {
     try {
       const {
-        phone_number,
-        full_name,
+        search,
         sortBy = 'full_name',
         order = 'DESC',
         page = 1,
@@ -340,12 +339,15 @@ export class UserService implements OnModuleInit {
       if (!userRepo.length) {
         throw new NotFoundException('Not faund data');
       }
+      const searchWhere = search
+        ? [
+            { full_name: ILike(`%${search}%`), role },
+            { phone_number: ILike(`%${search}%`), role },
+          ]
+        : { role };
+
       const [data, total] = await this.userRepo.findAndCount({
-        where: {
-          ...(full_name && { full_name: ILike(`%${full_name}%`) }),
-          ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(role && { role: ILike(`%${role}%`) }),
-        },
+        where: searchWhere,
         relations: ['booking', 'notifikation', 'reyting'],
         select: [
           'full_name',
