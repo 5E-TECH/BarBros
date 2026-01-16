@@ -348,3 +348,25 @@ export class BarberService {
     throw new ForbiddenException('Access denied');
   }
 }
+  }
+
+   async findBarbershopId(id: number) {
+    try {
+      const barber = await this.BarberRepo.find({
+        where: {barberShop:{ id }},
+        relations: [
+          'reyting',
+          'service',
+          // 'barberShop',
+          'barberSchuld',
+          'barberImage',
+          'booking',
+        ],
+      });
+      if (!barber) throw new NotFoundException('Barber not found');
+      return successRes(barber);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+}
