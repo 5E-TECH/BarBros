@@ -29,7 +29,7 @@ export default class Application {
       .setTitle('Barber Shop')
       .setDescription('The cats API description')
       .setVersion('1.0')
-      .addServer('/barber')
+      // .addServer('/barber')
       .addSecurityRequirements('bearer', ['bearer'])
       .addBearerAuth()
       .build();

@@ -50,6 +50,14 @@ export class ServiceController {
     return this.serviceService.findAllMyServices(req.user);
   }
 
+  @ApiOperation({
+    summary: 'Barber bo‘yicha servicelar (public)',
+  })
+  @Get('by-barber/:barberId')
+  findByBarber(@Param('barberId') barberId: number) {
+    return this.serviceService.findByBarberId(barberId);
+  }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(
     UserRole.SUPPER_ADMIN,
