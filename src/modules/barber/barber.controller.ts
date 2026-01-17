@@ -133,7 +133,7 @@ export class BarberController {
   })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
   findAllMyBarbers(@Query() query: Record<string, any>, @Req() req) {
-    return this.barberService.findAllMyBarbers(req, query);
+    return this.barberService.findAllMyBarbers(req.user, query);
   }
 
   @UseGuards(AuthGuard)
