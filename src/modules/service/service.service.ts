@@ -202,6 +202,7 @@ export class ServiceService {
       const query = this.serviceRepository
         .createQueryBuilder('service')
         .leftJoinAndSelect('service.barbers', 'barber')
+        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
         .where('barber.id = :barberId', { barberId });
 
       if (shopId) {
