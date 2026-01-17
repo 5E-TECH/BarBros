@@ -129,7 +129,13 @@ export class ServiceService {
   async findAll() {
     try {
       const data = await this.serviceRepository.find({
-        relations: ['booking', 'barbers', 'category', 'barberShopServices'],
+        relations: [
+          'booking',
+          'barbers',
+          'category',
+          'barberShopServices',
+          'serviceImages',
+        ],
       });
       if (!data.length) {
         throw new NotFoundException('Not Fount service');
@@ -144,7 +150,13 @@ export class ServiceService {
     try {
       const service = await this.serviceRepository.findOne({
         where: { id: id },
-        relations: ['booking', 'barbers', 'category', 'barberShopServices'],
+        relations: [
+          'booking',
+          'barbers',
+          'category',
+          'barberShopServices',
+          'serviceImages',
+        ],
       });
       if (!service) {
         throw new NotFoundException('Not Fount service');
