@@ -189,6 +189,44 @@ export class ServiceService {
     }
   }
 
+  async findByBarberId(barberId: number) {
+    try {
+      const barber = await this.barberRepository.findOne({
+        where: { id: barberId },
+        relations: ['barberShop'],
+      });
+      if (!barber) throw new NotFoundException('Barber not found');
+
+      const shopId = barber.barberShop?.id;
+
+      const query = this.serviceRepository
+        .createQueryBuilder('service')
+        .leftJoinAndSelect('service.barbers', 'barber')
+        .where('barber.id = :barberId', { barberId });
+
+      if (shopId) {
+        query.leftJoinAndSelect(
+          'service.barberShopServices',
+          'shopService',
+          'shopService.barber_shop_id = :shopId',
+          { shopId },
+        );
+      } else {
+        query.leftJoinAndSelect('service.barberShopServices', 'shopService');
+      }
+
+      const data = await query.getMany();
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   async update(id: number, updateServiceDto: UpdateServiceDto, req: Request) {
     try {
       const data = await this.serviceRepository.findOneBy({ id });
