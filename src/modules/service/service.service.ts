@@ -240,6 +240,31 @@ export class ServiceService {
     }
   }
 
+  async findByBarberShopId(barberShopId: number) {
+    try {
+      const data = await this.serviceRepository
+        .createQueryBuilder('service')
+        .innerJoinAndSelect(
+          'service.barberShopServices',
+          'shopService',
+          'shopService.barber_shop_id = :shopId',
+          { shopId: barberShopId },
+        )
+        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
+        .leftJoinAndSelect('service.category', 'category')
+        .leftJoinAndSelect('service.barbers', 'barbers')
+        .getMany();
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   async update(id: number, updateServiceDto: UpdateServiceDto, req: Request) {
     try {
       const data = await this.serviceRepository.findOneBy({ id });
