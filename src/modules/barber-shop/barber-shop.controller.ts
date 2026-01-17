@@ -111,6 +111,18 @@ export class BarberShopController {
   findAll(@Query() query: Record<string, any>) {
     return this.barberShopService.findAll(query);
   }
+
+  @ApiOperation({ summary: 'Service bo‘yicha shoplar (price, rating, distance)' })
+  @UseGuards(AuthGuard)
+  @Get('by-service')
+  @ApiQuery({ name: 'serviceId', required: true })
+  @ApiQuery({ name: 'lat', required: false })
+  @ApiQuery({ name: 'lng', required: false })
+  @ApiQuery({ name: 'radiusKm', required: false })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['distance', 'avg_rating'] })
+  findByService(@Query() query: Record<string, any>) {
+    return this.barberShopService.findByService(query);
+  }
   @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
