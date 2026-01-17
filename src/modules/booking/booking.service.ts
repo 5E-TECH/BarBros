@@ -78,7 +78,10 @@ export class BookingService {
         throw new NotFoundException('Service not found');
       }
 
-      if (!barber.barberShop || barber.barberShop.id !== createBookingDto.barber_shop_id) {
+      if (
+        !barber.barberShop ||
+        Number(barber.barberShop.id) !== Number(createBookingDto.barber_shop_id)
+      ) {
         throw new BadRequestException('Barber does not belong to this shop');
       }
 
