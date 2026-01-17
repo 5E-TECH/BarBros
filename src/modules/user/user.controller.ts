@@ -129,7 +129,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN,UserRole.ADMIN)
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
