@@ -318,6 +318,24 @@ export class BarberService {
     }
   }
 
+  async findByShopAndService(barberShopId: number, serviceId: number) {
+    try {
+      const data = await this.BarberRepo.createQueryBuilder('barber')
+        .leftJoinAndSelect('barber.service', 'service')
+        .leftJoinAndSelect('barber.barberShop', 'barberShop')
+        .leftJoinAndSelect('barber.barberImage', 'barberImage')
+        .leftJoinAndSelect('barber.reyting', 'reyting')
+        .where('barberShop.id = :barberShopId', { barberShopId })
+        .andWhere('service.id = :serviceId', { serviceId })
+        .getMany();
+
+      if (!data.length) throw new NotFoundException('Barber not found');
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   private async assertBarberAccess(barberId: number, req: Request) {
     const user = req['user'];
     if (!user) throw new ForbiddenException('Forbidden');
