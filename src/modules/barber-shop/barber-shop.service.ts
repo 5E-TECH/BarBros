@@ -313,7 +313,22 @@ export class BarberShopService {
         updateDto.img = await this.fileServis.createFile(file);
       }
 
-      await this.barberRepo.update({ id }, updateDto);
+      const rawBody = (req?.body || {}) as Record<string, any>;
+      const cleaned: Partial<UpdateBarberShopDto> = {};
+
+      Object.entries(updateDto).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (typeof value === 'string' && value.trim() === '') return;
+        if (
+          typeof rawBody[key] === 'string' &&
+          rawBody[key].trim() === ''
+        ) {
+          return;
+        }
+        cleaned[key as keyof UpdateBarberShopDto] = value as any;
+      });
+
+      await this.barberRepo.update({ id }, cleaned);
       const updated = await this.barberRepo.findOne({ where: { id } });
       return successRes(updated);
     } catch (error) {
