@@ -303,8 +303,13 @@ export class BarberShopService {
     try {
       const shop = await this.barberRepo.findOne({ where: { id } });
       if (!shop) throw new NotFoundException('BarberShop not found');
-      if (req && shop.id !== req['user'].id)
+      if (
+        req &&
+        shop.id !== req['user'].id &&
+        ![UserRole.SUPPER_ADMIN, UserRole.ADMIN].includes(req['user'].role)
+      ) {
         throw new ForbiddenException('Cannot update other BarberShop');
+      }
 
       if (file && new ImageValidationPipe().transform(file)) {
         if (shop.img && (await this.fileServis.existFile(shop.img))) {
