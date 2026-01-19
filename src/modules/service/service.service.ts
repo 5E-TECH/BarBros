@@ -215,6 +215,7 @@ export class ServiceService {
         .createQueryBuilder('service')
         .leftJoinAndSelect('service.barbers', 'barber')
         .leftJoinAndSelect('service.serviceImages', 'serviceImages')
+        .leftJoinAndSelect('service.category', 'category')
         .where('barber.id = :barberId', { barberId });
 
       if (shopId) {
