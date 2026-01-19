@@ -153,4 +153,28 @@ export class BookingController {
       serviceId,
     );
   }
+
+  @ApiOperation({
+    summary: 'Shop + Service + time bo‘yicha bo‘sh barberlar',
+  })
+  @ApiQuery({ name: 'barberShopId', required: true, example: 3 })
+  @ApiQuery({ name: 'serviceId', required: true, example: 1 })
+  @ApiQuery({ name: 'date', required: true, example: '2025-12-12' })
+  @ApiQuery({ name: 'time', required: true, example: '14:30:00' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.USER)
+  @Get('available-barbers')
+  findAvailableBarbers(
+    @Query('barberShopId') barberShopId: number,
+    @Query('serviceId') serviceId: number,
+    @Query('date') date: string,
+    @Query('time') time: string,
+  ) {
+    return this.bookingService.findAvailableBarbers(
+      barberShopId,
+      serviceId,
+      date,
+      time,
+    );
+  }
 }
