@@ -345,6 +345,50 @@ export class BookingService {
     });
   }
 
+  async findAvailableBarbers(
+    barberShopId: number,
+    serviceId: number,
+    date: string,
+    time: string,
+  ) {
+    try {
+      const selectedService = await this.servicerepo.findOne({
+        where: { id: serviceId },
+      });
+      if (!selectedService) {
+        throw new NotFoundException('Service not found');
+      }
+
+      const barbers = await this.Barber.createQueryBuilder('barber')
+        .leftJoinAndSelect('barber.service', 'service')
+        .leftJoinAndSelect('barber.barberShop', 'barberShop')
+        .leftJoinAndSelect('barber.barberImage', 'barberImage')
+        .leftJoinAndSelect('barber.reyting', 'reyting')
+        .where('barberShop.id = :barberShopId', { barberShopId })
+        .andWhere('service.id = :serviceId', { serviceId })
+        .getMany();
+
+      const normalizedDate = dayjs(date).format('YYYY-MM-DD');
+
+      const available: BarberEntity[] = [];
+      for (const barber of barbers) {
+        const ok = await this.isBarberAvailable(
+          barber.id,
+          normalizedDate,
+          time,
+          selectedService.duration_minutes,
+        );
+        if (ok) {
+          available.push(barber);
+        }
+      }
+
+      return successRes(available);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   private async buildAvailabilityForDate(
     barberId: number,
     date: string,
@@ -459,6 +503,51 @@ export class BookingService {
         throw new BadRequestException('Selected time is already booked');
       }
     }
+  }
+
+  private async isBarberAvailable(
+    barberId: number,
+    date: string,
+    time: string,
+    durationMinutes: number,
+  ) {
+    const weekday = dayjs(date).format('dddd').toLowerCase() as DayOfWeek;
+    const schedule = await this.barberscherepo.findOne({
+      where: { barber_id: barberId, day_of_week: weekday },
+    });
+
+    if (!schedule) {
+      return false;
+    }
+
+    const start = dayjs(`${date}T${schedule.start_time}`);
+    const end = dayjs(`${date}T${schedule.end_time}`);
+    const bookingStart = dayjs(`${date}T${time}`);
+    const bookingEnd = bookingStart.add(durationMinutes, 'minute');
+
+    if (!bookingStart.isSameOrAfter(start) || !bookingEnd.isSameOrBefore(end)) {
+      return false;
+    }
+
+    const existing = await this.Booking.find({
+      where: { barber_id: barberId, date },
+      relations: ['service'],
+    });
+
+    for (const item of existing) {
+      if (item.status === BookingStatus.CANCELLED) continue;
+      const itemDuration = item.service?.duration_minutes || 30;
+      const itemStart = dayjs(`${item.date}T${item.time}`);
+      const itemEnd = itemStart.add(itemDuration, 'minute');
+
+      const overlap =
+        bookingStart.isBefore(itemEnd) && bookingEnd.isAfter(itemStart);
+      if (overlap) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   private async ensureTransaction(booking: BookingEntity) {
