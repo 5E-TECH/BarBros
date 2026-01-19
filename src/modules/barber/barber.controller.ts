@@ -142,6 +142,17 @@ export class BarberController {
     return this.barberService.myAccount(req);
   }
 
+  @ApiOperation({
+    summary: 'Shop + Service bo‘yicha barberlar (public)',
+  })
+  @Get('by-shop-and-service')
+  findByShopAndService(
+    @Query('barberShopId') barberShopId: number,
+    @Query('serviceId') serviceId: number,
+  ) {
+    return this.barberService.findByShopAndService(barberShopId, serviceId);
+  }
+
   @UseGuards(AuthGuard, SelfGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
