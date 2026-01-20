@@ -32,60 +32,19 @@ export class ServiceService {
   ) {}
   async creates(createServiceDto: CreateServiceDto, user: any) {
     try {
-      const {
-        barber_ids = [],
-        category_id,
-        price,
-        ...serviceData
-      } = createServiceDto;
+      const { category_id, ...serviceData } = createServiceDto;
 
       const category = await this.categoryRepository.findOne({
         where: { id: category_id },
       });
       if (!category) throw new NotFoundException('Category not found');
 
-      if (
-        (price !== undefined || barber_ids.length) &&
-        user.role !== UserRole.SP_ADMIN
-      ) {
-        throw new ForbiddenException(
-          'Price and barber list only for barber shop',
-        );
-      }
-
-      let barbers: BarberEntity[] = [];
-      if (barber_ids.length) {
-        barbers = await this.barberRepository.find({
-          where: { id: In(barber_ids), barberShop: { id: user.id } },
-        });
-
-        if (barbers.length !== barber_ids.length) {
-          throw new BadRequestException(
-            'Some barber ids are invalid or do not belong to your shop',
-          );
-        }
-      }
-
       const service = this.serviceRepository.create({
         ...serviceData,
         category: { id: category_id },
-        barbers,
       });
 
       const saved = await this.serviceRepository.save(service);
-
-      if (user.role === UserRole.SP_ADMIN) {
-        if (price === undefined || price === null) {
-          throw new BadRequestException('Price is required for barber shop');
-        }
-
-        const link = this.barberShopServicesRepo.create({
-          barber_shop_id: user.id,
-          service_id: saved.id,
-          price,
-        });
-        await this.barberShopServicesRepo.save(link);
-      }
 
       return successRes(saved, 201);
     } catch (error) {
