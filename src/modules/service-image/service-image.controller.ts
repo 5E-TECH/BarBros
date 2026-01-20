@@ -37,7 +37,7 @@ export class ServiceImageController {
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   create(
@@ -56,7 +56,7 @@ export class ServiceImageController {
 
   @ApiOperation({ summary: 'Service rasmni o‘chirish' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceImageService.remove(Number(id), req);
