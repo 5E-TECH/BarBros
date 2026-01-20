@@ -173,11 +173,16 @@ export class ServiceService {
       const query = this.serviceRepository
         .createQueryBuilder('service')
         .leftJoinAndSelect('service.barbers', 'barber')
-        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
         .leftJoinAndSelect('service.category', 'category')
         .where('barber.id = :barberId', { barberId });
 
       if (shopId) {
+        query.leftJoinAndSelect(
+          'service.serviceImages',
+          'serviceImages',
+          'serviceImages.barber_shop_id = :shopId',
+          { shopId },
+        );
         query.leftJoinAndSelect(
           'service.barberShopServices',
           'shopService',
@@ -185,6 +190,7 @@ export class ServiceService {
           { shopId },
         );
       } else {
+        query.leftJoinAndSelect('service.serviceImages', 'serviceImages');
         query.leftJoinAndSelect('service.barberShopServices', 'shopService');
       }
 
@@ -210,7 +216,12 @@ export class ServiceService {
           'shopService.barber_shop_id = :shopId',
           { shopId: barberShopId },
         )
-        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
+        .leftJoinAndSelect(
+          'service.serviceImages',
+          'serviceImages',
+          'serviceImages.barber_shop_id = :shopId',
+          { shopId: barberShopId },
+        )
         .leftJoinAndSelect('service.category', 'category')
         .leftJoinAndSelect('service.barbers', 'barbers')
         .getMany();
