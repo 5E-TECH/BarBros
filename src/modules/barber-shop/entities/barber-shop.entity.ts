@@ -3,7 +3,6 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
 import { BarberShopServicesEntity } from 'src/modules/barber-shop-services/entities/barber-shop-services.entity';
-import { ServiceImageEntity } from 'src/modules/service-image/entities/service-image.entity';
 import { UserRole, Status } from 'src/common/enum';
 
 @Entity()
@@ -56,6 +55,4 @@ export class BarberShopEntity extends BaseEntity {
   )
   barberShopServices: BarberShopServicesEntity[];
 
-  @OneToMany(() => ServiceImageEntity, (image) => image.barberShop)
-  serviceImages: ServiceImageEntity[];
 }

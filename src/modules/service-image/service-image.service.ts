@@ -15,8 +15,6 @@ import { UserRole } from 'src/common/enum';
 import { FileService } from 'src/modules/file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
-import { BarberShopEntity } from 'src/modules/barber-shop/entities/barber-shop.entity';
-import { BarberShopServicesEntity } from 'src/modules/barber-shop-services/entities/barber-shop-services.entity';
 
 @Injectable()
 export class ServiceImageService {
@@ -25,10 +23,6 @@ export class ServiceImageService {
     private readonly imageRepo: Repository<ServiceImageEntity>,
     @InjectRepository(ServiceEntity)
     private readonly serviceRepo: Repository<ServiceEntity>,
-    @InjectRepository(BarberShopEntity)
-    private readonly shopRepo: Repository<BarberShopEntity>,
-    @InjectRepository(BarberShopServicesEntity)
-    private readonly shopServiceRepo: Repository<BarberShopServicesEntity>,
     private readonly fileService: FileService,
   ) {}
 
@@ -43,40 +37,21 @@ export class ServiceImageService {
       }
 
       const user = req['user'];
-      let barberShopId = dto.barber_shop_id;
-
-      if (user.role === UserRole.SUPPER_ADMIN || user.role === UserRole.ADMIN) {
-        if (!barberShopId) {
-          throw new BadRequestException('barber_shop_id is required');
-        }
-      } else {
+      if (user.role !== UserRole.SUPPER_ADMIN && user.role !== UserRole.ADMIN) {
         throw new ForbiddenException('Access denied');
       }
 
-      const [service, shop] = await Promise.all([
-        this.serviceRepo.findOne({ where: { id: dto.service_id } }),
-        this.shopRepo.findOne({ where: { id: barberShopId } }),
-      ]);
+      const service = await this.serviceRepo.findOne({
+        where: { id: dto.service_id },
+      });
 
       if (!service) throw new NotFoundException('Service not found');
-      if (!shop) throw new NotFoundException('BarberShop not found');
-
-      const link = await this.shopServiceRepo.findOne({
-        where: {
-          barber_shop_id: barberShopId,
-          service_id: dto.service_id,
-        },
-      });
-      if (!link) {
-        throw new BadRequestException('Service not offered by this shop');
-      }
 
       new ImageValidationPipe().transform(file);
       const image = await this.fileService.createFile(file);
 
       const entity = this.imageRepo.create({
         service_id: dto.service_id,
-        barber_shop_id: barberShopId,
         image,
       });
 
