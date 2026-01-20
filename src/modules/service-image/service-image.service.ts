@@ -45,15 +45,7 @@ export class ServiceImageService {
       const user = req['user'];
       let barberShopId = dto.barber_shop_id;
 
-      if (user.role === UserRole.SP_ADMIN) {
-        if (barberShopId && barberShopId !== user.id) {
-          throw new ForbiddenException('Cannot use another barber shop id');
-        }
-        barberShopId = user.id;
-      } else if (
-        user.role === UserRole.SUPPER_ADMIN ||
-        user.role === UserRole.ADMIN
-      ) {
+      if (user.role === UserRole.SUPPER_ADMIN || user.role === UserRole.ADMIN) {
         if (!barberShopId) {
           throw new BadRequestException('barber_shop_id is required');
         }
@@ -112,14 +104,7 @@ export class ServiceImageService {
       if (!data) throw new NotFoundException('Image not found');
 
       const user = req['user'];
-      if (user.role === UserRole.SP_ADMIN) {
-        if (data.barber_shop_id !== user.id) {
-          throw new ForbiddenException('Access denied');
-        }
-      } else if (
-        user.role !== UserRole.SUPPER_ADMIN &&
-        user.role !== UserRole.ADMIN
-      ) {
+      if (user.role !== UserRole.SUPPER_ADMIN && user.role !== UserRole.ADMIN) {
         throw new ForbiddenException('Access denied');
       }
 
