@@ -26,7 +26,7 @@ export class BarberShopEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   descripton: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', unique: true })
   phoneNumber: string;
 
   @Column({ type: 'varchar' })
