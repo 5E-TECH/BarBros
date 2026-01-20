@@ -225,6 +225,23 @@ export class ServiceService {
     }
   }
 
+  async findByCategoryId(categoryId: number) {
+    try {
+      const data = await this.serviceRepository.find({
+        where: { category: { id: categoryId } },
+        relations: ['category', 'serviceImages'],
+      });
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   async update(id: number, updateServiceDto: UpdateServiceDto, req: Request) {
     try {
       const data = await this.serviceRepository.findOneBy({ id });

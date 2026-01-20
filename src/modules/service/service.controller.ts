@@ -66,6 +66,14 @@ export class ServiceController {
     return this.serviceService.findByBarberShopId(barberShopId);
   }
 
+  @ApiOperation({
+    summary: 'Category bo‘yicha servicelar (public)',
+  })
+  @Get('by-category/:categoryId')
+  findByCategory(@Param('categoryId') categoryId: number) {
+    return this.serviceService.findByCategoryId(categoryId);
+  }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(
     UserRole.SUPPER_ADMIN,
