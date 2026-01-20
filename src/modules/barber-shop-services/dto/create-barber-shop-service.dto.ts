@@ -10,6 +10,10 @@ export class CreateBarberShopServiceDto {
   @IsNumber()
   price: number;
 
+  @ApiProperty({ example: 60, description: 'Service davomiyligi (minut)' })
+  @IsNumber()
+  duration_minutes: number;
+
   @ApiProperty({ example: 12, required: false })
   @IsOptional()
   @IsNumber()
