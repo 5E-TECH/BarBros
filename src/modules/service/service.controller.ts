@@ -24,7 +24,7 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @Req() req) {
     return this.serviceService.creates(createServiceDto, req.user);

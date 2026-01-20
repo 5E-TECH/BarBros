@@ -137,7 +137,7 @@ export class BarberShopController {
 
   @ApiOperation({ summary: 'Supper admin Tomonidan bloklansa' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN,UserRole.ADMIN)
   @Patch('status/:id')
   updateStatus(
     @Param('id') id: number,
