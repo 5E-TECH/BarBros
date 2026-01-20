@@ -56,12 +56,21 @@ export class CategoryService {
 
   async getAllCategory(categoryType?: Category) {
     try {
-      const category = await this.categoryRepo.find({
-        where: {
-          is_deleted: false,
-          ...(categoryType ? { categoryType } : {}),
-        },
-      });
+      const query = this.categoryRepo
+        .createQueryBuilder('category')
+        .where('category.is_deleted = :isDeleted', { isDeleted: false })
+        .loadRelationCountAndMap(
+          'category.services_count',
+          'category.services',
+        );
+
+      if (categoryType) {
+        query.andWhere('category.categoryType = :categoryType', {
+          categoryType,
+        });
+      }
+
+      const category = await query.getMany();
       return successRes(category);
     } catch (error) {
       return ErrorHender(error);
