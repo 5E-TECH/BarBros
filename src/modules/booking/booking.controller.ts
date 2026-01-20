@@ -73,7 +73,7 @@ export class BookingController {
 
   @ApiOperation({ summary: 'Userlar uchun' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER)
+  @Roles(UserRole.USER,UserRole.SUPPER_ADMIN,UserRole.ADMIN)
   @Get('User_booking')
   findOne(@Req() req: Request) {
     return this.bookingService.findAllUser(req);
