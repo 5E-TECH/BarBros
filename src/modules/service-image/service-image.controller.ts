@@ -31,7 +31,6 @@ export class ServiceImageController {
       type: 'object',
       properties: {
         service_id: { type: 'number', example: 3 },
-        barber_shop_id: { type: 'number', example: 12 },
         image: { type: 'string', format: 'binary' },
       },
     },

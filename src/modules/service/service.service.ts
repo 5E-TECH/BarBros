@@ -176,13 +176,8 @@ export class ServiceService {
         .leftJoinAndSelect('service.category', 'category')
         .where('barber.id = :barberId', { barberId });
 
+      query.leftJoinAndSelect('service.serviceImages', 'serviceImages');
       if (shopId) {
-        query.leftJoinAndSelect(
-          'service.serviceImages',
-          'serviceImages',
-          'serviceImages.barber_shop_id = :shopId',
-          { shopId },
-        );
         query.leftJoinAndSelect(
           'service.barberShopServices',
           'shopService',
@@ -190,7 +185,6 @@ export class ServiceService {
           { shopId },
         );
       } else {
-        query.leftJoinAndSelect('service.serviceImages', 'serviceImages');
         query.leftJoinAndSelect('service.barberShopServices', 'shopService');
       }
 
@@ -216,12 +210,7 @@ export class ServiceService {
           'shopService.barber_shop_id = :shopId',
           { shopId: barberShopId },
         )
-        .leftJoinAndSelect(
-          'service.serviceImages',
-          'serviceImages',
-          'serviceImages.barber_shop_id = :shopId',
-          { shopId: barberShopId },
-        )
+        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
         .leftJoinAndSelect('service.category', 'category')
         .leftJoinAndSelect('service.barbers', 'barbers')
         .getMany();
