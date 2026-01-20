@@ -94,12 +94,14 @@ export class BookingService {
       if (!shopService) {
         throw new BadRequestException('Service not offered by this shop');
       }
+      const durationMinutes =
+        shopService.duration_minutes ?? service.duration_minutes;
 
       await this.assertBarberAvailable(
         createBookingDto.barber_id,
         date,
         time,
-        service.duration_minutes,
+        durationMinutes,
       );
 
       const data = this.Booking.create({
@@ -283,18 +285,35 @@ export class BookingService {
     date: string,
     serviceId: number,
   ) {
+    const barber = await this.Barber.findOne({
+      where: { id: barberId },
+      relations: ['barberShop'],
+    });
+    if (!barber) {
+      throw new NotFoundException('Barber not found');
+    }
     const selectedService = await this.servicerepo.findOne({
       where: { id: serviceId },
     });
     if (!selectedService) {
       throw new NotFoundException('Service not found');
     }
+    const shopService = barber.barberShop
+      ? await this.barberShopServicesRepo.findOne({
+          where: {
+            barber_shop_id: barber.barberShop.id,
+            service_id: serviceId,
+          },
+        })
+      : null;
+    const durationMinutes =
+      shopService?.duration_minutes ?? selectedService.duration_minutes;
 
     const normalizedDate = dayjs(date).format('YYYY-MM-DD');
     return this.buildAvailabilityForDate(
       barberId,
       normalizedDate,
-      selectedService.duration_minutes,
+      durationMinutes,
     );
   }
 
@@ -304,12 +323,29 @@ export class BookingService {
     to: string,
     serviceId: number,
   ) {
+    const barber = await this.Barber.findOne({
+      where: { id: barberId },
+      relations: ['barberShop'],
+    });
+    if (!barber) {
+      throw new NotFoundException('Barber not found');
+    }
     const selectedService = await this.servicerepo.findOne({
       where: { id: serviceId },
     });
     if (!selectedService) {
       throw new NotFoundException('Service not found');
     }
+    const shopService = barber.barberShop
+      ? await this.barberShopServicesRepo.findOne({
+          where: {
+            barber_shop_id: barber.barberShop.id,
+            service_id: serviceId,
+          },
+        })
+      : null;
+    const durationMinutes =
+      shopService?.duration_minutes ?? selectedService.duration_minutes;
 
     const start = dayjs(from).startOf('day');
     const end = dayjs(to).startOf('day');
@@ -328,7 +364,7 @@ export class BookingService {
       const availability = await this.buildAvailabilityForDate(
         barberId,
         date,
-        selectedService.duration_minutes,
+        durationMinutes,
       );
       result.push({
         date: availability.date,

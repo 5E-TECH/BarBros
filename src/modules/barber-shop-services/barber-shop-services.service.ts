@@ -75,6 +75,7 @@ export class BarberShopServicesService {
         barber_shop_id: barberShopId,
         service_id: dto.service_id,
         price: dto.price,
+        duration_minutes: dto.duration_minutes,
         barberShop: { id: barberShopId },
         service: { id: dto.service_id },
       });

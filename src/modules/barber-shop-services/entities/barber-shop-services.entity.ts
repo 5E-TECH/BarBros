@@ -14,6 +14,9 @@ export class BarberShopServicesEntity extends BaseEntity {
   @Column({ type: 'int' })
   price: number;
 
+  @Column({ type: 'int', default: 30 })
+  duration_minutes: number;
+
   @ManyToOne(() => BarberShopEntity, (shop) => shop.barberShopServices, {
     onDelete: 'CASCADE',
   })
