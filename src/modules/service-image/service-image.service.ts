@@ -29,10 +29,10 @@ export class ServiceImageService {
   async create(
     dto: CreateServiceImageDto,
     req: Request,
-    file?: Express.Multer.File,
+    files?: Express.Multer.File[],
   ) {
     try {
-      if (!file) {
+      if (!files || !files.length) {
         throw new BadRequestException('image is required');
       }
 
@@ -47,16 +47,22 @@ export class ServiceImageService {
 
       if (!service) throw new NotFoundException('Service not found');
 
-      new ImageValidationPipe().transform(file);
-      const image = await this.fileService.createFile(file);
+      const savedImages: ServiceImageEntity[] = [];
 
-      const entity = this.imageRepo.create({
-        service_id: dto.service_id,
-        image,
-      });
+      for (const file of files) {
+        new ImageValidationPipe().transform(file);
+        const image = await this.fileService.createFile(file);
 
-      const saved = await this.imageRepo.save(entity);
-      return successRes(saved, 201);
+        const entity = this.imageRepo.create({
+          service_id: dto.service_id,
+          image,
+        });
+
+        const saved = await this.imageRepo.save(entity);
+        savedImages.push(saved);
+      }
+
+      return successRes(savedImages, 201);
     } catch (error) {
       return ErrorHender(error);
     }
