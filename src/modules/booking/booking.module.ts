@@ -10,6 +10,7 @@ import { BarberShopServicesEntity } from '../barber-shop-services/entities/barbe
 import { TransactionEntity } from '../transactions/entities/transaction.entity';
 import { NotificationEntity } from '../notification/entities/notification.entity';
 import { BookingReminderService } from './booking-reminder.service';
+import { UserEntity } from 'src/modules/user/entities/user.admin,entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BookingReminderService } from './booking-reminder.service';
       BarberShopServicesEntity,
       TransactionEntity,
       NotificationEntity,
+      UserEntity,
     ]),
   ],
   controllers: [BookingController],

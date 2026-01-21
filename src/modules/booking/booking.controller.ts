@@ -19,6 +19,7 @@ import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { CreateOfflineBookingDto } from './dto/create-offline-booking.dto';
 
 @Controller('booking')
 export class BookingController {
@@ -28,6 +29,17 @@ export class BookingController {
   @Post()
   create(@Body() createBookingDto: CreateBookingDto, @Req() req: Request) {
     return this.bookingService.create(createBookingDto, req);
+  }
+
+  @ApiOperation({ summary: 'Offline booking (barber/shop)' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.BARBER, UserRole.SP_ADMIN)
+  @Post('offline')
+  createOffline(
+    @Body() createBookingDto: CreateOfflineBookingDto,
+    @Req() req: Request,
+  ) {
+    return this.bookingService.createOffline(createBookingDto, req);
   }
 
   @ApiOperation({summary: "cancellation"})
@@ -67,8 +79,17 @@ export class BookingController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Get("All")
-  findAll_Admin(){
-    return this.bookingService.findAll_Abdin()
+  @ApiQuery({ name: 'search', required: false })
+  findAll_Admin(@Query() query: Record<string, any>){
+    return this.bookingService.findAll_Abdin(query)
+  }
+
+  @ApiOperation({ summary: 'Admin/Superadmin uchun bitta booking' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Get(':id')
+  findOneAdmin(@Param('id') id: number) {
+    return this.bookingService.findOneAdmin(id);
   }
 
   @ApiOperation({ summary: 'Userlar uchun' })
