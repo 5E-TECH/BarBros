@@ -29,6 +29,7 @@ import {
 } from 'src/common/enum';
 import { DayOfWeek } from '../barber_schedule/entities/barber_schedule.entity';
 import { CreateOfflineBookingDto } from './dto/create-offline-booking.dto';
+import { SubscriptionService } from '../subscription/subscription.service';
 const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore.js');
 const isSameOrAfter = require('dayjs/plugin/isSameOrAfter.js');
@@ -55,6 +56,7 @@ export class BookingService {
     private readonly notificationRepo: Repository<NotificationEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async create(createBookingDto: CreateBookingDto, req: Request) {
@@ -101,6 +103,7 @@ export class BookingService {
       if (!shopService) {
         throw new BadRequestException('Service not offered by this shop');
       }
+      await this.subscriptionService.ensureActive(createBookingDto.barber_shop_id);
       const durationMinutes =
         shopService.duration_minutes ?? service.duration_minutes;
 
@@ -194,6 +197,8 @@ export class BookingService {
       if (!shopService) {
         throw new BadRequestException('Service not offered by this shop');
       }
+
+      await this.subscriptionService.ensureActive(dto.barber_shop_id);
 
       const durationMinutes =
         shopService.duration_minutes ?? service.duration_minutes;

@@ -25,4 +25,9 @@ export class CreateNotificationDto {
   @IsOptional()
   @IsInt()
   barber_id?: number;
+
+  @ApiProperty({ example: 3, required: false })
+  @IsOptional()
+  @IsInt()
+  barber_shop_id?: number;
 }

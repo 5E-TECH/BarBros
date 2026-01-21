@@ -27,6 +27,7 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { BarberRefreshPasswordDto } from './dto/refreshPassword.doo';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber')
 export class BarberController {
@@ -75,7 +76,7 @@ export class BarberController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Post('create')
   @UseInterceptors(FileInterceptor('img'))
@@ -92,7 +93,7 @@ export class BarberController {
     return this.barberService.login(loginBarberDto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SUPPER_ADMIN,
     UserRole.ADMIN,
@@ -118,7 +119,7 @@ export class BarberController {
     return this.barberService.findAll(query);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Get('all-myBarbers')
   @ApiQuery({ name: 'page', required: false, example: 1 })
@@ -137,7 +138,7 @@ export class BarberController {
     return this.barberService.findAllMyBarbers(req.user, query);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, SubscriptionGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
     return this.barberService.myAccount(req);
@@ -201,7 +202,7 @@ export class BarberController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER, UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch('update/:id')
   @UseInterceptors(FileInterceptor('img'))
@@ -214,14 +215,14 @@ export class BarberController {
     return this.barberService.update(id, updateBarberDto, req, file);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER, UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.barberService.remove(id, req);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER)
   @Post('refresh_password')
   refresh_password(@Body() data: BarberRefreshPasswordDto, @Req() req: Request) {

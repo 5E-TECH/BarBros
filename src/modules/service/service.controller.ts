@@ -19,18 +19,19 @@ import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('service')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @Req() req) {
     return this.serviceService.creates(createServiceDto, req.user);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SUPPER_ADMIN,
     UserRole.ADMIN,
@@ -43,7 +44,7 @@ export class ServiceController {
     return this.serviceService.findAll();
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.BARBER)
   @Get('my-service')
   findAllMyservices(@Req() req ) {
@@ -74,7 +75,7 @@ export class ServiceController {
     return this.serviceService.findByCategoryId(categoryId);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SUPPER_ADMIN,
     UserRole.ADMIN,
@@ -87,7 +88,7 @@ export class ServiceController {
     return this.serviceService.findOne(id);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch(':id')
   update(
@@ -98,7 +99,7 @@ export class ServiceController {
     return this.serviceService.update(id, updateServiceDto, req);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
@@ -112,7 +113,7 @@ export class ServiceController {
     type: AddBarbersToServiceDto,
     description: 'Service id va barberlar id listi',
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Post('add-barbers')
   async addBarbersToService(@Body() dto: AddBarbersToServiceDto, @Req() req) {

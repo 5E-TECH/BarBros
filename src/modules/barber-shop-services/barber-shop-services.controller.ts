@@ -17,6 +17,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { ApiOperation } from '@nestjs/swagger';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber-shop-services')
 export class BarberShopServicesController {
@@ -25,7 +26,7 @@ export class BarberShopServicesController {
   ) {}
 
   @ApiOperation({ summary: 'BarberShopga service biriktirish' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
   create(@Body() dto: CreateBarberShopServiceDto, @Req() req) {
@@ -33,7 +34,7 @@ export class BarberShopServicesController {
   }
 
   @ApiOperation({ summary: 'BarberShop servicelar ro‘yxati' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SP_ADMIN,
     UserRole.SUPPER_ADMIN,
@@ -47,7 +48,7 @@ export class BarberShopServicesController {
   }
 
   @ApiOperation({ summary: 'BarberShop service ma`lumotlari' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SP_ADMIN,
     UserRole.SUPPER_ADMIN,
@@ -61,7 +62,7 @@ export class BarberShopServicesController {
   }
 
   @ApiOperation({ summary: 'BarberShop service yangilash' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch(':id')
   update(
@@ -73,7 +74,7 @@ export class BarberShopServicesController {
   }
 
   @ApiOperation({ summary: 'BarberShop service o‘chirish' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req) {
