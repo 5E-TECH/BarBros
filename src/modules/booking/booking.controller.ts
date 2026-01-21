@@ -84,14 +84,6 @@ export class BookingController {
     return this.bookingService.findAll_Abdin(query)
   }
 
-  @ApiOperation({ summary: 'Admin/Superadmin uchun bitta booking' })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
-  @Get(':id')
-  findOneAdmin(@Param('id') id: number) {
-    return this.bookingService.findOneAdmin(id);
-  }
-
   @ApiOperation({ summary: 'Userlar uchun' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER,UserRole.SUPPER_ADMIN,UserRole.ADMIN)
@@ -197,5 +189,13 @@ export class BookingController {
       date,
       time,
     );
+  }
+
+  @ApiOperation({ summary: 'Admin/Superadmin uchun bitta booking' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Get('admin/:id')
+  findOneAdmin(@Param('id') id: number) {
+    return this.bookingService.findOneAdmin(id);
   }
 }
