@@ -432,36 +432,40 @@ export class BookingService {
     date: string,
     serviceId: number,
   ) {
-    const barber = await this.Barber.findOne({
-      where: { id: barberId },
-      relations: ['barberShop'],
-    });
-    if (!barber) {
-      throw new NotFoundException('Barber not found');
-    }
-    const selectedService = await this.servicerepo.findOne({
-      where: { id: serviceId },
-    });
-    if (!selectedService) {
-      throw new NotFoundException('Service not found');
-    }
-    const shopService = barber.barberShop
-      ? await this.barberShopServicesRepo.findOne({
-          where: {
-            barber_shop_id: barber.barberShop.id,
-            service_id: serviceId,
-          },
-        })
-      : null;
-    const durationMinutes =
-      shopService?.duration_minutes ?? selectedService.duration_minutes;
+    try {
+      const barber = await this.Barber.findOne({
+        where: { id: barberId },
+        relations: ['barberShop'],
+      });
+      if (!barber) {
+        throw new NotFoundException('Barber not found');
+      }
+      const selectedService = await this.servicerepo.findOne({
+        where: { id: serviceId },
+      });
+      if (!selectedService) {
+        throw new NotFoundException('Service not found');
+      }
+      const shopService = barber.barberShop
+        ? await this.barberShopServicesRepo.findOne({
+            where: {
+              barber_shop_id: barber.barberShop.id,
+              service_id: serviceId,
+            },
+          })
+        : null;
+      const durationMinutes =
+        shopService?.duration_minutes ?? selectedService.duration_minutes;
 
-    const normalizedDate = dayjs(date).format('YYYY-MM-DD');
-    return this.buildAvailabilityForDate(
-      barberId,
-      normalizedDate,
-      durationMinutes,
-    );
+      const normalizedDate = dayjs(date).format('YYYY-MM-DD');
+      return this.buildAvailabilityForDate(
+        barberId,
+        normalizedDate,
+        durationMinutes,
+      );
+    } catch (error) {
+      return ErrorHender(error);
+    }
   }
 
   async getBarberAvailabilityRange(

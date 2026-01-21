@@ -114,6 +114,7 @@ export class ServiceService {
           'barbers',
           'category',
           'barberShopServices',
+          'barberShopServices.barberShop',
           'serviceImages',
         ],
       });
