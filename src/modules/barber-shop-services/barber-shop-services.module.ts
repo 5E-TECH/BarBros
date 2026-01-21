@@ -5,6 +5,7 @@ import { BarberShopServicesController } from './barber-shop-services.controller'
 import { BarberShopServicesEntity } from './entities/barber-shop-services.entity';
 import { BarberShopEntity } from 'src/modules/barber-shop/entities/barber-shop.entity';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ServiceEntity } from 'src/modules/service/entities/service.entity';
       BarberShopEntity,
       ServiceEntity,
     ]),
+    SubscriptionModule,
   ],
   controllers: [BarberShopServicesController],
   providers: [BarberShopServicesService],

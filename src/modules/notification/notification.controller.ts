@@ -38,7 +38,7 @@ export class NotificationController {
 
   @ApiOperation({ summary: 'User yoki Barber uchun' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.USER, UserRole.BARBER)
+  @Roles(UserRole.USER, UserRole.BARBER, UserRole.SP_ADMIN)
   @Get('my')
   findMy(@Req() req: Request) {
     return this.notificationService.findMy(req);

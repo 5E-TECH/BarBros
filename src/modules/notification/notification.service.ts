@@ -21,8 +21,14 @@ export class NotificationService {
 
   async create(createNotificationDto: CreateNotificationDto) {
     try {
-      if (!createNotificationDto.user_id && !createNotificationDto.barber_id) {
-        throw new BadRequestException('user_id or barber_id is required');
+      if (
+        !createNotificationDto.user_id &&
+        !createNotificationDto.barber_id &&
+        !createNotificationDto.barber_shop_id
+      ) {
+        throw new BadRequestException(
+          'user_id or barber_id or barber_shop_id is required',
+        );
       }
       const notification = this.notifRepo.create({ ...createNotificationDto });
       await this.notifRepo.save(notification);
@@ -49,6 +55,8 @@ export class NotificationService {
           ? { user_id: user.id }
           : user.role === UserRole.BARBER
             ? { barber_id: user.id }
+            : user.role === UserRole.SP_ADMIN
+              ? { barber_shop_id: user.id }
             : null;
 
       if (!where) {

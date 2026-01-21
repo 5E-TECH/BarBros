@@ -4,6 +4,8 @@ import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
 import { BarberShopServicesEntity } from 'src/modules/barber-shop-services/entities/barber-shop-services.entity';
 import { UserRole, Status } from 'src/common/enum';
+import { SubscriptionEntity } from 'src/modules/subscription/entities/subscription.entity';
+import { NotificationEntity } from 'src/modules/notification/entities/notification.entity';
 
 @Entity()
 export class BarberShopEntity extends BaseEntity {
@@ -54,5 +56,11 @@ export class BarberShopEntity extends BaseEntity {
     (barberShopService) => barberShopService.barberShop,
   )
   barberShopServices: BarberShopServicesEntity[];
+
+  @OneToMany(() => SubscriptionEntity, (subscription) => subscription.barberShop)
+  subscriptions: SubscriptionEntity[];
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.barberShop)
+  notifications: NotificationEntity[];
 
 }
