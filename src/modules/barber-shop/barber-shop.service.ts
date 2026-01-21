@@ -26,6 +26,7 @@ import { ErrorHender } from 'src/utils/catchError';
 import { BarberShopRefreshPasswordDto } from './dto/refreshPassword.dto';
 import { AccessToken, RefreshToken } from 'src/utils/Acses-Refresh-token';
 import { JwtService } from '@nestjs/jwt';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 @Injectable()
 export class BarberShopService {
@@ -37,6 +38,7 @@ export class BarberShopService {
     private readonly fileServis: FileService,
     private readonly Bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async signup(createDto: CreateBarberShopDto, file?: Express.Multer.File) {
@@ -76,6 +78,8 @@ export class BarberShopService {
       if (!shop) throw new ForbiddenException('Wrong username or password');
       if (shop.status === Status.INACTIVE)
         throw new ForbiddenException('Your account is blocked');
+
+      await this.subscriptionService.ensureActive(shop.id);
 
       const isMatch = await this.Bcrypt.Verify(dto.password, shop.password);
       if (!isMatch) throw new ForbiddenException('Wrong password');

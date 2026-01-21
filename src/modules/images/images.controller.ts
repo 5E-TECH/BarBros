@@ -17,6 +17,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('images')
 export class ImagesController {
@@ -34,7 +35,7 @@ export class ImagesController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Post()
   @UseInterceptors(FilesInterceptor('img'))
@@ -51,13 +52,13 @@ export class ImagesController {
   }
 
   @ApiOperation({summary:"BarberShoplar uchun"})
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Get('BarberShop_all')
   findAllBarber(@Req() req: Request) {
     return this.imagesService.findAllBarber(req);
   }
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {

@@ -20,6 +20,7 @@ import { UserRole } from 'src/common/enum';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { CreateOfflineBookingDto } from './dto/create-offline-booking.dto';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('booking')
 export class BookingController {
@@ -32,7 +33,7 @@ export class BookingController {
   }
 
   @ApiOperation({ summary: 'Offline booking (barber/shop)' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER, UserRole.SP_ADMIN)
   @Post('offline')
   createOffline(
@@ -51,7 +52,7 @@ export class BookingController {
   }
 
   @ApiOperation({ summary: 'Booking status update' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.BARBER,
     UserRole.SP_ADMIN,
@@ -68,7 +69,7 @@ export class BookingController {
   }
 
   @ApiOperation({ summary: 'Barberlar uchun' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER)
   @Get('Barber_bookig')
   findAll(@Req() req: Request) {

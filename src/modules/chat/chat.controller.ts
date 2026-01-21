@@ -18,6 +18,7 @@ import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('chat')
 export class ChatController {
@@ -39,7 +40,7 @@ export class ChatController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.USER,
     UserRole.BARBER,
@@ -60,7 +61,7 @@ export class ChatController {
   @ApiOperation({ summary: 'User-Barber chat tarixi' })
   @ApiQuery({ name: 'user_id', required: false })
   @ApiQuery({ name: 'barber_id', required: false })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.USER,
     UserRole.BARBER,
@@ -80,7 +81,7 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: 'Mening chatlarim' })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.USER, UserRole.BARBER)
   @Get('my')
   getMy(@Req() req: Request) {

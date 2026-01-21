@@ -22,6 +22,8 @@ import { BarberShopServicesModule } from './modules/barber-shop-services/barber-
 import { ChatModule } from './modules/chat/chat.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ServiceImageModule } from './modules/service-image/service-image.module';
+import { AdminDashboardModule } from './modules/admin-dashboard/admin-dashboard.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -60,6 +62,8 @@ import { ServiceImageModule } from './modules/service-image/service-image.module
     ChatModule,
     TransactionsModule,
     ServiceImageModule,
+    AdminDashboardModule,
+    SubscriptionModule,
   ],
 })
 export class AppModule {}

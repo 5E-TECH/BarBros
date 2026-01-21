@@ -7,11 +7,13 @@ import { BarberShopServicesEntity } from '../barber-shop-services/entities/barbe
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { OtpGenerate } from 'src/infrostructure/otp_generet/otp_generate';
 import { UserModule } from '../user/user.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([BarberShopEntity, BarberShopServicesEntity]),
     UserModule,
+    SubscriptionModule,
   ],
   controllers: [BarberShopController],
   providers: [BarberShopService, BcryptEncryption, OtpGenerate],

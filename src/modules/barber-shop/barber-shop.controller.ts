@@ -25,6 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
 import { BarberShopRefreshPasswordDto } from './dto/refreshPassword.dto';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber-shop')
 export class BarberShopController {
@@ -123,7 +124,7 @@ export class BarberShopController {
   findByService(@Query() query: Record<string, any>) {
     return this.barberShopService.findByService(query);
   }
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, SubscriptionGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
     return this.barberShopService.myAccount(req);
@@ -186,7 +187,7 @@ export class BarberShopController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('img'))

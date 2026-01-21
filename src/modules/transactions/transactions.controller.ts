@@ -54,4 +54,24 @@ export class TransactionsController {
   summary(@Req() req: Request, @Query() query: Record<string, any>) {
     return this.transactionsService.summary(req, query);
   }
+
+  @ApiOperation({ summary: 'Chart uchun statistikalar' })
+  @ApiQuery({
+    name: 'period',
+    required: false,
+    enum: ['daily', 'weekly', 'monthly'],
+  })
+  @ApiQuery({ name: 'startDate', required: false, example: '2025-01-01' })
+  @ApiQuery({ name: 'endDate', required: false, example: '2025-01-31' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+  )
+  @Get('summary-chart')
+  summaryChart(@Req() req: Request, @Query() query: Record<string, any>) {
+    return this.transactionsService.summaryChart(req, query);
+  }
 }

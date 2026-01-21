@@ -24,6 +24,7 @@ import { AccessToken, RefreshToken } from 'src/utils/Acses-Refresh-token';
 import { successRes } from 'src/utils/succesResponse';
 import { ErrorHender } from 'src/utils/catchError';
 import { BarberRefreshPasswordDto } from './dto/refreshPassword.doo';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 @Injectable()
 export class BarberService {
@@ -33,6 +34,7 @@ export class BarberService {
     private readonly Bcrypt: BcryptEncryption,
     private readonly fileServis: FileService,
     private readonly jwtService: JwtService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async create(
@@ -78,6 +80,7 @@ export class BarberService {
     try {
       const barber = await this.BarberRepo.findOne({
         where: { username: loginBarberDto.username },
+        relations: ['barberShop'],
       });
       if (!barber) throw new ForbiddenException('Wrong email');
 
@@ -89,6 +92,11 @@ export class BarberService {
         barber.password,
       );
       if (!isMatch) throw new ForbiddenException('Wrong password');
+
+      if (!barber.barberShop) {
+        throw new ForbiddenException('Barber shop not found');
+      }
+      await this.subscriptionService.ensureActive(barber.barberShop.id);
 
       const accessToken = AccessToken(this.jwtService, {
         id: barber.id,

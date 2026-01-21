@@ -18,13 +18,14 @@ import { Roles } from 'src/common/Decorator/Role.decorator';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Request } from 'express';
 import { ApiOperation } from '@nestjs/swagger';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber-schedule')
 export class BarberScheduleController {
   constructor(private readonly barberScheduleService: BarberScheduleService) {}
 
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SP_ADMIN,
     UserRole.ADMIN,
@@ -53,7 +54,7 @@ export class BarberScheduleController {
 
 
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(UserRole.BARBER)
   @Get('getSchedulesByBarber')
   getSchedulesByBarber(@Req() req: Request) {
@@ -70,7 +71,7 @@ export class BarberScheduleController {
 
 
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.SP_ADMIN,
     UserRole.SUPPER_ADMIN,
@@ -88,7 +89,7 @@ export class BarberScheduleController {
 
 
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
   @Roles(
     UserRole.BARBER,
     UserRole.SP_ADMIN,
