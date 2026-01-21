@@ -22,7 +22,7 @@ export class ServiceEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', default: 30 })
   duration_minutes: number;
 
   // @Column()

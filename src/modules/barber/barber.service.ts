@@ -121,6 +121,7 @@ export class BarberService {
   async findAll(query: Record<string, any>) {
     try {
       const {
+        search,
         full_name,
         phone_number,
         email,
@@ -132,14 +133,26 @@ export class BarberService {
       } = query;
       const skip = (Number(page) - 1) * Number(limit);
 
+      const searchWhere = search
+        ? [
+            { role: UserRole.BARBER, full_name: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, phone_number: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, email: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, bio: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, username: ILike(`%${search}%`) },
+          ]
+        : undefined;
+
       const [data, total] = await this.BarberRepo.findAndCount({
-        where: {
-          role: UserRole.BARBER,
-          ...(full_name && { full_name: ILike(`%${full_name}%`) }),
-          ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(email && { email: ILike(`%${email}%`) }),
-          ...(bio && { bio: ILike(`%${bio}%`) }),
-        },
+        where:
+          searchWhere ??
+          ({
+            role: UserRole.BARBER,
+            ...(full_name && { full_name: ILike(`%${full_name}%`) }),
+            ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
+            ...(email && { email: ILike(`%${email}%`) }),
+            ...(bio && { bio: ILike(`%${bio}%`) }),
+          } as any),
         relations: [
           'reyting',
           'service',
