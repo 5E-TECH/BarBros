@@ -134,6 +134,7 @@ export class BarberShopController {
   findOne(@Param('id') id: number) {
     return this.barberShopService.findOne(id);
   }
+  
 
   @ApiOperation({ summary: 'Supper admin Tomonidan bloklansa' })
   @UseGuards(AuthGuard, RolesGuard)
