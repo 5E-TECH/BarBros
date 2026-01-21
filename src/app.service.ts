@@ -33,6 +33,8 @@ export default class Application {
       .addSecurityRequirements('bearer', ['bearer'])
       .addBearerAuth()
       .build();
+      console.log();
+      
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api/v1', app, documentFactory);
