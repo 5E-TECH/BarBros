@@ -103,6 +103,7 @@ export class BarberController {
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'full_name', required: false })
   @ApiQuery({ name: 'phone_number', required: false })
   @ApiQuery({ name: 'bio', required: false })

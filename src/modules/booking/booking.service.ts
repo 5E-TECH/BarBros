@@ -19,6 +19,7 @@ import { UpdateBookingDto } from './dto/update-booking.dto';
 import { BarberShopServicesEntity } from '../barber-shop-services/entities/barber-shop-services.entity';
 import { TransactionEntity } from '../transactions/entities/transaction.entity';
 import { NotificationEntity } from '../notification/entities/notification.entity';
+import { UserEntity } from 'src/modules/user/entities/user.admin,entity';
 import {
   BookingStatus,
   OrderType,
@@ -27,6 +28,7 @@ import {
   UserRole,
 } from 'src/common/enum';
 import { DayOfWeek } from '../barber_schedule/entities/barber_schedule.entity';
+import { CreateOfflineBookingDto } from './dto/create-offline-booking.dto';
 const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore.js');
 const isSameOrAfter = require('dayjs/plugin/isSameOrAfter.js');
@@ -51,6 +53,8 @@ export class BookingService {
     private readonly transactionRepo: Repository<TransactionEntity>,
     @InjectRepository(NotificationEntity)
     private readonly notificationRepo: Repository<NotificationEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
   ) {}
 
   async create(createBookingDto: CreateBookingDto, req: Request) {
@@ -58,6 +62,9 @@ export class BookingService {
       const user = req['user'];
       if (user.role !== UserRole.USER) {
         throw new ForbiddenException('Only users can create bookings');
+      }
+      if (createBookingDto.order_type !== OrderType.ONLINE) {
+        throw new BadRequestException('Users can only create online bookings');
       }
 
       const date = dayjs(createBookingDto.date).format('YYYY-MM-DD');
@@ -112,7 +119,7 @@ export class BookingService {
         date,
         time,
         payment_model: createBookingDto.payment_model as PaymentModel,
-        order_type: createBookingDto.order_type as OrderType,
+        order_type: OrderType.ONLINE,
         payment_status: PaymentStatus.PENDING,
         status: BookingStatus.PENDING,
       });
@@ -125,6 +132,101 @@ export class BookingService {
           is_read: false,
         }),
       );
+      return successRes(data, 201);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  async createOffline(dto: CreateOfflineBookingDto, req: Request) {
+    try {
+      const user = req['user'];
+      if (![UserRole.BARBER, UserRole.SP_ADMIN].includes(user.role)) {
+        throw new ForbiddenException('Only barber or barber shop can create offline bookings');
+      }
+
+      if (user.role === UserRole.BARBER && dto.barber_id !== user.id) {
+        throw new ForbiddenException('Barber can only book for self');
+      }
+
+      if (user.role === UserRole.SP_ADMIN && dto.barber_shop_id !== user.id) {
+        throw new ForbiddenException('Cannot use another barber shop id');
+      }
+
+      const client = await this.userRepo.findOne({
+        where: { id: dto.user_id },
+      });
+      if (!client) {
+        throw new NotFoundException('User not found');
+      }
+
+      const date = dayjs(dto.date).format('YYYY-MM-DD');
+      const time = dto.time;
+
+      const barber = await this.Barber.findOne({
+        where: { id: dto.barber_id },
+        relations: ['barberShop'],
+      });
+      if (!barber) {
+        throw new NotFoundException('Not fount barber');
+      }
+
+      const service = await this.servicerepo.findOne({
+        where: { id: dto.service_id },
+      });
+      if (!service) {
+        throw new NotFoundException('Service not found');
+      }
+
+      if (
+        !barber.barberShop ||
+        Number(barber.barberShop.id) !== Number(dto.barber_shop_id)
+      ) {
+        throw new BadRequestException('Barber does not belong to this shop');
+      }
+
+      const shopService = await this.barberShopServicesRepo.findOne({
+        where: {
+          barber_shop_id: dto.barber_shop_id,
+          service_id: dto.service_id,
+        },
+      });
+      if (!shopService) {
+        throw new BadRequestException('Service not offered by this shop');
+      }
+
+      const durationMinutes =
+        shopService.duration_minutes ?? service.duration_minutes;
+
+      await this.assertBarberAvailable(
+        dto.barber_id,
+        date,
+        time,
+        durationMinutes,
+      );
+
+      const data = this.Booking.create({
+        user_id: dto.user_id,
+        service_id: dto.service_id,
+        barber_shop_id: dto.barber_shop_id,
+        barber_id: dto.barber_id,
+        date,
+        time,
+        payment_model: dto.payment_model as PaymentModel,
+        order_type: OrderType.OFFLINE,
+        payment_status: PaymentStatus.PENDING,
+        status: BookingStatus.CONFIRMED,
+      });
+
+      await this.Booking.save(data);
+      await this.notificationRepo.save(
+        this.notificationRepo.create({
+          message: `Booking created for ${date} ${time}`,
+          user_id: dto.user_id,
+          is_read: false,
+        }),
+      );
+
       return successRes(data, 201);
     } catch (error) {
       return ErrorHender(error);
@@ -265,17 +367,62 @@ export class BookingService {
     }
   }
 
-  async findAll_Abdin(){
+  async findAll_Abdin(query: Record<string, any> = {}){
     try {
-      const data = await this.Booking.find({
-        relations: ['service', 'user', 'barber', 'barberShop'],
-      });
+      const { search } = query;
+      const qb = this.Booking.createQueryBuilder('booking')
+        .leftJoinAndSelect('booking.service', 'service')
+        .leftJoinAndSelect('booking.user', 'user')
+        .leftJoinAndSelect('booking.barber', 'barber')
+        .leftJoinAndSelect('booking.barberShop', 'barberShop')
+        .leftJoinAndMapOne(
+          'booking.shopService',
+          BarberShopServicesEntity,
+          'shopService',
+          'shopService.barber_shop_id = booking.barber_shop_id AND shopService.service_id = booking.service_id',
+        );
+
+      if (search) {
+        const term = `%${search}%`;
+        qb.andWhere(
+          '(service.name ILIKE :term OR barber.full_name ILIKE :term OR barberShop.name ILIKE :term OR user.phone_number ILIKE :term OR booking.date ILIKE :term)',
+          { term },
+        );
+      }
+
+      const data = await qb.getMany();
       if(!data.length){
         throw new NotFoundException("Not fount data")
       }
       return successRes(data)
     } catch (error) {
       return ErrorHender(error)
+    }
+  }
+
+  async findOneAdmin(id: number) {
+    try {
+      const data = await this.Booking.createQueryBuilder('booking')
+        .leftJoinAndSelect('booking.service', 'service')
+        .leftJoinAndSelect('booking.user', 'user')
+        .leftJoinAndSelect('booking.barber', 'barber')
+        .leftJoinAndSelect('booking.barberShop', 'barberShop')
+        .leftJoinAndMapOne(
+          'booking.shopService',
+          BarberShopServicesEntity,
+          'shopService',
+          'shopService.barber_shop_id = booking.barber_shop_id AND shopService.service_id = booking.service_id',
+        )
+        .where('booking.id = :id', { id })
+        .getOne();
+
+      if (!data) {
+        throw new NotFoundException('Not fount data');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
     }
   }
 

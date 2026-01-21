@@ -10,10 +10,6 @@ export class CreateServiceDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: 30 })
-  @IsNumber()
-  duration_minutes: number;
-
   @ApiProperty({ example: 3 })
   @IsNumber()
   category_id: number;
