@@ -82,7 +82,15 @@ export class ServiceService {
 
     await this.serviceRepository.save(service);
 
-    return successRes(service, 200);
+    const scoped = await this.serviceRepository
+      .createQueryBuilder('service')
+      .leftJoinAndSelect('service.barbers', 'barber')
+      .leftJoinAndSelect('barber.barberShop', 'barberShop')
+      .where('service.id = :id', { id: service_id })
+      .andWhere('barberShop.id = :shopId', { shopId: currentShopId })
+      .getOne();
+
+    return successRes(scoped ?? service, 200);
   }
 
   async findAll() {

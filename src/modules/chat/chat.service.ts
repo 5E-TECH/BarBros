@@ -31,7 +31,7 @@ export class ChatService {
     private readonly chatGateway: ChatGateway,
   ) {}
 
-  async create(dto: CreateChatDto, req: Request, file?: Express.Multer.File) {
+  async create(dto: CreateChatDto, req: Request, files?: Express.Multer.File[]) {
     try {
       const user = req['user'];
       let userId: number | undefined;
@@ -66,27 +66,44 @@ export class ChatService {
       if (!u) throw new NotFoundException('User not found');
       if (!b) throw new NotFoundException('Barber not found');
 
-      if (!dto.message && !file) {
+      if (!dto.message && (!files || !files.length)) {
         throw new BadRequestException('message or image is required');
       }
 
-      let image: string | null = null;
-      if (file) {
-        new ImageValidationPipe().transform(file);
-        image = await this.fileService.createFile(file);
+      const savedMessages: ChatEntity[] = [];
+
+      const images = files ?? [];
+      if (!images.length) {
+        const chat = this.chatRepo.create({
+          message: dto.message ?? null,
+          image: null,
+          user_id: userId,
+          barber_id: barberId,
+          sender_role: user.role,
+        });
+        const saved = await this.chatRepo.save(chat);
+        this.chatGateway.emitNewMessage(saved);
+        return successRes(saved, 201);
       }
 
-      const chat = this.chatRepo.create({
-        message: dto.message ?? null,
-        image,
-        user_id: userId,
-        barber_id: barberId,
-        sender_role: user.role,
-      });
+      for (let i = 0; i < images.length; i += 1) {
+        const file = images[i];
+        new ImageValidationPipe().transform(file);
+        const image = await this.fileService.createFile(file);
 
-      const saved = await this.chatRepo.save(chat);
-      this.chatGateway.emitNewMessage(saved);
-      return successRes(saved, 201);
+        const chat = this.chatRepo.create({
+          message: i === 0 ? dto.message ?? null : null,
+          image,
+          user_id: userId,
+          barber_id: barberId,
+          sender_role: user.role,
+        });
+        const saved = await this.chatRepo.save(chat);
+        this.chatGateway.emitNewMessage(saved);
+        savedMessages.push(saved);
+      }
+
+      return successRes(savedMessages, 201);
     } catch (error) {
       return ErrorHender(error);
     }
