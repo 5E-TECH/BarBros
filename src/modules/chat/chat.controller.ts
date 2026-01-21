@@ -5,7 +5,7 @@ import {
   Post,
   Query,
   Req,
-  UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +16,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
 @Controller('chat')
@@ -32,7 +32,10 @@ export class ChatController {
         message: { type: 'string', example: 'Salom, bo‘sh vaqt bormi?' },
         user_id: { type: 'number', example: 12 },
         barber_id: { type: 'number', example: 5 },
-        image: { type: 'string', format: 'binary' },
+        image: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+        },
       },
     },
   })
@@ -45,13 +48,13 @@ export class ChatController {
     UserRole.SUPPER_ADMIN,
   )
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('image', 10))
   create(
     @Body() dto: CreateChatDto,
     @Req() req: Request,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    return this.chatService.create(dto, req, file);
+    return this.chatService.create(dto, req, files);
   }
 
   @ApiOperation({ summary: 'User-Barber chat tarixi' })

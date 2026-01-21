@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
-  UploadedFile,
+  UploadedFiles,
   Body,
 } from '@nestjs/common';
 import { ServiceImageService } from './service-image.service';
@@ -17,7 +17,7 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
 @Controller('service-image')
@@ -31,20 +31,23 @@ export class ServiceImageController {
       type: 'object',
       properties: {
         service_id: { type: 'number', example: 3 },
-        image: { type: 'string', format: 'binary' },
+        image: {
+          type: 'array',
+          items: { type: 'string', format: 'binary' },
+        },
       },
     },
   })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FilesInterceptor('image', 10))
   create(
     @Body() dto: CreateServiceImageDto,
     @Req() req: Request,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles() files?: Express.Multer.File[],
   ) {
-    return this.serviceImageService.create(dto, req, file);
+    return this.serviceImageService.create(dto, req, files);
   }
 
   @ApiOperation({ summary: 'Service rasmlari (public)' })
