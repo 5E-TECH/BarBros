@@ -122,6 +122,7 @@ export class BarberShopService {
   async findAll(query: Record<string, any>) {
     try {
       const {
+        search,
         name,
         descripton,
         location,
@@ -135,11 +136,19 @@ export class BarberShopService {
       } = query;
       const skip = (Number(page) - 1) * Number(limit);
 
-      const where = {
-        ...(name && { name: ILike(`%${name}%`) }),
-        ...(descripton && { descripton: ILike(`%${descripton}%`) }),
-        ...(location && { location: ILike(`%${location}%`) }),
-      };
+      const where = search
+        ? [
+            { name: ILike(`%${search}%`) },
+            { descripton: ILike(`%${search}%`) },
+            { location: ILike(`%${search}%`) },
+            { phoneNumber: ILike(`%${search}%`) },
+            { username: ILike(`%${search}%`) },
+          ]
+        : {
+          ...(name && { name: ILike(`%${name}%`) }),
+          ...(descripton && { descripton: ILike(`%${descripton}%`) }),
+          ...(location && { location: ILike(`%${location}%`) }),
+        };
 
       const baseOrder: FindOptionsOrder<BarberShopEntity> =
         sortBy === 'distance' || sortBy === 'avg_rating'

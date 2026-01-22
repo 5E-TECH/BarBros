@@ -391,7 +391,19 @@ export class BookingService {
       if (search) {
         const term = `%${search}%`;
         qb.andWhere(
-          '(service.name ILIKE :term OR barber.full_name ILIKE :term OR barberShop.name ILIKE :term OR user.phone_number ILIKE :term OR booking.date ILIKE :term)',
+          '(' +
+            'service.name ILIKE :term OR ' +
+            'barber.full_name ILIKE :term OR ' +
+            'barberShop.name ILIKE :term OR ' +
+            'user.phone_number ILIKE :term OR ' +
+            'user.full_name ILIKE :term OR ' +
+            'booking.date ILIKE :term OR ' +
+            'booking.time ILIKE :term OR ' +
+            'CAST(booking.id AS text) ILIKE :term OR ' +
+            'CAST(booking.status AS text) ILIKE :term OR ' +
+            'CAST(booking.order_type AS text) ILIKE :term OR ' +
+            'CAST(booking.payment_model AS text) ILIKE :term' +
+          ')',
           { term },
         );
       }
