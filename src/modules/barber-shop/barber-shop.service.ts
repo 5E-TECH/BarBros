@@ -163,7 +163,7 @@ export class BarberShopService {
       const useGeo = lat !== undefined && lng !== undefined;
       const [data, total] = await this.barberRepo.findAndCount({
         where,
-        relations: ['barber', 'images'],
+        relations: ['barber', 'images', "subscriptions"],
         order: baseOrder,
         ...(useGeo ? {} : { skip, take: Number(limit) }),
       });
