@@ -11,7 +11,7 @@ import { BarberShopServicesEntity } from '../barber-shop-services/entities/barbe
 import { Request } from 'express';
 
 import { BarberShopEntity } from './entities/barber-shop.entity';
-import { UserRole, Status } from 'src/common/enum';
+import { UserRole, Status, SubscriptionStatus } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { FileService } from '../file/file.service';
 import { ImageValidationPipe } from 'src/common/pipe/img-validation';
@@ -408,12 +408,35 @@ export class BarberShopService {
     try {
       const shop = await this.barberRepo.findOne({
         where: { id },
-        relations: ['barber', 'images'],
+        relations: ['barber', 'images', 'subscriptions', 'subscriptions.plan'],
       });
       if (!shop) throw new NotFoundException('BarberShop not found');
       if (shop.status !== Status.ACTIVE)
         throw new NotFoundException('BarberShop is blocked by admin');
-      return successRes(shop);
+      const now = Date.now();
+      const subscriptions = shop.subscriptions ?? [];
+      const activeSubscription = subscriptions.find((sub) => {
+        const endAt = typeof sub.end_at === 'string' ? Number(sub.end_at) : sub.end_at;
+        return (
+          sub.status === SubscriptionStatus.ACTIVE &&
+          typeof endAt === 'number' &&
+          endAt >= now
+        );
+      });
+      const latestSubscription = subscriptions.reduce((latest, current) => {
+        if (!latest) return current;
+        const latestEnd = typeof latest.end_at === 'string' ? Number(latest.end_at) : latest.end_at;
+        const currentEnd =
+          typeof current.end_at === 'string' ? Number(current.end_at) : current.end_at;
+        if (typeof latestEnd !== 'number') return current;
+        if (typeof currentEnd !== 'number') return latest;
+        return currentEnd > latestEnd ? current : latest;
+      }, null as (typeof subscriptions)[number] | null);
+
+      return successRes({
+        ...shop,
+        current_subscription: activeSubscription ?? latestSubscription ?? null,
+      });
     } catch (error) {
       return ErrorHender(error);
     }
