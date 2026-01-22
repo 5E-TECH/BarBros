@@ -378,6 +378,7 @@ export class BarberShopService {
 
       await this.barberRepo.update(id, { status: newData.status });
       const updated = await this.barberRepo.findOne({ where: { id } });
+      console.log(`Status updated successfully for user: ${updated?.name}`);
       return successRes(updated);
     } catch (error) {
       return ErrorHender(error);
