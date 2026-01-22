@@ -79,4 +79,12 @@ export class SubscriptionController {
   my(@CurrentUser() user: JWTPayload) {
     return this.subscriptionService.mySubscription(user);
   }
+
+  @ApiOperation({ summary: 'Barbershops by plan id' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Get('by-plan/:planId')
+  listByPlan(@Param('planId') planId: number) {
+    return this.subscriptionService.listBarberShopsByPlan(planId);
+  }
 }
