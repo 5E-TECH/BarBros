@@ -205,6 +205,34 @@ export class SubscriptionService {
     }
   }
 
+  async listBarberShopsByPlan(planId: number) {
+    try {
+      const plan = await this.planRepo.findOne({ where: { id: planId } });
+      if (!plan) throw new NotFoundException('Plan not found');
+
+      const subs = await this.subscriptionRepo.find({
+        where: { plan_id: planId },
+        relations: ['barberShop', 'plan'],
+        order: { end_at: 'DESC' },
+      });
+
+      const unique = new Map<number, { barberShop: BarberShopEntity; subscription: SubscriptionEntity }>();
+      for (const sub of subs) {
+        if (!sub.barberShop) continue;
+        if (!unique.has(sub.barber_shop_id)) {
+          unique.set(sub.barber_shop_id, {
+            barberShop: sub.barberShop,
+            subscription: sub,
+          });
+        }
+      }
+
+      return successRes(Array.from(unique.values()));
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   async ensureActive(barberShopId: number) {
     const now = Date.now();
     const active = await this.subscriptionRepo.findOne({
