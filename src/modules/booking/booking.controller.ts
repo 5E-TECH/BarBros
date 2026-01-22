@@ -81,6 +81,7 @@ export class BookingController {
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Get("All")
   @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'status', required: false, enum: ['pending','confirmed','completed','cancelled'] })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   findAll_Admin(@Query() query: Record<string, any>){
