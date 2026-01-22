@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -17,7 +18,13 @@ import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
 import { Category, UserRole } from 'src/common/enum';
 import { CreateCategoryDto } from './dto/category.dto';
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('category')
@@ -38,7 +45,7 @@ export class CategoryController {
         },
         categoryType: {
         type: 'string',
-        enum: Object.values(Category), // 🔥 SELECT BO‘LADI
+        enum: Object.values(Category),
         example: Category.MAN,
       },
         img: {
@@ -59,28 +66,15 @@ export class CategoryController {
   @ApiOperation({
     summary: 'Get all category',
   })
+  @ApiQuery({
+    name: 'categoryType',
+    required: false,
+    enum: Object.values(Category),
+  })
   @UseGuards(AuthGuard)
   @Get('getAll')
-  getAll() {
-    return this.categoryService.getAllCategory();
-  }
-
-  @ApiOperation({
-    summary: 'Get all category',
-  })
-  @UseGuards(AuthGuard)
-  @Get('getAll-man')
-  getAllManCategroy() {
-    return this.categoryService.getAllManCategory();
-  }
-
-  @ApiOperation({
-    summary: 'Get all category',
-  })
-  @UseGuards(AuthGuard)
-  @Get('getAll-woman')
-  getAllWomanCategory() {
-    return this.categoryService.getAllWomanCategory();
+  getAll(@Query('categoryType') categoryType?: Category) {
+    return this.categoryService.getAllCategory(categoryType);
   }
 
 

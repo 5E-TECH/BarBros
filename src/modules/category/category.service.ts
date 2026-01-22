@@ -54,31 +54,23 @@ export class CategoryService {
     }
   }
 
-  async getAllCategory() {
+  async getAllCategory(categoryType?: Category) {
     try {
-      const category = await this.categoryRepo.find();
-      return successRes(category);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
+      const query = this.categoryRepo
+        .createQueryBuilder('category')
+        .where('category.is_deleted = :isDeleted', { isDeleted: false })
+        .loadRelationCountAndMap(
+          'category.services_count',
+          'category.services',
+        );
 
-  async getAllManCategory() {
-    try {
-      const category = await this.categoryRepo.find({
-        where: { categoryType: Category.MAN },
-      });
-      return successRes(category);
-    } catch (error) {
-      return ErrorHender(error);
-    }
-  }
+      if (categoryType) {
+        query.andWhere('category.categoryType = :categoryType', {
+          categoryType,
+        });
+      }
 
-  async getAllWomanCategory() {
-    try {
-      const category = await this.categoryRepo.find({
-        where: { categoryType: Category.WOMAN },
-      });
+      const category = await query.getMany();
       return successRes(category);
     } catch (error) {
       return ErrorHender(error);
@@ -91,8 +83,6 @@ export class CategoryService {
     file?: Express.Multer.File,
   ) {
     try {
-      const { name, categoryType } = updateCategoryDto;
-
       const category = await this.categoryRepo.findOne({
         where: { id },
       });
@@ -100,6 +90,10 @@ export class CategoryService {
       if (!category) {
         throw new NotFoundException('Category not found');
       }
+
+      const name = updateCategoryDto.name ?? category.name;
+      const categoryType =
+        updateCategoryDto.categoryType ?? category.categoryType;
 
       const existCategory = await this.categoryRepo.findOne({
         where: {
@@ -139,7 +133,7 @@ export class CategoryService {
       await this.categoryRepo.save(category);
       return successRes(category);
     } catch (error) {
-      ErrorHender(error);
+      return ErrorHender(error);
     }
   }
 }

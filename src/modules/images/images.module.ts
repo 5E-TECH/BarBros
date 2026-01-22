@@ -3,9 +3,10 @@ import { ImagesService } from './images.service';
 import { ImagesController } from './images.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ImageEntity])],
+  imports: [TypeOrmModule.forFeature([ImageEntity]), SubscriptionModule],
   controllers: [ImagesController],
   providers: [ImagesService, ],
 })

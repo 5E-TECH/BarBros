@@ -19,12 +19,13 @@ import { UpdateBarberShopStatus } from './dto/update-status';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LogimBarberShopDto } from './dto/login-barber-shop.dto';
 import { Request } from 'express';
-import { RefreshPasswordDto } from './dto/refreshPassword.dto';
+import { BarberShopRefreshPasswordDto } from './dto/refreshPassword.dto';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber-shop')
 export class BarberShopController {
@@ -45,6 +46,14 @@ export class BarberShopController {
         location: {
           type: 'string',
           example: 'lince',
+        },
+        latitude: {
+          type: 'number',
+          example: 41.2995,
+        },
+        longitude: {
+          type: 'number',
+          example: 69.2401,
         },
         password: {
           type: 'string',
@@ -88,15 +97,35 @@ export class BarberShopController {
   @Get()
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'description', required: false })
   @ApiQuery({ name: "location", required: false })
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'description'] })
+  @ApiQuery({ name: 'lat', required: false })
+  @ApiQuery({ name: 'lng', required: false })
+  @ApiQuery({ name: 'radiusKm', required: false })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    enum: ['name', 'description', 'distance', 'avg_rating'],
+  })
   @ApiQuery({ name: "order", required: false, enum: ["asc", "desc"] })
   findAll(@Query() query: Record<string, any>) {
     return this.barberShopService.findAll(query);
   }
+
+  @ApiOperation({ summary: 'Service bo‘yicha shoplar (price, rating, distance)' })
   @UseGuards(AuthGuard)
+  @Get('by-service')
+  @ApiQuery({ name: 'serviceId', required: true })
+  @ApiQuery({ name: 'lat', required: false })
+  @ApiQuery({ name: 'lng', required: false })
+  @ApiQuery({ name: 'radiusKm', required: false })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['distance', 'avg_rating'] })
+  findByService(@Query() query: Record<string, any>) {
+    return this.barberShopService.findByService(query);
+  }
+  @UseGuards(AuthGuard, SubscriptionGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
     return this.barberShopService.myAccount(req);
@@ -108,9 +137,10 @@ export class BarberShopController {
     return this.barberShopService.findOne(id);
   }
 
+
   @ApiOperation({ summary: 'Supper admin Tomonidan bloklansa' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch('status/:id')
   updateStatus(
     @Param('id') id: number,
@@ -135,6 +165,14 @@ export class BarberShopController {
           type: 'string',
           example: 'lince',
         },
+        latitude: {
+          type: 'number',
+          example: 41.2995,
+        },
+        longitude: {
+          type: 'number',
+          example: 69.2401,
+        },
         img: {
           type: 'string',
           format: 'binary',
@@ -150,8 +188,8 @@ export class BarberShopController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('img'))
   update(
@@ -169,8 +207,10 @@ export class BarberShopController {
     return this.barberShopService.remove(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Post('Refresh_password')
-  refresh_password(data: RefreshPasswordDto) {
+  refresh_password(@Body() data: BarberShopRefreshPasswordDto) {
     return this.barberShopService.refreshPassword(data);
   }
 }

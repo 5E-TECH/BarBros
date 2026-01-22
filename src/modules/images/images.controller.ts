@@ -2,25 +2,22 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
-import { CreateImageDto } from './dto/create-image.dto';
 import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('images')
 export class ImagesController {
@@ -38,8 +35,8 @@ export class ImagesController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Post()
   @UseInterceptors(FilesInterceptor('img'))
   create(
@@ -48,22 +45,21 @@ export class ImagesController {
   ) {
     return this.imagesService.create(files, req);
   }
-  @ApiOperation({summary:"Barcha uchun"})
-  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Barcha uchun' })
   @Get('all')
   findAllUser() {
     return this.imagesService.findAll();
   }
 
   @ApiOperation({summary:"BarberShoplar uchun"})
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Get('BarberShop_all')
   findAllBarber(@Req() req: Request) {
     return this.imagesService.findAllBarber(req);
   }
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.imagesService.remove(id, req);

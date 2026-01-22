@@ -18,8 +18,9 @@ import { AuthGuard } from 'src/common/guard/auth.guard';
 import { SelfGuard } from 'src/common/guard/self.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @ApiTags('barber_images')
 @Controller('barber_images')
@@ -39,8 +40,8 @@ export class BarberImagesController {
       },
     },
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.BARBER)
   @Post()
   @UseInterceptors(FilesInterceptor('img'))
   create(
@@ -59,14 +60,14 @@ export class BarberImagesController {
   @ApiOperation({
     summary: 'Barber Uchun',
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.BARBER)
   @Get('findAllBarberImg')
   findAllBarberImg(@Req() req: Request) {
     return this.barberImagesService.findAllBarberImg(req);
   }
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.BARBER)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.barberImagesService.remove(id, req);

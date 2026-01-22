@@ -10,7 +10,7 @@ import { Repository, ILike } from 'typeorm';
 import { Request } from 'express';
 
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { BcryptEncryption } from 'src/infrostructure/bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { FileService } from '../file/file.service';
@@ -23,7 +23,8 @@ import { UpdateBarberDto } from './dto/update-barber.dto';
 import { AccessToken, RefreshToken } from 'src/utils/Acses-Refresh-token';
 import { successRes } from 'src/utils/succesResponse';
 import { ErrorHender } from 'src/utils/catchError';
-import { RefreshPasswordDto } from './dto/refreshPassword.doo';
+import { BarberRefreshPasswordDto } from './dto/refreshPassword.doo';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 @Injectable()
 export class BarberService {
@@ -33,6 +34,7 @@ export class BarberService {
     private readonly Bcrypt: BcryptEncryption,
     private readonly fileServis: FileService,
     private readonly jwtService: JwtService,
+    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   async create(
@@ -58,7 +60,7 @@ export class BarberService {
       const newBarber = this.BarberRepo.create({
         ...registerBarberDto,
         password: hashPass,
-        role: BarberRole.BARBER,
+        role: UserRole.BARBER,
         barberShop: { id: barbershop_id },
       });
 
@@ -78,10 +80,11 @@ export class BarberService {
     try {
       const barber = await this.BarberRepo.findOne({
         where: { username: loginBarberDto.username },
+        relations: ['barberShop'],
       });
       if (!barber) throw new ForbiddenException('Wrong email');
 
-      if (barber.role !== BarberRole.BARBER)
+      if (barber.role !== UserRole.BARBER)
         throw new ForbiddenException('Forbidden');
 
       const isMatch = await this.Bcrypt.Verify(
@@ -89,6 +92,11 @@ export class BarberService {
         barber.password,
       );
       if (!isMatch) throw new ForbiddenException('Wrong password');
+
+      if (!barber.barberShop) {
+        throw new ForbiddenException('Barber shop not found');
+      }
+      await this.subscriptionService.ensureActive(barber.barberShop.id);
 
       const accessToken = AccessToken(this.jwtService, {
         id: barber.id,
@@ -108,7 +116,7 @@ export class BarberService {
   async myAccount(req: Request) {
     try {
       const user = req['user'];
-      if (user.role !== BarberRole.BARBER)
+      if (user.role !== UserRole.BARBER)
         throw new ForbiddenException('Forbidden');
 
       const barber = await this.BarberRepo.findOne({ where: { id: user.id } });
@@ -121,6 +129,7 @@ export class BarberService {
   async findAll(query: Record<string, any>) {
     try {
       const {
+        search,
         full_name,
         phone_number,
         email,
@@ -132,14 +141,26 @@ export class BarberService {
       } = query;
       const skip = (Number(page) - 1) * Number(limit);
 
+      const searchWhere = search
+        ? [
+            { role: UserRole.BARBER, full_name: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, phone_number: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, email: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, bio: ILike(`%${search}%`) },
+            { role: UserRole.BARBER, username: ILike(`%${search}%`) },
+          ]
+        : undefined;
+
       const [data, total] = await this.BarberRepo.findAndCount({
-        where: {
-          role: BarberRole.BARBER,
-          ...(full_name && { full_name: ILike(`%${full_name}%`) }),
-          ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
-          ...(email && { email: ILike(`%${email}%`) }),
-          ...(bio && { bio: ILike(`%${bio}%`) }),
-        },
+        where:
+          searchWhere ??
+          ({
+            role: UserRole.BARBER,
+            ...(full_name && { full_name: ILike(`%${full_name}%`) }),
+            ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
+            ...(email && { email: ILike(`%${email}%`) }),
+            ...(bio && { bio: ILike(`%${bio}%`) }),
+          } as any),
         relations: [
           'reyting',
           'service',
@@ -182,7 +203,7 @@ export class BarberService {
 
       const [data, total] = await this.BarberRepo.findAndCount({
         where: {
-          role: BarberRole.BARBER,
+          role: UserRole.BARBER,
           barberShop: { id: user.id }, // 🔥 faqat o‘zining barberlari
           ...(full_name && { full_name: ILike(`%${full_name}%`) }),
           ...(phone_number && { phone_number: ILike(`%${phone_number}%`) }),
@@ -218,11 +239,14 @@ export class BarberService {
   async update(
     id: number,
     updateBarberDto: UpdateBarberDto,
+    req: Request,
     file?: Express.Multer.File,
   ) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
       if (!barber) throw new NotFoundException('Barber not found');
+
+      await this.assertBarberAccess(id, req);
 
       if (file) {
         if (barber.img && (await this.fileServis.existFile(barber.img))) {
@@ -240,10 +264,12 @@ export class BarberService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, req: Request) {
     try {
       const barber = await this.BarberRepo.findOne({ where: { id } });
       if (!barber) throw new NotFoundException('Barber not found');
+
+      await this.assertBarberAccess(id, req);
 
       await this.BarberRepo.remove(barber);
       return successRes(barber);
@@ -252,11 +278,13 @@ export class BarberService {
     }
   }
 
-  async refreshPassword(data: RefreshPasswordDto) {
+  async refreshPassword(data: BarberRefreshPasswordDto, req: Request) {
     try {
-      const barber = await this.BarberRepo.findOne({
-        where: { username: data.username },
-      });
+      const user = req['user'];
+      if (user.role !== UserRole.BARBER) {
+        throw new ForbiddenException('Forbidden');
+      }
+      const barber = await this.BarberRepo.findOne({ where: { id: user.id } });
       if (!barber) throw new NotFoundException('Barber not found');
 
       if (!data.new_password)
@@ -291,10 +319,10 @@ export class BarberService {
     }
   }
 
-   async findBarbershopId(id: number) {
+  async findBarbershopId(id: number) {
     try {
       const barber = await this.BarberRepo.find({
-        where: {barberShop:{ id }},
+        where: { barberShop: { id } },
         relations: [
           'reyting',
           'service',
@@ -309,5 +337,53 @@ export class BarberService {
     } catch (error) {
       return ErrorHender(error);
     }
+  }
+
+  async findByShopAndService(barberShopId: number, serviceId: number) {
+    try {
+      const data = await this.BarberRepo.createQueryBuilder('barber')
+        .leftJoinAndSelect('barber.service', 'service')
+        .leftJoinAndSelect('barber.barberShop', 'barberShop')
+        .leftJoinAndSelect('barber.barberImage', 'barberImage')
+        .leftJoinAndSelect('barber.reyting', 'reyting')
+        .where('barberShop.id = :barberShopId', { barberShopId })
+        .andWhere('service.id = :serviceId', { serviceId })
+        .getMany();
+
+      if (!data.length) throw new NotFoundException('Barber not found');
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  private async assertBarberAccess(barberId: number, req: Request) {
+    const user = req['user'];
+    if (!user) throw new ForbiddenException('Forbidden');
+
+    if (user.role === UserRole.BARBER) {
+      if (user.id !== barberId) {
+        throw new ForbiddenException('Access denied');
+      }
+      return;
+    }
+
+    if (user.role === UserRole.SP_ADMIN) {
+      const barber = await this.BarberRepo.findOne({
+        where: { id: barberId },
+        relations: ['barberShop'],
+      });
+      if (!barber) throw new NotFoundException('Barber not found');
+      if (!barber.barberShop || barber.barberShop.id !== user.id) {
+        throw new ForbiddenException('Access denied');
+      }
+      return;
+    }
+
+    if (user.role === UserRole.SUPPER_ADMIN || user.role === UserRole.ADMIN) {
+      return;
+    }
+
+    throw new ForbiddenException('Access denied');
   }
 }

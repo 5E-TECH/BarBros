@@ -1,13 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateServiceDto {
-  @ApiProperty({ example: 25000 })
-  @IsNumber()
-  @IsOptional()
-  price: number;
-
   @ApiProperty({ example: 'kelorasilar' })
   @IsString()
   @IsOptional()

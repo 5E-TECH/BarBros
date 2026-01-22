@@ -9,7 +9,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenDro } from './refreshToken.Dto';
 import { ApiTags } from '@nestjs/swagger';
-import { BarberRole, Status } from 'src/common/enum';
+import { UserRole, Status } from 'src/common/enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BarberShopEntity } from '../barber-shop/entities/barber-shop.entity';
 import { Repository } from 'typeorm';
@@ -40,7 +40,7 @@ export class RefreshController {
         secret: String(process.env.REFRESH_SECRET),
       });
 
-      if (data.role === BarberRole.BARBER_SHOP) {
+      if (data.role === UserRole.SP_ADMIN) {
         const barberShop = await this.barberShop.findOne({
           where: { id: data.id },
         });

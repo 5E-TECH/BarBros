@@ -1,5 +1,4 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImageEntity } from 'src/modules/images/entities/image.entity';
 import { DataSource, Repository } from 'typeorm';

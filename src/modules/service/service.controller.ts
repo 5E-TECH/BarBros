@@ -15,44 +15,81 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
-import { BarberRole, UserRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
 import { Request } from 'express';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('service')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, UserRole.SUPPER_ADMIN)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Post()
   create(@Body() createServiceDto: CreateServiceDto, @Req() req) {
-    return this.serviceService.creates(createServiceDto, req.user.id);
+    return this.serviceService.creates(createServiceDto, req.user);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.USER,
+  )
   @Get()
   findAll() {
     return this.serviceService.findAll();
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP, BarberRole.BARBER)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN, UserRole.BARBER)
   @Get('my-service')
   findAllMyservices(@Req() req ) {
     return this.serviceService.findAllMyServices(req.user);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN, UserRole.SUPPER_ADMIN, UserRole.USER)
+  @ApiOperation({
+    summary: 'Barber bo‘yicha servicelar (public)',
+  })
+  @Get('by-barber/:barberId')
+  findByBarber(@Param('barberId') barberId: number) {
+    return this.serviceService.findByBarberId(barberId);
+  }
+
+  @ApiOperation({
+    summary: 'BarberShop bo‘yicha servicelar (public)',
+  })
+  @Get('by-barber-shop/:barberShopId')
+  findByBarberShop(@Param('barberShopId') barberShopId: number) {
+    return this.serviceService.findByBarberShopId(barberShopId);
+  }
+
+  @ApiOperation({
+    summary: 'Category bo‘yicha servicelar (public)',
+  })
+  @Get('by-category/:categoryId')
+  findByCategory(@Param('categoryId') categoryId: number) {
+    return this.serviceService.findByCategoryId(categoryId);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(
+    UserRole.SUPPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.SP_ADMIN,
+    UserRole.BARBER,
+    UserRole.USER,
+  )
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.serviceService.findOne(id);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -62,8 +99,8 @@ export class ServiceController {
     return this.serviceService.update(id, updateServiceDto, req);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN, UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number, @Req() req: Request) {
     return this.serviceService.remove(id, req);
@@ -76,8 +113,8 @@ export class ServiceController {
     type: AddBarbersToServiceDto,
     description: 'Service id va barberlar id listi',
   })
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles(BarberRole.BARBER_SHOP)
+  @UseGuards(AuthGuard, RolesGuard, SubscriptionGuard)
+  @Roles(UserRole.SP_ADMIN)
   @Post('add-barbers')
   async addBarbersToService(@Body() dto: AddBarbersToServiceDto, @Req() req) {
     // Token orqali olingan barber_shop id

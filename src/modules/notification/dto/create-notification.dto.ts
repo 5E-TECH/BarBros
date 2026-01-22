@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateNotificationDto {
   @ApiProperty({
@@ -10,7 +10,24 @@ export class CreateNotificationDto {
 
   @ApiProperty({
     example: true,
+    required: false,
   })
+  @IsOptional()
   @IsBoolean()
-  is_read: boolean;
+  is_read?: boolean;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  user_id?: number;
+
+  @ApiProperty({ example: 2, required: false })
+  @IsOptional()
+  @IsInt()
+  barber_id?: number;
+
+  @ApiProperty({ example: 3, required: false })
+  @IsOptional()
+  @IsInt()
+  barber_shop_id?: number;
 }

@@ -1,10 +1,8 @@
 import {
   Injectable,
   NotFoundException,
-  InternalServerErrorException,
   ForbiddenException,
   BadRequestException,
-  Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -16,7 +14,9 @@ import { successRes } from 'src/utils/succesResponse';
 import { Request } from 'express';
 import { BarberEntity } from '../barber/entities/barber.entity';
 import { AddBarbersToServiceDto } from './dto/addbarbertoservice.dto';
-import { BarberRole } from 'src/common/enum';
+import { UserRole } from 'src/common/enum';
+import { CategoryEntitiy } from '../category/entitiy/category.entitiy';
+import { BarberShopServicesEntity } from '../barber-shop-services/entities/barber-shop-services.entity';
 
 @Injectable()
 export class ServiceService {
@@ -25,32 +25,28 @@ export class ServiceService {
     private readonly serviceRepository: Repository<ServiceEntity>,
     @InjectRepository(BarberEntity)
     private readonly barberRepository: Repository<BarberEntity>,
+    @InjectRepository(CategoryEntitiy)
+    private readonly categoryRepository: Repository<CategoryEntitiy>,
+    @InjectRepository(BarberShopServicesEntity)
+    private readonly barberShopServicesRepo: Repository<BarberShopServicesEntity>,
   ) {}
-  async creates(createServiceDto: CreateServiceDto, barbershop_id: number) {
+  async creates(createServiceDto: CreateServiceDto, user: any) {
     try {
-      const { barber_ids, category_id, ...serviceData } = createServiceDto;
+      const { category_id, ...serviceData } = createServiceDto;
 
- 
-      const barbers = await this.barberRepository.find({
-        where: { id: In(barber_ids), barberShop: { id: barbershop_id } },
+      const category = await this.categoryRepository.findOne({
+        where: { id: category_id },
       });
-
-      if (barbers.length !== barber_ids.length) {
-        throw new BadRequestException(
-          'Some barber ids are invalid or do not belong to your shop',
-        );
-      }
+      if (!category) throw new NotFoundException('Category not found');
 
       const service = this.serviceRepository.create({
         ...serviceData,
         category: { id: category_id },
-        barberShop: { id: barbershop_id },
-        barbers,
       });
 
-      await this.serviceRepository.save(service);
+      const saved = await this.serviceRepository.save(service);
 
-      return successRes(service, 201);
+      return successRes(saved, 201);
     } catch (error) {
       return ErrorHender(error);
     }
@@ -86,13 +82,27 @@ export class ServiceService {
 
     await this.serviceRepository.save(service);
 
-    return successRes(service, 200);
+    const scoped = await this.serviceRepository
+      .createQueryBuilder('service')
+      .leftJoinAndSelect('service.barbers', 'barber')
+      .leftJoinAndSelect('barber.barberShop', 'barberShop')
+      .where('service.id = :id', { id: service_id })
+      .andWhere('barberShop.id = :shopId', { shopId: currentShopId })
+      .getOne();
+
+    return successRes(scoped ?? service, 200);
   }
 
   async findAll() {
     try {
       const data = await this.serviceRepository.find({
-        relations: ['booking', 'barbers', 'barberShop'],
+        relations: [
+          'booking',
+          'barbers',
+          'category',
+          'barberShopServices',
+          'serviceImages',
+        ],
       });
       if (!data.length) {
         throw new NotFoundException('Not Fount service');
@@ -107,7 +117,14 @@ export class ServiceService {
     try {
       const service = await this.serviceRepository.findOne({
         where: { id: id },
-        relations: ['booking', 'barbers', 'barberShop'],
+        relations: [
+          'booking',
+          'barbers',
+          'category',
+          'barberShopServices',
+          'barberShopServices.barberShop',
+          'serviceImages',
+        ],
       });
       if (!service) {
         throw new NotFoundException('Not Fount service');
@@ -122,16 +139,16 @@ export class ServiceService {
     try {
       let data;
 
-      if (user.role === BarberRole.BARBER_SHOP) {
-        data = await this.serviceRepository.find({
-          where: {
-            barberShop: { id: user.id },
-          },
-          relations: ['barbers'],
-        });
+      if (user.role === UserRole.SP_ADMIN) {
+        data = await this.serviceRepository
+          .createQueryBuilder('service')
+          .leftJoinAndSelect('service.barbers', 'barbers')
+          .leftJoinAndSelect('service.barberShopServices', 'shopService')
+          .where('shopService.barber_shop_id = :shopId', { shopId: user.id })
+          .getMany();
       }
 
-      else if (user.role === BarberRole.BARBER) {
+      else if (user.role === UserRole.BARBER) {
         data = await this.serviceRepository
           .createQueryBuilder('service')
           .leftJoin('service.barbers', 'barber')
@@ -152,15 +169,108 @@ export class ServiceService {
     }
   }
 
+  async findByBarberId(barberId: number) {
+    try {
+      const barber = await this.barberRepository.findOne({
+        where: { id: barberId },
+        relations: ['barberShop'],
+      });
+      if (!barber) throw new NotFoundException('Barber not found');
+
+      const shopId = barber.barberShop?.id;
+
+      const query = this.serviceRepository
+        .createQueryBuilder('service')
+        .leftJoinAndSelect('service.barbers', 'barber')
+        .leftJoinAndSelect('service.category', 'category')
+        .where('barber.id = :barberId', { barberId });
+
+      query.leftJoinAndSelect('service.serviceImages', 'serviceImages');
+      if (shopId) {
+        query.leftJoinAndSelect(
+          'service.barberShopServices',
+          'shopService',
+          'shopService.barber_shop_id = :shopId',
+          { shopId },
+        );
+      } else {
+        query.leftJoinAndSelect('service.barberShopServices', 'shopService');
+      }
+
+      const data = await query.getMany();
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  async findByBarberShopId(barberShopId: number) {
+    try {
+      const data = await this.serviceRepository
+        .createQueryBuilder('service')
+        .innerJoinAndSelect(
+          'service.barberShopServices',
+          'shopService',
+          'shopService.barber_shop_id = :shopId',
+          { shopId: barberShopId },
+        )
+        .leftJoinAndSelect('service.serviceImages', 'serviceImages')
+        .leftJoinAndSelect('service.category', 'category')
+        .leftJoinAndSelect('service.barbers', 'barbers')
+        .getMany();
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  async findByCategoryId(categoryId: number) {
+    try {
+      const data = await this.serviceRepository.find({
+        where: { category: { id: categoryId } },
+        relations: ['category', 'serviceImages'],
+      });
+
+      if (!data.length) {
+        throw new NotFoundException('Not Found service');
+      }
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
   async update(id: number, updateServiceDto: UpdateServiceDto, req: Request) {
     try {
       const data = await this.serviceRepository.findOneBy({ id });
       if (!data) {
         throw new NotFoundException('Nor fount service');
       }
-      // if(data.barber_id !== req["user"].id){
-      //   throw new ForbiddenException("Siz boshqa barber servisini o'zgartira olmaysiz")
-      // }
+      const user = req['user'];
+      if (user.role === UserRole.SP_ADMIN) {
+        const link = await this.barberShopServicesRepo.findOne({
+          where: { barber_shop_id: user.id, service_id: id },
+        });
+        if (!link) {
+          throw new ForbiddenException('Access denied');
+        }
+      } else if (
+        ![UserRole.SUPPER_ADMIN, UserRole.ADMIN].includes(user.role)
+      ) {
+        throw new ForbiddenException('Access denied');
+      }
+
       await this.serviceRepository.update(data.id, { ...updateServiceDto });
       const newData = await this.serviceRepository.findOne({
         where: { id: data.id },
@@ -177,9 +287,20 @@ export class ServiceService {
       if (!service) {
         throw new NotFoundException('Not fount service');
       }
-      // if(service.barber_id !== req["user"].id){
-      //   throw new ForbiddenException("Siz boshqa barber servislarini o'zgartira olmaysiz")
-      // }
+      const user = req['user'];
+      if (user.role === UserRole.SP_ADMIN) {
+        const link = await this.barberShopServicesRepo.findOne({
+          where: { barber_shop_id: user.id, service_id: id },
+        });
+        if (!link) {
+          throw new ForbiddenException('Access denied');
+        }
+      } else if (
+        ![UserRole.SUPPER_ADMIN, UserRole.ADMIN].includes(user.role)
+      ) {
+        throw new ForbiddenException('Access denied');
+      }
+
       const data = await this.serviceRepository.remove(service);
       return successRes(data);
     } catch (error) {
