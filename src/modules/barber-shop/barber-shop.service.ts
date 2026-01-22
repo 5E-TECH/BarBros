@@ -71,6 +71,7 @@ export class BarberShopService {
   }
 
   async login(dto: LogimBarberShopDto) {
+    console.log(`Login attempt by user: ${dto.username}`);
     try {
       const shop = await this.barberRepo.findOne({
         where: { username: dto.username },
@@ -376,7 +377,7 @@ export class BarberShopService {
 
       await this.barberRepo.update(id, { status: newData.status });
       const updated = await this.barberRepo.findOne({ where: { id } });
-      console.log(`Status updated successfully for user: ${updated?.name}`);
+      console.log(`Status updated successfully for user: ${updated?.name} to ${newData.status}`);
       return successRes(updated);
     } catch (error) {
       return ErrorHender(error);
