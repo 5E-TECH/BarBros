@@ -125,7 +125,7 @@ export class BarberShopController {
   findByService(@Query() query: Record<string, any>) {
     return this.barberShopService.findByService(query);
   }
-  @UseGuards(AuthGuard, SubscriptionGuard)
+  @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
     return this.barberShopService.myAccount(req);
