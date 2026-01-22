@@ -96,7 +96,6 @@ export class BarberService {
       if (!barber.barberShop) {
         throw new ForbiddenException('Barber shop not found');
       }
-      await this.subscriptionService.ensureActive(barber.barberShop.id);
 
       const accessToken = AccessToken(this.jwtService, {
         id: barber.id,

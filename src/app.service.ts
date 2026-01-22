@@ -16,6 +16,7 @@ export default class Application {
       origin: '*',
     });
 
+    
 
     app.useGlobalPipes(
       new ValidationPipe({

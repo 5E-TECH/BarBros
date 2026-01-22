@@ -79,8 +79,6 @@ export class BarberShopService {
       if (shop.status === Status.INACTIVE)
         throw new ForbiddenException('Your account is blocked');
 
-      await this.subscriptionService.ensureActive(shop.id);
-
       const isMatch = await this.Bcrypt.Verify(dto.password, shop.password);
       if (!isMatch) throw new ForbiddenException('Wrong password');
       const accessToken = AccessToken(this.jwtService, {
