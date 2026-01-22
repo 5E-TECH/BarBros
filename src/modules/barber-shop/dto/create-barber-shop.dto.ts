@@ -29,7 +29,7 @@ export class CreateBarberShopDto {
 
   @IsString()
   @IsNotEmpty()
-  descripton: string;
+  description: string;
 
   @IsString()
   @IsNotEmpty()

@@ -39,7 +39,7 @@ export class BarberShopService {
     private readonly Bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
     private readonly subscriptionService: SubscriptionService,
-  ) {}
+  ) { }
 
   async signup(createDto: CreateBarberShopDto, file?: Express.Multer.File) {
     try {
@@ -99,32 +99,32 @@ export class BarberShopService {
   }
 
   async myAccount(req: Request) {
-  try {
-    const user = req['user'];
-    if (user.role !== UserRole.SP_ADMIN)
-      throw new ForbiddenException('Forbidden');
+    try {
+      const user = req['user'];
+      if (user.role !== UserRole.SP_ADMIN)
+        throw new ForbiddenException('Forbidden');
 
-    const shop = await this.barberRepo.findOne({
-      where: { id: user.id },
-      relations: [
-        'barber',      // OneToMany → barberlar
-        'images',      // OneToMany → rasmlar
-        // 'service',     // agar barberShop service bog‘langan bo‘lsa
-      ],
-    });
+      const shop = await this.barberRepo.findOne({
+        where: { id: user.id },
+        relations: [
+          'barber',      // OneToMany → barberlar
+          'images',      // OneToMany → rasmlar
+          // 'service',     // agar barberShop service bog‘langan bo‘lsa
+        ],
+      });
 
-    return successRes(shop);
-  } catch (error) {
-    return ErrorHender(error);
+      return successRes(shop);
+    } catch (error) {
+      return ErrorHender(error);
+    }
   }
-}
 
   async findAll(query: Record<string, any>) {
     try {
       const {
         search,
         name,
-        descripton,
+        description,
         location,
         sortBy = 'name',
         order = 'DESC',
@@ -138,15 +138,15 @@ export class BarberShopService {
 
       const where = search
         ? [
-            { name: ILike(`%${search}%`) },
-            { descripton: ILike(`%${search}%`) },
-            { location: ILike(`%${search}%`) },
-            { phoneNumber: ILike(`%${search}%`) },
-            { username: ILike(`%${search}%`) },
-          ]
+          { name: ILike(`%${search}%`) },
+          { descripton: ILike(`%${search}%`) },
+          { location: ILike(`%${search}%`) },
+          { phoneNumber: ILike(`%${search}%`) },
+          { username: ILike(`%${search}%`) },
+        ]
         : {
           ...(name && { name: ILike(`%${name}%`) }),
-          ...(descripton && { descripton: ILike(`%${descripton}%`) }),
+          ...(description && { description: ILike(`%${description}%`) }),
           ...(location && { location: ILike(`%${location}%`) }),
         };
 
@@ -154,11 +154,11 @@ export class BarberShopService {
         sortBy === 'distance' || sortBy === 'avg_rating'
           ? { name: 'ASC' }
           : {
-              [sortBy]:
-                order.toUpperCase() === 'ASC'
-                  ? ('ASC' as const)
-                  : ('DESC' as const),
-            };
+            [sortBy]:
+              order.toUpperCase() === 'ASC'
+                ? ('ASC' as const)
+                : ('DESC' as const),
+          };
 
       const useGeo = lat !== undefined && lng !== undefined;
       const [data, total] = await this.barberRepo.findAndCount({
@@ -195,10 +195,10 @@ export class BarberShopService {
         const sorted =
           sortBy === 'distance'
             ? withDistance.sort((a, b) => {
-                if (a.distance_km === null) return 1;
-                if (b.distance_km === null) return -1;
-                return a.distance_km - b.distance_km;
-              })
+              if (a.distance_km === null) return 1;
+              if (b.distance_km === null) return -1;
+              return a.distance_km - b.distance_km;
+            })
             : sortBy === 'avg_rating'
               ? withDistance.sort((a, b) => b.avg_rating - a.avg_rating)
               : withDistance;
@@ -239,9 +239,9 @@ export class BarberShopService {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c * 100) / 100;
   }
@@ -267,9 +267,9 @@ export class BarberShopService {
         const shop = link.barberShop;
         const distance =
           latNum !== null &&
-          lngNum !== null &&
-          shop.latitude !== null &&
-          shop.longitude !== null
+            lngNum !== null &&
+            shop.latitude !== null &&
+            shop.longitude !== null
             ? this.calcDistanceKm(latNum, lngNum, shop.latitude, shop.longitude)
             : null;
 
@@ -295,10 +295,10 @@ export class BarberShopService {
           ? filtered.sort((a, b) => b.avg_rating - a.avg_rating)
           : sortBy === 'distance'
             ? filtered.sort((a, b) => {
-                if (a.distance_km === null) return 1;
-                if (b.distance_km === null) return -1;
-                return a.distance_km - b.distance_km;
-              })
+              if (a.distance_km === null) return 1;
+              if (b.distance_km === null) return -1;
+              return a.distance_km - b.distance_km;
+            })
             : filtered;
 
       return successRes(sorted);

@@ -29,7 +29,7 @@ import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('barber-shop')
 export class BarberShopController {
-  constructor(private readonly barberShopService: BarberShopService) {}
+  constructor(private readonly barberShopService: BarberShopService) { }
 
   @ApiOperation({
     summary: 'Created barberShop  Admin tomonidan',
@@ -65,7 +65,7 @@ export class BarberShopController {
         },
         img: { type: 'string', format: 'binary' },
 
-        descripton: {
+        description: {
           type: 'string',
           example: 'Berber shop haqida',
         },
@@ -99,17 +99,17 @@ export class BarberShopController {
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'name', required: false })
-  @ApiQuery({ name: 'descripton', required: false })
-  @ApiQuery({name: "location", required: false})
+  @ApiQuery({ name: 'description', required: false })
+  @ApiQuery({ name: "location", required: false })
   @ApiQuery({ name: 'lat', required: false })
   @ApiQuery({ name: 'lng', required: false })
   @ApiQuery({ name: 'radiusKm', required: false })
   @ApiQuery({
     name: 'sortBy',
     required: false,
-    enum: ['name', 'descripton', 'distance', 'avg_rating'],
+    enum: ['name', 'description', 'distance', 'avg_rating'],
   })
-  @ApiQuery({name: "order", required: false, enum:["asc","desc"]})
+  @ApiQuery({ name: "order", required: false, enum: ["asc", "desc"] })
   findAll(@Query() query: Record<string, any>) {
     return this.barberShopService.findAll(query);
   }
@@ -136,11 +136,11 @@ export class BarberShopController {
   findOne(@Param('id') id: number) {
     return this.barberShopService.findOne(id);
   }
-  
+
 
   @ApiOperation({ summary: 'Supper admin Tomonidan bloklansa' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN,UserRole.ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Patch('status/:id')
   updateStatus(
     @Param('id') id: number,
@@ -177,7 +177,7 @@ export class BarberShopController {
           type: 'string',
           format: 'binary',
         },
-        descripton: {
+        description: {
           type: 'string',
           example: 'Berber shop haqida',
         },
