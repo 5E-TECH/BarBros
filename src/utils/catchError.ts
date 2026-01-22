@@ -1,6 +1,7 @@
 import { HttpException, InternalServerErrorException } from '@nestjs/common';
 
 export const ErrorHender = (error: any) => {
+  console.error('Xatolik:', error.message || error);
   if (error instanceof HttpException) {
     throw error;
   }

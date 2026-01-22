@@ -75,9 +75,9 @@ export class BarberShopService {
       const shop = await this.barberRepo.findOne({
         where: { username: dto.username },
       });
-      if (!shop) throw new ForbiddenException('Wrong username or password');
+      if (!shop) throw new ForbiddenException(`Wrong username or password`);
       if (shop.status === Status.INACTIVE)
-        throw new ForbiddenException('Your account is blocked');
+        throw new ForbiddenException(`Your account ${dto.username} is blocked`);
 
       await this.subscriptionService.ensureActive(shop.id);
 
