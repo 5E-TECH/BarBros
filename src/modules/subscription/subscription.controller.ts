@@ -4,6 +4,7 @@ import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { AssignSubscriptionDto } from './dto/assign-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { AssignByBarberDto } from './dto/assign-by-barber.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { Roles } from 'src/common/Decorator/Role.decorator';
@@ -44,6 +45,14 @@ export class SubscriptionController {
   @Post('assign')
   assign(@Body() dto: AssignSubscriptionDto) {
     return this.subscriptionService.assignSubscription(dto);
+  }
+
+  @ApiOperation({ summary: 'Assign subscription by barber id' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Post('assign-by-barber')
+  assignByBarber(@Body() dto: AssignByBarberDto) {
+    return this.subscriptionService.assignByBarber(dto);
   }
 
   @ApiOperation({ summary: 'Update subscription' })
