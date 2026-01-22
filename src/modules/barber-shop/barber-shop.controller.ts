@@ -97,6 +97,7 @@ export class BarberShopController {
   @Get()
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiQuery({ name: 'search', required: false })
   @ApiQuery({ name: 'name', required: false })
   @ApiQuery({ name: 'descripton', required: false })
   @ApiQuery({name: "location", required: false})
