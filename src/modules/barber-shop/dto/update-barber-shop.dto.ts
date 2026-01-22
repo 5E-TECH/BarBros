@@ -3,7 +3,7 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateBarberShopDto {
   @ApiProperty({
-    example:'faxa mee'
+    example: 'faxa mee'
   })
   @IsString()
   @IsOptional()
@@ -15,7 +15,7 @@ export class UpdateBarberShopDto {
 
   @IsString()
   @IsOptional()
-  descripton?: string;
+  description?: string;
 
   @IsString()
   @IsOptional()

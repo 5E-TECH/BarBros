@@ -34,7 +34,7 @@ export class BarberShopService {
     private readonly fileServis: FileService,
     private readonly Bcrypt: BcryptEncryption,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signup(createDto: CreateBarberShopDto, file?: Express.Multer.File) {
     try {
@@ -92,31 +92,31 @@ export class BarberShopService {
   }
 
   async myAccount(req: Request) {
-  try {
-    const user = req['user'];
-    if (user.role !== BarberRole.BARBER_SHOP)
-      throw new ForbiddenException('Forbidden');
+    try {
+      const user = req['user'];
+      if (user.role !== BarberRole.BARBER_SHOP)
+        throw new ForbiddenException('Forbidden');
 
-    const shop = await this.barberRepo.findOne({
-      where: { id: user.id },
-      relations: [
-        'barber',      // OneToMany → barberlar
-        'images',      // OneToMany → rasmlar
-        // 'service',     // agar barberShop service bog‘langan bo‘lsa
-      ],
-    });
+      const shop = await this.barberRepo.findOne({
+        where: { id: user.id },
+        relations: [
+          'barber',      // OneToMany → barberlar
+          'images',      // OneToMany → rasmlar
+          // 'service',     // agar barberShop service bog‘langan bo‘lsa
+        ],
+      });
 
-    return successRes(shop);
-  } catch (error) {
-    return ErrorHender(error);
+      return successRes(shop);
+    } catch (error) {
+      return ErrorHender(error);
+    }
   }
-}
 
   async findAll(query: Record<string, any>) {
     try {
       const {
         name,
-        descripton,
+        description,
         location,
         sortBy = 'name',
         order = 'DESC',
@@ -128,7 +128,7 @@ export class BarberShopService {
       const [data, total] = await this.barberRepo.findAndCount({
         where: {
           ...(name && { name: ILike(`%${name}%`) }),
-          ...(descripton && { descripton: ILike(`%${descripton}%`) }),
+          ...(description && { description: ILike(`%${description}%`) }),
           ...(location && { location: ILike(`%${location}%`) }),
         },
         relations: ['barber', 'images'],

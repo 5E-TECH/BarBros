@@ -28,7 +28,7 @@ import { RefreshPasswordDto } from './dto/refreshPassword.dto';
 
 @Controller('barber-shop')
 export class BarberShopController {
-  constructor(private readonly barberShopService: BarberShopService) {}
+  constructor(private readonly barberShopService: BarberShopService) { }
 
   @ApiOperation({
     summary: 'Created barberShop  Admin tomonidan',
@@ -56,7 +56,7 @@ export class BarberShopController {
         },
         img: { type: 'string', format: 'binary' },
 
-        descripton: {
+        description: {
           type: 'string',
           example: 'Berber shop haqida',
         },
@@ -89,10 +89,10 @@ export class BarberShopController {
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   @ApiQuery({ name: 'name', required: false })
-  @ApiQuery({ name: 'descripton', required: false })
-  @ApiQuery({name: "location", required: false})
-  @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'descripton'] })
-  @ApiQuery({name: "order", required: false, enum:["asc","desc"]})
+  @ApiQuery({ name: 'description', required: false })
+  @ApiQuery({ name: "location", required: false })
+  @ApiQuery({ name: 'sortBy', required: false, enum: ['name', 'description'] })
+  @ApiQuery({ name: "order", required: false, enum: ["asc", "desc"] })
   findAll(@Query() query: Record<string, any>) {
     return this.barberShopService.findAll(query);
   }
@@ -139,7 +139,7 @@ export class BarberShopController {
           type: 'string',
           format: 'binary',
         },
-        descripton: {
+        description: {
           type: 'string',
           example: 'Berber shop haqida',
         },
