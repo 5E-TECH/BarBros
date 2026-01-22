@@ -7,7 +7,8 @@ import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 import { TransactionEntity } from 'src/modules/transactions/entities/transaction.entity';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
-import { BookingStatus, UserRole } from 'src/common/enum';
+import { SubscriptionEntity } from 'src/modules/subscription/entities/subscription.entity';
+import { BookingStatus, SubscriptionStatus, UserRole } from 'src/common/enum';
 import { successRes } from 'src/utils/succesResponse';
 import { ErrorHender } from 'src/utils/catchError';
 
@@ -24,6 +25,8 @@ export class AdminDashboardService {
     private readonly bookingRepo: Repository<BookingEntity>,
     @InjectRepository(TransactionEntity)
     private readonly transactionRepo: Repository<TransactionEntity>,
+    @InjectRepository(SubscriptionEntity)
+    private readonly subscriptionRepo: Repository<SubscriptionEntity>,
     @InjectRepository(ServiceEntity)
     private readonly serviceRepo: Repository<ServiceEntity>,
   ) {}
@@ -48,8 +51,9 @@ export class AdminDashboardService {
         .getRawMany();
 
       const total_revenue = await this.sumTransactions(start, end);
-
       const revenue_series = await this.revenueSeries(period, start, end);
+      const subscription_series = await this.subscriptionSeries(period, start, end);
+      const subscription_stats = await this.subscriptionStats();
       const top_barbershops = await this.topBarberShops(start, end);
       const top_services = await this.topServices(start, end);
 
@@ -66,6 +70,10 @@ export class AdminDashboardService {
         revenue: {
           total_amount: total_revenue,
           series: revenue_series,
+        },
+        subscriptions: {
+          stats: subscription_stats,
+          series: subscription_series,
         },
         top_barbershops,
         top_services,
@@ -148,6 +156,64 @@ export class AdminDashboardService {
     }
 
     return qb.getRawMany();
+  }
+
+  private async subscriptionSeries(period: string, start?: Date, end?: Date) {
+    const bucket =
+      period === 'weekly' ? 'week' : period === 'monthly' ? 'month' : 'day';
+    const labelFormat =
+      period === 'weekly'
+        ? 'IYYY-IW'
+        : period === 'monthly'
+          ? 'YYYY-MM'
+          : 'YYYY-MM-DD';
+
+    const qb = this.subscriptionRepo
+      .createQueryBuilder('s')
+      .select(
+        `to_char(date_trunc('${bucket}', to_timestamp(s.created_at/1000)), '${labelFormat}')`,
+        'label',
+      )
+      .addSelect('COUNT(*)', 'total_subscriptions')
+      .groupBy('label')
+      .orderBy('label', 'ASC');
+
+    if (start) {
+      qb.andWhere('s.created_at >= :start', {
+        start: Math.floor(start.getTime()),
+      });
+    }
+    if (end) {
+      qb.andWhere('s.created_at <= :end', {
+        end: Math.floor(end.getTime()),
+      });
+    }
+
+    return qb.getRawMany();
+  }
+
+  private async subscriptionStats() {
+    const rows = await this.subscriptionRepo
+      .createQueryBuilder('s')
+      .select('s.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('s.status')
+      .getRawMany();
+
+    const base = {
+      [SubscriptionStatus.ACTIVE]: 0,
+      [SubscriptionStatus.EXPIRED]: 0,
+      [SubscriptionStatus.CANCELLED]: 0,
+    };
+
+    rows.forEach((row) => {
+      const key = row.status as SubscriptionStatus;
+      if (key in base) {
+        base[key] = Number(row.count);
+      }
+    });
+
+    return base;
   }
 
   private async topBarberShops(start?: Date, end?: Date) {

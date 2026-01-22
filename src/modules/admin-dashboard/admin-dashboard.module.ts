@@ -8,6 +8,7 @@ import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
 import { BookingEntity } from 'src/modules/booking/entities/booking.entity';
 import { TransactionEntity } from 'src/modules/transactions/entities/transaction.entity';
 import { ServiceEntity } from 'src/modules/service/entities/service.entity';
+import { SubscriptionEntity } from 'src/modules/subscription/entities/subscription.entity';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ServiceEntity } from 'src/modules/service/entities/service.entity';
       BarberEntity,
       BookingEntity,
       TransactionEntity,
+      SubscriptionEntity,
       ServiceEntity,
     ]),
   ],
