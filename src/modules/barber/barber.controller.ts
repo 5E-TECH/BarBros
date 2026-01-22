@@ -138,7 +138,7 @@ export class BarberController {
     return this.barberService.findAllMyBarbers(req.user, query);
   }
 
-  @UseGuards(AuthGuard, SubscriptionGuard)
+  @UseGuards(AuthGuard)
   @Get('My_Accaunt')
   my_accaunt(@Req() req: Request) {
     return this.barberService.myAccount(req);
