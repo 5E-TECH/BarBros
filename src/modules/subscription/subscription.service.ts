@@ -12,6 +12,7 @@ import { AssignSubscriptionDto } from './dto/assign-subscription.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { AssignByBarberDto } from './dto/assign-by-barber.dto';
 import { PaymentStatus, Status, SubscriptionStatus, UserRole } from 'src/common/enum';
 import { BarberShopEntity } from 'src/modules/barber-shop/entities/barber-shop.entity';
 import { BarberEntity } from 'src/modules/barber/entities/barber.entity';
@@ -102,6 +103,55 @@ export class SubscriptionService {
 
       const saved = await this.subscriptionRepo.save(subscription);
       await this.shopRepo.update({ id: dto.barber_shop_id }, { status: Status.ACTIVE });
+      return successRes(saved, 201);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
+
+  async assignByBarber(dto: AssignByBarberDto) {
+    try {
+      const barber = await this.barberRepo.findOne({
+        where: { id: dto.barber_id },
+        relations: ['barberShop'],
+      });
+      if (!barber || !barber.barberShop) {
+        throw new NotFoundException('Barber shop not found');
+      }
+
+      const plan = await this.planRepo.findOne({ where: { id: dto.plan_id } });
+      if (!plan || !plan.is_active) {
+        throw new NotFoundException('Plan not found');
+      }
+
+      const now = Date.now();
+      const existing = await this.subscriptionRepo.findOne({
+        where: {
+          barber_shop_id: barber.barberShop.id,
+          status: SubscriptionStatus.ACTIVE,
+          end_at: MoreThanOrEqual(now),
+        },
+        order: { end_at: 'DESC' },
+      });
+
+      const baseTime = existing ? existing.end_at : now;
+      const endAt = this.addMonths(baseTime, plan.duration_months);
+
+      const subscription = this.subscriptionRepo.create({
+        barber_shop_id: barber.barberShop.id,
+        plan_id: dto.plan_id,
+        start_at: existing ? baseTime : now,
+        end_at: endAt,
+        status: SubscriptionStatus.ACTIVE,
+        payment_model: dto.payment_model,
+        payment_status: PaymentStatus.PAID,
+      });
+
+      const saved = await this.subscriptionRepo.save(subscription);
+      await this.shopRepo.update(
+        { id: barber.barberShop.id },
+        { status: Status.ACTIVE },
+      );
       return successRes(saved, 201);
     } catch (error) {
       return ErrorHender(error);
