@@ -57,7 +57,7 @@ export class BookingService {
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
     private readonly subscriptionService: SubscriptionService,
-  ) {}
+  ) { }
 
   async create(createBookingDto: CreateBookingDto, req: Request) {
     try {
@@ -344,18 +344,36 @@ export class BookingService {
 
   async findAllBarber(req: Request) {
     try {
-      const data = await this.Booking.find({
-        where: { barber_id: req['user'].id },
-        relations: ['service', 'user', 'barber', 'barberShop'],
-      });
-      if (!data.length) {
-        throw new NotFoundException('Not fount data');
+      const user = req['user'];
+
+      let whereCondition: any;
+
+      // 👇 BARBER → only own bookings
+      if (user.role === UserRole.BARBER) {
+        whereCondition = {
+          barber: { id: user.barberId },
+        };
       }
+
+      // 👇 SP_ADMIN → all bookings of barbershop
+      else if (user.role === UserRole.SP_ADMIN) {
+        whereCondition = {
+          barberShop: { id: user.barberShopId },
+        };
+      }
+
+      const data = await this.Booking.find({
+        where: whereCondition,
+        relations: ['service', 'user', 'barber', 'barberShop'],
+        order: { created_at: 'DESC' },
+      });
+
       return successRes(data);
     } catch (error) {
       return ErrorHender(error);
     }
   }
+
 
   async findAllUser(req: Request) {
     try {
@@ -372,7 +390,7 @@ export class BookingService {
     }
   }
 
-  async findAll_Abdin(query: Record<string, any> = {}){
+  async findAll_Abdin(query: Record<string, any> = {}) {
     try {
       const { search, status, page = 1, limit = 10 } = query;
       const skip = (Number(page) - 1) * Number(limit);
@@ -392,17 +410,17 @@ export class BookingService {
         const term = `%${search}%`;
         qb.andWhere(
           '(' +
-            'service.name ILIKE :term OR ' +
-            'barber.full_name ILIKE :term OR ' +
-            'barberShop.name ILIKE :term OR ' +
-            'user.phone_number ILIKE :term OR ' +
-            'user.full_name ILIKE :term OR ' +
-            'booking.date ILIKE :term OR ' +
-            'booking.time ILIKE :term OR ' +
-            'CAST(booking.id AS text) ILIKE :term OR ' +
-            'CAST(booking.status AS text) ILIKE :term OR ' +
-            'CAST(booking.order_type AS text) ILIKE :term OR ' +
-            'CAST(booking.payment_model AS text) ILIKE :term' +
+          'service.name ILIKE :term OR ' +
+          'barber.full_name ILIKE :term OR ' +
+          'barberShop.name ILIKE :term OR ' +
+          'user.phone_number ILIKE :term OR ' +
+          'user.full_name ILIKE :term OR ' +
+          'booking.date ILIKE :term OR ' +
+          'booking.time ILIKE :term OR ' +
+          'CAST(booking.id AS text) ILIKE :term OR ' +
+          'CAST(booking.status AS text) ILIKE :term OR ' +
+          'CAST(booking.order_type AS text) ILIKE :term OR ' +
+          'CAST(booking.payment_model AS text) ILIKE :term' +
           ')',
           { term },
         );
@@ -416,7 +434,7 @@ export class BookingService {
         .take(Number(limit))
         .getManyAndCount();
 
-      if(!data.length){
+      if (!data.length) {
         throw new NotFoundException("Not fount data")
       }
 
@@ -458,7 +476,7 @@ export class BookingService {
     }
   }
 
-  
+
   async getBarberAvailability(
     barberId: number,
     date: string,
@@ -480,11 +498,11 @@ export class BookingService {
       }
       const shopService = barber.barberShop
         ? await this.barberShopServicesRepo.findOne({
-            where: {
-              barber_shop_id: barber.barberShop.id,
-              service_id: serviceId,
-            },
-          })
+          where: {
+            barber_shop_id: barber.barberShop.id,
+            service_id: serviceId,
+          },
+        })
         : null;
       const durationMinutes =
         shopService?.duration_minutes ?? selectedService.duration_minutes;
@@ -521,11 +539,11 @@ export class BookingService {
     }
     const shopService = barber.barberShop
       ? await this.barberShopServicesRepo.findOne({
-          where: {
-            barber_shop_id: barber.barberShop.id,
-            service_id: serviceId,
-          },
-        })
+        where: {
+          barber_shop_id: barber.barberShop.id,
+          service_id: serviceId,
+        },
+      })
       : null;
     const durationMinutes =
       shopService?.duration_minutes ?? selectedService.duration_minutes;
