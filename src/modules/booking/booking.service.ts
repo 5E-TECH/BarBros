@@ -374,7 +374,7 @@ export class BookingService {
 
   async findAll_Abdin(query: Record<string, any> = {}){
     try {
-      const { search, page = 1, limit = 10 } = query;
+      const { search, status, page = 1, limit = 10 } = query;
       const skip = (Number(page) - 1) * Number(limit);
       const qb = this.Booking.createQueryBuilder('booking')
         .leftJoinAndSelect('booking.service', 'service')
@@ -394,6 +394,9 @@ export class BookingService {
           '(service.name ILIKE :term OR barber.full_name ILIKE :term OR barberShop.name ILIKE :term OR user.phone_number ILIKE :term OR booking.date ILIKE :term)',
           { term },
         );
+      }
+      if (status) {
+        qb.andWhere('booking.status = :status', { status });
       }
 
       const [data, total] = await qb
