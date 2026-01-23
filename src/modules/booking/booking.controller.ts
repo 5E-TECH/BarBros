@@ -24,7 +24,7 @@ import { SubscriptionGuard } from 'src/common/guard/subscription.guard';
 
 @Controller('booking')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) { }
+  constructor(private readonly bookingService: BookingService) {}
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER)
   @Post()
@@ -43,12 +43,12 @@ export class BookingController {
     return this.bookingService.createOffline(createBookingDto, req);
   }
 
-  @ApiOperation({ summary: "cancellation" })
+  @ApiOperation({ summary: 'cancellation' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.USER, UserRole.BARBER, UserRole.ADMIN, UserRole.SUPPER_ADMIN)
   @Delete(':id')
   cancel(@Param('id') id: number, @Req() req: Request) {
-    return this.bookingService.cancel(id, req)
+    return this.bookingService.cancel(id, req);
   }
 
   @ApiOperation({ summary: 'Booking status update' })
@@ -76,16 +76,20 @@ export class BookingController {
     return this.bookingService.findAllBarber(req);
   }
 
-  @ApiOperation({ summary: "Abmin va supper_admin uchun" })
+  @ApiOperation({ summary: 'Abmin va supper_admin uchun' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
-  @Get("All")
+  @Get('All')
   @ApiQuery({ name: 'search', required: false })
-  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'confirmed', 'completed', 'cancelled'] })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+  })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
   findAll_Admin(@Query() query: Record<string, any>) {
-    return this.bookingService.findAll_Abdin(query)
+    return this.bookingService.findAll_Abdin(query);
   }
 
   @ApiOperation({ summary: 'Userlar uchun' })
@@ -103,28 +107,32 @@ export class BookingController {
     type: String,
     required: true,
     example: '123abc456def',
-    description: 'ID of the barber'
+    description: 'ID of the barber',
   })
   @ApiQuery({
     name: 'date',
     type: String,
     required: true,
     example: '2025-07-10',
-    description: 'Date in YYYY-MM-DD format'
+    description: 'Date in YYYY-MM-DD format',
   })
   @ApiQuery({
     name: 'serviceId',
     type: String,
     required: true,
     example: 'svc789xyz',
-    description: 'ID of the service to be checked for availability'
+    description: 'ID of the service to be checked for availability',
   })
   async getAvailability(
     @Query('barberId') barberId: number,
     @Query('date') date: string,
-    @Query("serviceId") serviceId: number
+    @Query('serviceId') serviceId: number,
   ) {
-    return await this.bookingService.getBarberAvailability(barberId, date, serviceId);
+    return await this.bookingService.getBarberAvailability(
+      barberId,
+      date,
+      serviceId,
+    );
   }
 
   @Get('availability-range')
@@ -201,5 +209,13 @@ export class BookingController {
   @Get('admin/:id')
   findOneAdmin(@Param('id') id: number) {
     return this.bookingService.findOneAdmin(id);
+  }
+
+  @ApiOperation({ summary: 'Admin/Superadmin uchun bitta userga tegishli booking' })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
+  @Get('user-bookings/:userId')
+  async getUserBookings(@Param('userId') userId: number) {
+    return this.bookingService.findByUserId(userId);
   }
 }
