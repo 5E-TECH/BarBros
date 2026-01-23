@@ -31,7 +31,7 @@ export class UserService implements OnModuleInit {
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwtService: JwtService,
     private readonly bcrypt: BcryptEncryption,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     const full_name = process.env.SUPPER_ADMIN_FULL_NAME;
@@ -239,7 +239,7 @@ export class UserService implements OnModuleInit {
       if (!user) {
         user = this.userRepo.create({
           phone_number,
-          otp:code,
+          otp: code,
           role: UserRole.USER,
         });
 
@@ -333,51 +333,90 @@ export class UserService implements OnModuleInit {
         limit = 10,
       } = query;
 
-      const skip = (Number(page) - 1) * Number(limit);
+      const take = Number(limit);
+      const skip = (Number(page) - 1) * take;
       const role = UserRole.USER;
-      const userRepo = await this.userRepo.find();
-      if (!userRepo.length) {
-        throw new NotFoundException('Not faund data');
-      }
-      const searchWhere = search
-        ? [
-            { full_name: ILike(`%${search}%`), role },
-            { phone_number: ILike(`%${search}%`), role },
-          ]
-        : { role };
 
-      const [data, total] = await this.userRepo.findAndCount({
-        where: searchWhere,
-        relations: ['booking', 'notifikation', 'reyting'],
-        select: [
-          'full_name',
-          'phone_number',
-          'role',
-          'id',
-          'created_at',
-          'created_by',
-          'modified_at',
-          'is_deleted',
-          'modified_by',
-        ],
-        order: {
-          [sortBy]: order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
-        },
-        skip,
-        take: Number(limit),
-      });
+      const qb = this.userRepo
+        .createQueryBuilder('user')
+        .leftJoin('user.booking', 'booking')
+        .where('user.role = :role', { role });
+
+      /* 🔍 SEARCH */
+      if (search) {
+        qb.andWhere(
+          '(user.full_name ILIKE :search OR user.phone_number ILIKE :search)',
+          { search: `%${search}%` },
+        );
+      }
+
+      /* 📦 SELECT FIELDS */
+      qb.select([
+        'user.id',
+        'user.full_name',
+        'user.phone_number',
+        'user.role',
+        'user.created_at',
+        'user.created_by',
+        'user.modified_at',
+        'user.modified_by',
+        'user.is_deleted',
+      ]);
+
+      /* 🧮 COUNT ORDERS */
+      qb.addSelect('COUNT(booking.id)', 'ordersCount');
+
+      qb.groupBy('user.id');
+
+      /* 🔃 SORTING */
+      if (sortBy === 'ordersCount') {
+        qb.orderBy(
+          'ordersCount',
+          order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+        );
+      } else {
+        qb.orderBy(
+          `user.${sortBy}`,
+          order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+        );
+      }
+
+      /* 📄 PAGINATION */
+      qb.skip(skip).take(take);
+
+      /* 🚀 EXECUTE */
+      const [raw, total] = await Promise.all([
+        qb.getRawMany(),
+        qb.getCount(),
+      ]);
+
+      /* 🧼 FORMAT RESPONSE */
+      const data = raw.map((r) => ({
+        id: r.user_id,
+        full_name: r.user_full_name,
+        phone_number: r.user_phone_number,
+        role: r.user_role,
+        created_at: r.user_created_at,
+        created_by: r.user_created_by,
+        modified_at: r.user_modified_at,
+        modified_by: r.user_modified_by,
+        is_deleted: r.user_is_deleted,
+        ordersCount: Number(r.ordersCount),
+      }));
 
       return successRes({
         data,
         total,
         currentPage: Number(page),
-        pageSize: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)),
+        pageSize: take,
+        totalPages: Math.ceil(total / take),
       });
     } catch (error) {
       return ErrorHender(error);
     }
   }
+
+
   async My_accaunt(req: Request) {
     try {
       let user = req['user'];

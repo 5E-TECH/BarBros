@@ -34,7 +34,7 @@ import { RefreshAdminPasswordDto } from './dto/Refresh-Admin-Password.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN)
@@ -84,7 +84,7 @@ export class UserController {
     return this.userService.deleteAdmin(id);
   }
 
-    @ApiOperation({ summary: 'Supper admin va admin uchun' })
+  @ApiOperation({ summary: 'Supper admin va admin uchun' })
   @Post('refresh-password')
   refreshPassword(@Body() data: RefreshAdminPasswordDto) {
     return this.userService.refreshPasswordAdmin(data);
@@ -129,7 +129,7 @@ export class UserController {
 
   @ApiOperation({ summary: 'Supper admin uchum' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Roles(UserRole.SUPPER_ADMIN,UserRole.ADMIN)
+  @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Get('all')
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
@@ -137,7 +137,7 @@ export class UserController {
   @ApiQuery({
     name: 'sortBy',
     required: false,
-    enum: ['phone_number', 'full_name'],
+    enum: ['phone_number', 'full_name', 'ordersCount'],
   })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'] })
   findAll(@Query() query: Record<string, any>) {
