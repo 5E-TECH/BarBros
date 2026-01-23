@@ -211,23 +211,11 @@ export class BookingController {
     return this.bookingService.findOneAdmin(id);
   }
 
-  @ApiOperation({
-    summary: 'Admin/Superadmin uchun bitta userga tegishli booking',
-  })
+  @ApiOperation({ summary: 'Admin/Superadmin uchun bitta userga tegishli booking' })
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.SUPPER_ADMIN, UserRole.ADMIN)
   @Get('user-bookings/:userId')
-  async getBookingsByUserId(
-    @Param('userId') userId: number,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-    @Query('search') search?: string,
-  ) {
-    return this.bookingService.findByUserId(
-      userId,
-      Number(page),
-      Number(limit),
-      search,
-    );
+  async getUserBookings(@Param('userId') userId: number) {
+    return this.bookingService.findByUserId(userId);
   }
 }
