@@ -364,14 +364,14 @@ export class UserService implements OnModuleInit {
       ]);
 
       /* 🧮 COUNT ORDERS */
-      qb.addSelect('COUNT(booking.id)', 'ordersCount');
+      qb.addSelect('COUNT(booking.id)', 'orderscount');
 
       qb.groupBy('user.id');
 
       /* 🔃 SORTING */
       if (sortBy === 'ordersCount') {
         qb.orderBy(
-          'ordersCount',
+          'orderscount',
           order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
         );
       } else {
@@ -401,7 +401,7 @@ export class UserService implements OnModuleInit {
         modified_at: r.user_modified_at,
         modified_by: r.user_modified_by,
         is_deleted: r.user_is_deleted,
-        ordersCount: Number(r.ordersCount),
+        ordersCount: Number(r.orderscount),
       }));
 
       return successRes({
