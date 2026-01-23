@@ -57,7 +57,7 @@ export class BookingService {
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
     private readonly subscriptionService: SubscriptionService,
-  ) { }
+  ) {}
 
   async create(createBookingDto: CreateBookingDto, req: Request) {
     try {
@@ -103,7 +103,9 @@ export class BookingService {
       if (!shopService) {
         throw new BadRequestException('Service not offered by this shop');
       }
-      await this.subscriptionService.ensureActive(createBookingDto.barber_shop_id);
+      await this.subscriptionService.ensureActive(
+        createBookingDto.barber_shop_id,
+      );
       const durationMinutes =
         shopService.duration_minutes ?? service.duration_minutes;
 
@@ -145,7 +147,9 @@ export class BookingService {
     try {
       const user = req['user'];
       if (![UserRole.BARBER, UserRole.SP_ADMIN].includes(user.role)) {
-        throw new ForbiddenException('Only barber or barber shop can create offline bookings');
+        throw new ForbiddenException(
+          'Only barber or barber shop can create offline bookings',
+        );
       }
 
       if (user.role === UserRole.BARBER && dto.barber_id !== user.id) {
@@ -295,8 +299,7 @@ export class BookingService {
         user.role === UserRole.SUPPER_ADMIN ||
         user.role === UserRole.ADMIN ||
         (user.role === UserRole.BARBER && booking.barber_id === user.id) ||
-        (user.role === UserRole.SP_ADMIN &&
-          booking.barber_shop_id === user.id);
+        (user.role === UserRole.SP_ADMIN && booking.barber_shop_id === user.id);
 
       if (!allowed) {
         throw new ForbiddenException('Access denied');
@@ -374,7 +377,6 @@ export class BookingService {
     }
   }
 
-
   async findAllUser(req: Request) {
     try {
       const data = await this.Booking.find({
@@ -410,18 +412,18 @@ export class BookingService {
         const term = `%${search}%`;
         qb.andWhere(
           '(' +
-          'service.name ILIKE :term OR ' +
-          'barber.full_name ILIKE :term OR ' +
-          'barberShop.name ILIKE :term OR ' +
-          'user.phone_number ILIKE :term OR ' +
-          'user.full_name ILIKE :term OR ' +
-          'booking.date ILIKE :term OR ' +
-          'booking.time ILIKE :term OR ' +
-          'CAST(booking.id AS text) ILIKE :term OR ' +
-          'CAST(booking.status AS text) ILIKE :term OR ' +
-          'CAST(booking.order_type AS text) ILIKE :term OR ' +
-          'CAST(booking.payment_model AS text) ILIKE :term' +
-          ')',
+            'service.name ILIKE :term OR ' +
+            'barber.full_name ILIKE :term OR ' +
+            'barberShop.name ILIKE :term OR ' +
+            'user.phone_number ILIKE :term OR ' +
+            'user.full_name ILIKE :term OR ' +
+            'booking.date ILIKE :term OR ' +
+            'booking.time ILIKE :term OR ' +
+            'CAST(booking.id AS text) ILIKE :term OR ' +
+            'CAST(booking.status AS text) ILIKE :term OR ' +
+            'CAST(booking.order_type AS text) ILIKE :term OR ' +
+            'CAST(booking.payment_model AS text) ILIKE :term' +
+            ')',
           { term },
         );
       }
@@ -435,7 +437,7 @@ export class BookingService {
         .getManyAndCount();
 
       if (!data.length) {
-        throw new NotFoundException("Not fount data")
+        throw new NotFoundException('Not fount data');
       }
 
       return successRes({
@@ -444,9 +446,9 @@ export class BookingService {
         currentPage: Number(page),
         pageSize: Number(limit),
         totalPages: Math.ceil(total / Number(limit)),
-      })
+      });
     } catch (error) {
-      return ErrorHender(error)
+      return ErrorHender(error);
     }
   }
 
@@ -476,6 +478,26 @@ export class BookingService {
     }
   }
 
+  async findByUserId(userId: number) {
+    try {
+      const user = await this.userRepo.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const data = await this.Booking.find({
+        where: { user_id: userId },
+        relations: ['service', 'user', 'barber', 'barberShop'],
+        order: { created_at: 'DESC' },
+      });
+
+      return successRes(data);
+    } catch (error) {
+      return ErrorHender(error);
+    }
+  }
 
   async getBarberAvailability(
     barberId: number,
@@ -498,11 +520,11 @@ export class BookingService {
       }
       const shopService = barber.barberShop
         ? await this.barberShopServicesRepo.findOne({
-          where: {
-            barber_shop_id: barber.barberShop.id,
-            service_id: serviceId,
-          },
-        })
+            where: {
+              barber_shop_id: barber.barberShop.id,
+              service_id: serviceId,
+            },
+          })
         : null;
       const durationMinutes =
         shopService?.duration_minutes ?? selectedService.duration_minutes;
@@ -539,11 +561,11 @@ export class BookingService {
     }
     const shopService = barber.barberShop
       ? await this.barberShopServicesRepo.findOne({
-        where: {
-          barber_shop_id: barber.barberShop.id,
-          service_id: serviceId,
-        },
-      })
+          where: {
+            barber_shop_id: barber.barberShop.id,
+            service_id: serviceId,
+          },
+        })
       : null;
     const durationMinutes =
       shopService?.duration_minutes ?? selectedService.duration_minutes;
