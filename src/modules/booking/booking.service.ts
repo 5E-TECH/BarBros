@@ -478,22 +478,61 @@ export class BookingService {
     }
   }
 
-  async findByUserId(userId: number) {
+  async findByUserId(
+    userId: number,
+    page: number = 1,
+    limit: number = 10,
+    search?: string,
+  ) {
     try {
       const user = await this.userRepo.findOne({
         where: { id: userId },
       });
+
       if (!user) {
         throw new NotFoundException('User not found');
       }
 
-      const data = await this.Booking.find({
-        where: { user_id: userId },
-        relations: ['service', 'user', 'barber', 'barberShop'],
-        order: { created_at: 'DESC' },
-      });
+      // Pagination uchun offset hisoblash
+      const skip = (page - 1) * limit;
 
-      return successRes(data);
+      // Query builder yaratish
+      const queryBuilder = this.Booking.createQueryBuilder('booking')
+        .leftJoinAndSelect('booking.service', 'service')
+        .leftJoinAndSelect('booking.user', 'user')
+        .leftJoinAndSelect('booking.barber', 'barber')
+        .leftJoinAndSelect('booking.barberShop', 'barberShop')
+        .where('booking.user_id = :userId', { userId });
+
+      // Search qo'shish (agar kerak bo'lsa)
+      if (search) {
+        queryBuilder.andWhere(
+          '(service.name LIKE :search OR barber.name LIKE :search OR barberShop.name LIKE :search)',
+          { search: `%${search}%` },
+        );
+      }
+
+      // Umumiy soni va ma'lumotlarni olish
+      const [data, total] = await queryBuilder
+        .orderBy('booking.created_at', 'DESC')
+        .skip(skip)
+        .take(limit)
+        .getManyAndCount();
+
+      // Pagination meta ma'lumotlari
+      const totalPages = Math.ceil(total / limit);
+      const hasNextPage = page < totalPages;
+      const hasPrevPage = page > 1;
+
+      return successRes({
+        data: data,
+        total,
+        page,
+        limit,
+        totalPages,
+        hasNextPage,
+        hasPrevPage,
+      });
     } catch (error) {
       return ErrorHender(error);
     }
